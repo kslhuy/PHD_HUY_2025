@@ -30,6 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Gestion maths %%%%%%%%%% 
 \usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{bm} % for bold math symbols
 \usepackage{mathtools,empheq} % mathtools (enhanced amsmath) and empheq (boxed equations)
 \usepackage{mathrsfs}% pour rajouter un format de lettres façon calligraphie en math mode.
 \DeclareMathOperator{\sinc}{sinc}
@@ -45,6 +46,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%  Graphics / Table / List %%%%%%%%%%%
 \usepackage{graphicx,array,tikz,multirow}
+% \usepackage{tikz}
+\usetikzlibrary{circuits.ee.IEC}
+\usepackage[european resistor, european voltage, european current]{circuitikz}
+\usetikzlibrary{arrows, shapes, positioning}
+\usetikzlibrary{decorations.markings, decorations.pathmorphing,
+decorations.pathreplacing}
+\usetikzlibrary{calc,patterns,shapes.geometric}
+\usetikzlibrary{shapes.multipart, positioning, patterns, backgrounds}
+\tikzstyle{titlebox}=[rectangle,inner sep=10pt,inner ysep=10pt,draw]%
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{matrix, fit}
+\tikzset{global scale/.style={
+    scale=#1,
+    every node/.append style={scale=#1}
+  }
+}
+
+
 \usepackage{caption,subcaption} % permet de faire des subfigures (remplace le package subfig)
 \usepackage{svg,float}
 \usepackage{booktabs,paralist}
@@ -198,6 +217,37 @@
 \def\eqref#1{(\ref{#1})}
 \def\rank{\mathop{{\rm rank}}}
 
+% User definition from Shengya
+\def\V{\mathcal{V}} % the set of vehicle
+\def\E{\mathcal{E}} % the set of edge
+\def\G{\mathcal{G}} % graph
+\def\A{\mathcal{A}} % adjacency matrix 
+\def\W{\mathcal{W}} % weighted adjacency matrix
+\def\L{\mathcal{L}} % Laplacian matrix
+\def\N{\mathcal{N}} % neighbors
+\def\LO{\mathcal{LO}} % the set of observer
+\def\DO{\mathcal{DO}} % the set of observer
+\def\diag#1{\mathop{{\rm diag}\,\left(\,#1\,\right)}}
+\def\ST{\mathcal{ST}} % Self trust
+\def\LT{\mathcal{LT}} % Local trust
+\def\DT{\mathcal{DT}} % Distributed trust 
+\def\VT{\mathcal{VT}} % Vehicle trust 
+\def\AT{\mathcal{AT}} % Aggregation trust
+\def\T{\mathcal{T}} % Aggregation trust
+\def\O{\mathcal{O}} % opinion
+
+% User Defined Color based on RGB
+\definecolor{userblue}{RGB}{31,119,180}
+\definecolor{userorange}{RGB}{255,127,14}
+\definecolor{usergreen}{RGB}{44,160,44}
+\definecolor{userpurple}{RGB}{148,103,189}
+
+\definecolor{blue1}{RGB}{31,119,180}    % 车辆/物理层
+\definecolor{orange1}{RGB}{255,127,14}  % 本地观测器
+\definecolor{green1}{RGB}{44,160,44}    % 信息层/通信
+\definecolor{purple1}{RGB}{148,103,189} % 分布式观测器
+\definecolor{rose1}{RGB}{227, 119, 194}
+
 \newcommand{\widebox}[2][0.5em]{\fbox{\hspace{#1}$\displaystyle #2$\hspace{#1}}}
 
 
@@ -214,4 +264,20 @@
 \newtheorem{example}{\it \textbf{Example}}%[section]b
 \newtheorem{annex}{\it Annex}%[section]b
 \newtheorem{prop}{\it \textbf{Proposition}}%[section]b
+\newtheorem{proposition}{\it \textbf{Proposition}}%[section]b
+
+% Package for dashed rules
+\usepackage{dashrule}
+% Create alias for compatibility
+% \newcommand{\dashedhrule}[2]{\hdashrule{#1}{#2}}
+
+\newcommand{\dashedhrule}[3][\linewidth]{%
+  \par\noindent\hdashrule[0pt]{#1}{#2}{#3}\par
+}
+
+% Custom commands for subscripts used in the document
+\newcommand{\refx}{\text{ref}}
+\newcommand{\uio}{\text{uio}}
+\newcommand{\nn}{\text{nn}}
+\newcommand{\Lo}{L}
 

@@ -3,26 +3,43 @@
 \contentsline {chapter}{Résumé}{ii}{chapter*.2}%
 \contentsline {chapter}{Abstract}{iii}{chapter*.3}%
 \contentsline {chapter}{Table des matières}{iii}{section*.4}%
-\contentsline {chapter}{Liste des figures}{v}{chapter*.7}%
-\contentsline {chapter}{Liste des tableaux}{vi}{chapter*.9}%
-\contentsline {chapter}{\numberline {1}Resilient State Estimation and Cyber-Attack Reconstruction}{1}{chapter.1}%
-\contentsline {section}{\numberline {1}Introduction and Problem Statement}{2}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1}Context}{2}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.2}The Cyber-Security Challenge}{2}{subsection.1.1.2}%
-\contentsline {section}{\numberline {2}Design of Resilient Observers}{2}{section.1.2}%
-\contentsline {subsection}{\numberline {2.1}CACC modeling subject to cyberattack}{2}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {2.2}Problem formulation and objectives}{5}{subsection.1.2.2}%
-\contentsline {section}{\numberline {3}Discrete-Time Model-Based UIO design for CACC system}{6}{section.1.3}%
-\contentsline {subsection}{\numberline {3.1}UIO structure for the shifted system}{6}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {3.2}LMI-Baed ISS design method}{7}{subsection.1.3.2}%
-\contentsline {subsection}{\numberline {3.3}Defense strategy}{8}{subsection.1.3.3}%
-\contentsline {section}{\numberline {4}Simulation results by Using Matlab and Carla Platform}{9}{section.1.4}%
-\contentsline {subsection}{\numberline {4.1}Simulation result using Matlab}{10}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {4.2}Simulation result using Carla}{12}{subsection.1.4.2}%
-\contentsline {section}{\numberline {5}Conclusion}{13}{section.1.5}%
-\contentsline {section}{\numberline {6}Exact discretization}{13}{section.1.6}%
-\contentsline {chapter}{Conclusion et perspectives}{15}{chapter*.22}%
-\contentsline {section}{\numberline {1}Conclusions de l'étude}{15}{section.2.1}%
-\contentsline {section}{\numberline {2}Ouverture et perspectives}{15}{section.2.2}%
-\contentsline {chapter}{Liste des publications}{16}{chapter*.24}%
-\contentsline {chapter}{Bibliographie}{17}{chapter*.28}%
+\contentsline {chapter}{Liste des figures}{vi}{chapter*.7}%
+\contentsline {chapter}{Liste des tableaux}{vii}{chapter*.9}%
+\contentsline {chapter}{\numberline {1}Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons}{1}{chapter.1}%
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1}General introduction}{2}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.2}Graph theory}{3}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.3}Vehicle mathematical model}{3}{subsection.1.1.3}%
+\contentsline {section}{\numberline {2}Distributed State Observer Architecture}{4}{section.1.2}%
+\contentsline {subsection}{\numberline {2.1}General structure of the observer}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {2.2}On the structure of the observer~(\ref {eq_observer})}{5}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {2.3}Introduction of a virtual communication graph}{5}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {2.4}Main objectives}{6}{subsection.1.2.4}%
+\contentsline {section}{\numberline {3}Trust Score Framework}{6}{section.1.3}%
+\contentsline {subsection}{\numberline {3.1}Data validity indicator}{7}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {3.2}Local trust}{7}{subsection.1.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Velocity consistency:}{7}{subsubsection.1.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Distance consistency:}{8}{subsubsection.1.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}Acceleration consistency:}{8}{subsubsection.1.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}Fusion and update rule:}{8}{subsubsection.1.3.2.4}%
+\contentsline {subsection}{\numberline {3.3}Distributed trust}{9}{subsection.1.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Consistency with host's global estimate:}{9}{subsubsection.1.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Consistency with host's local measurement:}{10}{subsubsection.1.3.3.2}%
+\contentsline {subsection}{\numberline {3.4}Target trust and temporal evolution}{10}{subsection.1.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Discretization into trust quality:}{11}{subsubsection.1.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Accumulated trust history:}{11}{subsubsection.1.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Normalized trust distribution:}{11}{subsubsection.1.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}Expected trust level:}{11}{subsubsection.1.3.4.4}%
+\contentsline {subsection}{\numberline {3.5}Generalized trust vector}{12}{subsection.1.3.5}%
+\contentsline {section}{\numberline {4}Weight Design for observer based on the trust}{13}{section.1.4}%
+\contentsline {subsection}{\numberline {4.1}Weight based on the trust}{13}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {4.2}Stability of the error}{14}{subsection.1.4.2}%
+\contentsline {section}{\numberline {5}Simulation Results}{15}{section.1.5}%
+\contentsline {subsection}{\numberline {5.1}Simulation setup}{15}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {5.2}Attack scenarios}{16}{subsection.1.5.2}%
+\contentsline {subsection}{\numberline {5.3}Results}{16}{subsection.1.5.3}%
+\contentsline {section}{\numberline {6}Conclusion and Future Work}{18}{section.1.6}%
+\contentsline {chapter}{Conclusion et perspectives}{19}{chapter*.16}%
+\contentsline {section}{\numberline {1}Conclusions de l'étude}{19}{section.2.1}%
+\contentsline {section}{\numberline {2}Ouverture et perspectives}{19}{section.2.2}%
+\contentsline {chapter}{Liste des publications}{20}{chapter*.18}%

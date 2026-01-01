@@ -6,24 +6,788 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Formulation and Motivation}\label{sec2}
+%
+In this paper, we consider the class of continuous-time nonlinear systems in state-space form described by the following equations:
 
-\subsection{Paragraphe avec une figure}
+\begin{equation}\label{sys_1}
+    \begin{array}{l}
+        \dot{x} = \varphi(x,u) + B\mu_{x}  \\
+        y = Cx, 
+    \end{array}
+\end{equation}
+where $x\in \mathcal{X} \subseteq\mathbb{R}^{n_x}$ is the state vector, $y\in\mathbb{R}^{n_y}$ is the output measurement, $u\in\mathcal{U} \subseteq\mathbb{R}^{n_u}$ is the control input, and $\mu_{x}\in\mathbb{R}^{n_{\mu}}$ is an unknown nonlinear function that encapsulates the system uncertainty including both unmodeled dynamics and external disturbances. The matrices $C\in\mathbb{R}^{n_y}\times\mathbb{R}^{n_x}$ and $B\in\mathbb{R}^{n_x}\times\mathbb{R}^{n_{\mu}}$ are constant and known matrices. The function $\varphi: \mathcal{X} \times \mathcal{U} \to \mathbb{R}^{n_x}$ represents the known nonlinear component of the system. 
 
-\lipsum[50]
-\begin{figure}[H]\centering
-\includegraphics[width=.5\linewidth]{ch2/fig/Saturation_voxel_size.png}
-\caption{Une description avec la légende associée et sa référence.}
-\label{fig2_example}
+\begin{remark}
+For simplicity, we consider systems with linear output. Otherwise, if we have nonlinear output $y = h(x)$, we introduce a new state $\eta(t)$, with $\dot{\eta} \triangleq A_{\eta} \eta + \gamma y$ and $\eta_0 = \eta(0)$ known. Then, a new system with the augmented vector $\zeta = \begin{bmatrix} \eta \\ x \end{bmatrix}$ may be considered, which has as linear output the vector $\eta$.
+\end{remark}
+
+
+Now, let us introduce the following assumptions which are required for our unknown input observer design methods.
+\begin{assumption}\label{ali_hyp1}
+%Assumption 1. 
+The output vector $y$ has dimension greater than or equal to the number of unknown terms~$\mu_{x}$; equivalently, $n_{\mu} \leq n_y$.
+\end{assumption}
+
+\begin{assumption}\label{ali_hyp2}
+%Assumption 2. 
+The nonlinear function $\varphi(.)$ is $\gamma_{\varphi}-$Lipschitz continuous on $\mathcal{X}$, uniformly on $u\in\mathcal{U}$.
+\end{assumption}
+
+\begin{assumption}\label{ali_hyp3}
+The unknown nonlinearity $\mu_{x}(.)$ is Lebesgue measurable and $\mathcal{L}_{2}-$bounded.
+\end{assumption}
+
+The objective of this paper is to estimate the unmodeled dynamics $\mu_{x}$. More specifically, we propose to estimate $\mu_{x}$ by combining an unknown input observer~(UIO) with a neural network--based approach, leveraging gradient-based methods to better capture the unmodeled components of the system. The key idea is to incorporate the UIO-based estimation into the loss function of the neural network, thereby enhancing residual regularization and ensuring consistency with the UIO. This, in turn, improves the robustness and performance of the overall estimation scheme. Unfortunately, it is not possible to estimate the unknown input, $\mu_x$, if the system fails to satisfy the following main necessary condition:
+\begin{equation}\label{rank}
+\textrm{rank}(C B) = \textrm{rank}(B).
+\end{equation}
+%
+In addition, to be able to directly construct a UIO for system~\eqref{sys_1} to estimate simultaneously $x$ and $\mu_x$, the constraint~\eqref{rank} is not sufficient. For this, we should be able to write the system under the form:
+\begin{equation}\label{sys_2}
+    \begin{array}{l}
+        \mathbb{E} \dot{\zeta} = \varphi_{\zeta}(\zeta,u)  \\
+        y = \mathcal{H} \zeta
+    \end{array}
+\end{equation}
+with
+\begin{equation}\label{rank2}
+\textrm{rank}\left( \begin{bmatrix} \mathbb{E} \\  \mathcal{H} \end{bmatrix} \right) = n_{x} + n_{\mu}.
+\end{equation}
+%--
+For further details on this requirement, the reader is referred to~\cite{chaouche2022unknown,trinh2011functional,Zemouche-Boutayeb-2009,Hassan13a,Trinh:TAC08} and the references therein. 
+
+% % %%% Simple details of problem
+
+% Various techniques address the rank condition issue. Some invert system dynamics [13]–[15] or rely on output derivatives [13], [16], which amplifies noise. Others augment the system with additional sensors [13], which increases cost. Proportional-Integral Observers (PIO) often assume null dynamics [17], [18] or constant inputs [19], which is overly conservative for vehicle dynamics. 
+% % %%% Simple details of problem
+
+
+%%% TOO much details of the literature
+To address this challenge, various techniques have been proposed in the literature, each offering a different approach to the problem. Without aiming for exhaustiveness, these techniques can be summarized as follows. Nevertheless, the problem remains open, and new ideas or improvements are still possible, although often at the cost of additional assumptions:
+%==
+\begin{itemize}
+\item {\it Inverting the system dynamics:} The system state is first estimated, and the unknown inputs are then obtained by inverting the dynamics~\cite{Phanomchoeng:ASME/TM14,Benallouch:TCST17,Marquez:Auto14}. However, the presence of disturbances and nonlinearities in the output signal or in the dynamics can make the problem particularly challenging.
+%
+
+
+
+\item {\it Deriving the output vector $y(t)$:} In some cases, the derivatives of the output measurements are required~\cite{Hou:256351,Phanomchoeng:ASME/TM14}. This leads to the construction of a pseudo-output vector $y_{\rm new}$, which enables the simultaneous estimation of $x$ and $\mu_{x}$. For instance, in the linear case without disturbances, one obtains 
+$$
+y_{\rm new} = C_{\rm new} x + C_{\mu}\mu_{x},
+$$
+where $\mathrm{rank}(C_{\mu}) = n_{\mu}$. However, this approach is not suitable for nonlinear disturbed systems, since differentiating $y(t)$ introduces additional variables arising from the derivatives of the disturbance vector, as well as new nonlinearities in the pseudo-output vector. Consequently, satisfying the rank condition~\eqref{rank} with the new matrices becomes very difficult.
+
+%
+\item {\it Adding sensors:} In some cases, augmenting the system with additional sensors is a natural way to overcome the rank condition~\eqref{rank}. This approach introduces a new measurement vector $y_{\rm new}$, where the original output $y(t)$ is used to estimate the state $x(t)$, and the additional outputs $y_{\rm new}$ are exploited to estimate the unknown input, $\mu_{x}$. For example, in~\cite{Phanomchoeng:ASME/TM14} (and references therein), four sensors (i.e., four output measurements) were employed to estimate only two unknown inputs. However, the presence of disturbances can significantly decrease estimation performance. Moreover, additional sensors may be very expensive or, in some cases, unavailable.
+%
+\item {\it Proportional--Integral Observer and Null Dynamics:} Some works in the literature have employed a Proportional--Integral Observer (PIO) together with null dynamics imposed on the estimated unknown input~\cite{PIO_1995,PIOreview}. However, this assumption does not reflect the true dynamics of the unknown input, leading to inaccurate estimation. Other approaches assume constant inputs~\cite{jeon2020simultaneous}, i.e., $\dot{\mu}_{x} \equiv 0$, but this restriction is overly conservative. Recently, a method for discrete-time systems was proposed in~\cite{nguyen2024cyberattack}; however, this approach yields delayed estimates of both the system state and the unknown inputs, which is often impractical to design reliable controllers.
+\end{itemize}
+%%%%
+
+The limitations of the aforementioned methods motivated us to adopt a different approach and propose a simple strategy to estimate the system state and the unknown input without relying on conservative assumptions. The key idea is to recognize that this initial estimation is not final. Rather, the objective is to provide a first-level approximation of $x$ and $\mu_{x}$, which will subsequently be refined through the neuro-adaptive observer we introduce later. This refinement enhances estimation accuracy and ultimately yields a definitive estimate of the unmodeled nonlinearity, $\mu_{x}$.
+
+
+The strategy consists in rewriting system~\eqref{sys_1} without modifying it. Then, the UIO we will propose will be based on reliable approximation of~\eqref{sys_1}.
+
+\begin{equation}\label{ali_syst1}
+    \begin{array}{l}
+        \dot{x} + E_{\delta_1} \dot{\mu}_{x} = \varphi(x,u) + B\mu_{x} + E \omega_{\delta_{1}} \\
+        y = Cx + D_{\delta_2} \mu_{x} + D\, \omega_{\delta_{2}} 
+    \end{array}
+\end{equation}
+where $D \in \mathbb{R}^{n_y \times n_{\mu}}$ and $E \in \mathbb{R}^{n_x \times n_{\mu}}$ are given constant, full-column-rank matrix specified by the user; $E_{\delta_1} = \delta_{1} E, D_{\delta_2} = \delta_{2} D$; and $\omega_{\delta_{1}}(t) = \delta_{1} \dot{\mu}_{x}(t), \omega_{\delta_{2}}(t) = \delta_{2} \mu_{x}(t)$, with $\delta_{j} \geq 0$, with $(\delta_1,\delta_2) \neq (0,0)$, chosen sufficiently small to ensure the feasibility of some sufficient conditions that will be stated later. The purpose of this reformulation is to recover the rank condition~\eqref{rank2}, at the expense of introducing the additive terms $\omega_{\delta_{j}}(t), j=1,2$, which are handled as disturbances. 
+
+The next section presents LMI conditions that guarantee accurate estimation of $x$ and $\mu_{x}$ while satisfying an $\mathcal{H}_{\infty}$ criterion, or more specifically, an $\mathcal{L}_{2}$-optimality criterion---where the performance bound is proportional to $\delta_{j}, j=1,2$.
+
+
+
+
+
+
+
+
+\section{LMI-Based $\mathcal{H}^{1}$ UIO Design}\label{uio}
+%==  $\mathcal{W}^{1,2}$
+This section is devoted to the numerical LMI-based design procedure ensuring the asymptotic estimation of the system state $x$ and the unmodeled dynamics $\mu_{x}$ following a $\mathcal{H}^{1}-$optimality criterion.
+
+%===========
+\subsection{System transformation}
+%-----
+Recall that $\mathcal{H}^{1}$ is the {\it Hilbert} space corresponding to the {\it Sobolev} space, $\mathcal{W}^{1,2}$, of square--integrable functions whose weak first derivatives are also square--integrable. Mathematically, we define the set $\mathcal{H}^{1}\left( \Omega \right)$ as
+$$
+\mathcal{H}^{1}\left( \Omega \right) := \left\{ \psi \in \mathcal{L}^{2}(\Omega) \;\middle|\; \frac{\textrm{d} \psi}{\textrm{d} t} \in \mathcal{L}^{2}(\Omega) \right\}
+$$
+with $\Omega = [0~+\infty[$ in our case. This space is endowed by the norm $\| . \|_{\mathcal{H}^{1}}$ defined as follows:
+$$
+\| \psi \|_{\mathcal{H}^{1}} :=
+\left( \| \psi \|_{\mathcal{L}^{2}}^2 + \left\| \frac{\textrm{d} \psi}{\textrm{d} t} \right\|_{\mathcal{L}^{2}}^2 \right)^{1/2}.
+$$
+
+First, system~\eqref{ali_syst1} can be rewritten under the compact form:
+\begin{equation}\label{ali_syst2}
+    \begin{array}{l}
+        \mathbb{E} \dot{\zeta} = \varphi_{\zeta}(\zeta,u) + \bar{E} \bm{\omega}_{\delta} \\
+        y = \mathcal{H} \zeta + \bar{D} \bm{\omega}_{\delta}
+    \end{array}
+\end{equation}
+where
+\begin{subequations}\label{ali_syst2_e1}
+\begin{equation}\label{ali_syst2_e1_1}
+\mathbb{E} := \begin{bmatrix} \mathbb{I}_{n_x} & E_{\delta_1} \end{bmatrix},~\mathcal{H} := \begin{bmatrix} C & D_{\delta_2} \end{bmatrix},
+\end{equation}
+%
+\begin{equation}\label{ali_syst2_e1_2}
+\bar{E} := \begin{bmatrix} E & 0_{n_{x}\times n_{\mu}} \end{bmatrix},~\bar{D} := \begin{bmatrix} 0_{n_{y}\times n_{\mu}} & D \end{bmatrix},
+\end{equation}
+%
+\begin{align}\label{ali_syst2_e1_3}
+\zeta := \begin{bmatrix} x \\ \mu_{x} \end{bmatrix},~\bm{\omega}_{\delta} := \begin{bmatrix} \omega_{\delta_{1}} \\ \omega_{\delta_{2}} \end{bmatrix},
+\end{align}
+%
+%\vspace{-0.7cm}
+\begin{align}\label{ali_syst2_e1_4}
+\varphi_{\zeta}(\zeta,u) := \varphi(x,u) + B \mu_{x}.
+\end{align}
+\end{subequations}
+%==
+%
+Now, let us introduce the following necessary assumption:
+\begin{assumption}\label{ali_hyp4}
+The matrices $E$ and $D$ are chosen such that $\mathbb{E}$ and $\mathcal{H}$ satisfy the rank condition~\eqref{rank2}.
+\end{assumption}
+
+The objective is to design a state observer that provides an estimate $\hat{\zeta}$ of $\zeta$, such that the following $\mathcal{H}^1$-optimality inequality holds:
+%
+\begin{align}%\label{ali_h1_e1}
+\| \tilde{\zeta} \|_{\mathcal{H}^{1}} &\leq \lambda_{\delta} \, \left\| \mu_{x} \right\|_{\mathcal{H}^{1}}  + \beta \, \left\| \xi_0 \right\| \label{ali_h1_e1_2}
+\end{align}
+where $\tilde{\zeta} := \zeta - \hat{\zeta}$, $\lambda_{\delta}$ is the disturbance attenuation level, explicitly depending on $\delta_1$ and $\delta_2$, $\beta > 0$ is a weighting real constant, and $\xi_0$ is a vector depending on $\tilde{\zeta}(0)$ and $\mu_{x}(0)$.%$\mathcal{N}\left(\tilde{\zeta}(0), \mu_{x}(0)\right)$. $\xi_0 := \tilde{\zeta}(0) - D \mu_{x}(0)$
+%--
+%===========
+\subsection{UIO structure and error dynamics}
+%-----
+From Assumption~\ref{ali_hyp4},  there exist two matrices $P_{\zeta}$ and $Q_{\zeta}$ such that
+\begin{equation}\label{ali_syst2_e2}
+ P_{\zeta} \mathbb{E} + Q_{\zeta} \mathcal{H} = \mathbb{I}_{n_{\zeta}}.
+\end{equation}
+where $n_{\zeta} := n_{x} + n_{\mu}$. These matrices are exploited in the following observer structure:
+\begin{equation}\label{ali_syst2_e3}
+\left\{
+\begin{array}{rcl}
+\dot{\eta} & = & P_{\zeta} \varphi_{\zeta}(\hat{\zeta},u) + K \left( y - \mathcal{H} \hat{\zeta} \right)
+\\
+\hat{\zeta} & = & \eta + Q_{\zeta} y 
+\end{array}
+\right.
+\end{equation}
+where $\hat{\zeta}$ is the estimate of $\zeta$ and $K \in\mathbb{R}^{n_{\zeta}}\times\mathbb{R}^{n_y}$ is the observer gain to be determined such that the estimation error, $\tilde{\zeta} : = \zeta - \hat{\zeta}$, satisfies the $\mathcal{H}^1$-optimality criterion~\eqref{ali_h1_e1_2} with appropriate $\lambda_{\delta}, \beta$, and $\xi_0$.
+%
+
+We have 
+
+\begin{align}\label{ali_syst2_e4}
+\tilde{\zeta} &= \zeta - \eta - Q_{\zeta} y \notag \\
+&= \left(\mathbb{I}_{n_{\zeta}} - Q_{\zeta} \mathcal{H}\right) \zeta - \eta - Q_{\zeta} \bar{D} \bm{\omega}_{\delta} \notag \\
+&\overbrace{ \mathrel{\scalebox{2}[1]{=}} }^{\eqref{ali_syst2_e2}} P_{\zeta} \mathbb{E} \zeta - \eta - Q_{\zeta} \bar{D} \bm{\omega}_{\delta}
+\end{align}
+which gives equivalently
+\begin{equation}\label{ali_syst2_e5}
+\overbrace{ \tilde{\zeta} + Q_{\zeta} \bar{D} \bm{\omega}_{\delta} }^{\xi(t)} = P_{\zeta} \mathbb{E} \zeta(t) - \eta(t).
+\end{equation}
+It is worth noting that the reformulation~\eqref{ali_syst2_e5} conveniently avoids the derivative of $\bm{\omega}_{\delta}$ in the derivation of the error dynamics.
+
+By using the dynamics~\eqref{ali_syst2} and~\eqref{ali_syst2_e3}, we obtain
+\begin{align}\label{ali_syst2_e6}
+\dot{\xi} &= P_{\zeta} \left[ \varphi_{\zeta}(\zeta,u) - \varphi_{\zeta}(\hat{\zeta},u) \right] -K \mathcal{H} \tilde{\zeta} \notag \\
+&\quad + \left(P_{\zeta} \bar{E} - K \bar{D} \right) \bm{\omega}_{\delta} \notag \\
+&= \left(P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) \xi \notag \\
+&\quad+ \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D} \Big) \bm{\omega}_{\delta}
+\end{align}
+where
+$$
+\mathcal{E}\left( \bm{z},u\right) := \bar{E} - P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) Q_{\zeta} \bar{D}
+$$
+%==
+$$
+\mathcal{D} := \left( \mathbb{I}_{n_y} + \mathcal{H} Q_{\zeta} \right) \bar{D}.
+$$
+and from the differential mean value theorem~\cite{Hasni_LCSS_24}, we have
+$$
+\varphi_{\zeta}\left(\zeta,u \right) - \varphi_{\zeta}\left(\hat{\zeta},u \right) = \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) \tilde{\zeta}
+$$
+for a given $\bm{z}$.
+
+From this point onward, the analysis will be carried out with the vector~$\xi$ instead of~$\tilde{\zeta}$, and we will return to~$\tilde{\zeta}$ at the end to derive the final $\mathcal{H}^{1}$ bound~\eqref{ali_h1_e1_2}.
+%===========
+\subsection{New LMI-based UIO design conditions}
+%-----
+Before presenting the proposed LMI-based UIO design procedure, we state an intermediate and general result in the following proposition.
+%-
+\begin{proposition}\label{ali_prop1}
+Le $\vartheta(.)$ be a Lyapunov function such that there exists $\vartheta_{\max} >0$ such that $\vartheta(z) \leq \vartheta_{\max}\| z \|^{2}$, for all $z \in \mathbb{R}^{n_\zeta}$. Consider a matrix $\mathcal{S} = \mathcal{S}^{\top} > 0$ and a real constant $\lambda >0$ such that the following inequality holds:
+\begin{multline}\label{ali_prop1_e1}
+\dot{\vartheta}(z) + \| z \|^{2} + \dot{z}^{\top} \mathcal{S} \dot{z} - \lambda \| w \|^{2} \leq 0,\\ 
+\forall z \in \mathbb{R}^{n_\zeta}, w \in \mathbb{R}^{2n_{\mu}}
+\end{multline}
+%
+with $z \in \mathcal{H}^{1}$ and $w \in \mathcal{L}^{2}$. Then, the following inequality is satisfied:
+\begin{multline}\label{ali_prop1_e2}
+\| z \|_{\mathcal{H}^{1}} \leq \sqrt{\frac{\lambda}{\min\left(1,\lambda_{\min}(\mathcal{S})\right)}} \| w \|_{\mathcal{L}^{2}}  \\
++\sqrt{\frac{\vartheta_{\max}}{\min\left(1,\lambda_{\min}(\mathcal{S})\right)}} \| z_0 \|.
+\end{multline}
+Moreover, if~\eqref{ali_prop1_e1} is satisfied with $z := \xi$ and $w := \bm{\omega}_{\delta}$, where $\xi$ and $\bm{\omega}_{\delta}$ are defined by~\eqref{ali_syst2_e5} and~\eqref{ali_syst2_e1_3}, respectively, then the estimation error, $\tilde{\zeta}$, satisfies the $\mathcal{H}^{1}$ bound~\eqref{ali_h1_e1_2} with $\lambda_{\delta}$, $\beta$, and $\xi_0$ given as follows:
+\begin{subequations}
+\begin{multline}\label{ali_prop1_e3}
+\lambda_{\delta} := \delta_{2} \sigma_{\max}\left(Q_{\zeta} D\right) \\
++ \max\left(\delta_{1}, \delta_{2} \right) \sqrt{\frac{\lambda}{\min\left(1,\lambda_{\min}(\mathcal{S})\right)}}
+\end{multline}
+%--
+\begin{equation}\label{ali_prop1_e4}
+\beta := \sqrt{\frac{\vartheta_{\max}}{\min\left(1,\lambda_{\min}(\mathcal{S})\right)}}
+\end{equation}
+%--
+\begin{equation}\label{ali_prop1_e5}
+\xi_0 := \tilde{\zeta}(0) + Q_{\zeta} D \mu_{x}(0).
+\end{equation}
+\end{subequations}
+where $\sigma_{\max}\left(Q_{\zeta} D\right)$ represents the largest singular value of the matrix $Q_{\zeta} D$.
+\end{proposition}
+%==
+\begin{proof}
+The first part of the proof is relatively straightforward. Before integrating~\eqref{ali_prop1_e1} to get the norms $\| . \|_{\mathcal{H}^{1}}$ and $\| . \|_{\mathcal{L}^{2}}$, take in mind that
+$$
+\min\left(1,\lambda_{\min}(\mathcal{S})\right) \left(  \| z \|^{2} +  \| \dot{z} \|^{2}  \right) \leq \| z \|^{2} + \dot{z}^{\top} \mathcal{S} \dot{z}.
+$$
+%
+Hence, since 
+$$
+\int_{0}^{+\infty} \!\left( \| z(s) \|^{2} + \| \dot{z}(s) \|^{2} \right) \, {\rm d}s \;=\; \| z \|^{2}_{\mathcal{H}^{1}},
+$$
+$$
+\int_{0}^{+\infty} \! \| w(s) \|^{2} \, {\rm d}s \;=\; \| w \|^{2}_{\mathcal{L}^{2}},
+$$
+and because $\vartheta(z(t)) \geq 0$ for all $t \geq 0$, implying that 
+$$
+\int_{0}^{+\infty} \vartheta(z(s)) \, {\rm d}s \;\geq\; - \vartheta(z(0)),
+$$
+we can readily conclude~\eqref{ali_prop1_e2}.\\
+As for the second part of the proof, we will exploit the structure of $\xi$ and $\bm{\omega}_{\delta}$. First, $\xi$ and $\bm{\omega}_{\delta}$ satisfy~\eqref{ali_prop1_e2} proved in the first part. In addition, we have
+%
+\begin{align}\label{ali_prop1_e6}
+\| \tilde{\zeta} \|_{\mathcal{H}^{1}} &= \left\| \xi - Q_{\zeta} \bar{D} \bm{\omega}_{\delta} \right\|_{\mathcal{H}^{1}} \notag \\
+&\leq \left\| \xi \right\|_{\mathcal{H}^{1}} + \left\| Q_{\zeta} \bar{D} \bm{\omega}_{\delta} \right\|_{\mathcal{H}^{1}} \notag \\
+&\quad= \left\| \xi \right\|_{\mathcal{H}^{1}} + \left\| \begin{bmatrix}0 & Q_{\zeta} D \end{bmatrix} \bm{\omega}_{\delta} \right\|_{\mathcal{H}^{1}} \notag \\
+&\quad= \left\| \xi \right\|_{\mathcal{H}^{1}} + \delta_{2} \left\| Q_{\zeta} D \mu_{x} \right\|_{\mathcal{H}^{1}} \notag \\
+&\leq \left\| \xi \right\|_{\mathcal{H}^{1}} + \delta_{2} \sigma_{\max}\left(Q_{\zeta}D\right) \left\| \mu_{x} \right\|_{\mathcal{H}^{1}}
+\end{align}
+and
+%
+\begin{align}\label{ali_prop1_e7}
+\| \bm{\omega}_{\delta} \|_{\mathcal{L}^{2}} &= \sqrt{ \delta^{2}_{1}  \left\| \dot{\mu}_{x} \right\|^{2}_{\mathcal{L}^{2}} + \delta^{2}_{2}  \left\| \mu_{x} \right\|^{2}_{\mathcal{L}^{2}} } \notag \\
+&\leq \max\left(\delta_{1}, \delta_{2} \right)  \sqrt{ \left\| \dot{\mu}_{x} \right\|^{2}_{\mathcal{L}^{2}} + \left\| \mu_{x} \right\|^{2}_{\mathcal{L}^{2}} } \notag \\
+&\quad= \max\left(\delta_{1}, \delta_{2} \right) \left\| \mu_{x} \right\|_{\mathcal{H}^{1}}.
+\end{align}
+Hence, by substituting~\eqref{ali_prop1_e6} and~\eqref{ali_prop1_e7} in~\eqref{ali_prop1_e2}, the bound~\eqref{ali_h1_e1_2} is inferred with the parameters given in~\eqref{ali_prop1_e3}--\eqref{ali_prop1_e5}.
+%
+\end{proof}
+%
+Before stating the main theorem, notice that from Assumption~\ref{ali_hyp2}, there exist constant matrices $\mathcal{A}_{j} \in \mathbb{R}^{n_\zeta \times n_\zeta}$ and functions $\alpha_{j}(\bm{z})$, $j=1,\dots \bar{n}_{\zeta}$ such that the Jacobian $\nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u)$ belongs to the convex polytopic set defined as:
+%--
+\begin{equation}\label{varphi_zeta}
+\mathcal{H}_{\varphi} \triangleq \left\{ \sum^{\bar{n}_{\zeta}}_{j=1}\alpha_{j} (\bm{z}) \mathcal{A}_{j}, \sum^{\bar{n}_{\zeta}}_{j=1}\alpha_{j}(\bm{z}) =1, \alpha_{j}(\bm{z}) \geq0 \right\}
+\end{equation}
+%-- 
+where $\mathcal{A}_{j} \in \mathbb{R}^{n_\zeta \times n_\zeta}$, are the vertices of the polytope $\mathcal{H}_{\varphi}$. 
+
+Now, we are ready to state the main theorem, which provides new LMI conditions ensuring the bound~\eqref{ali_h1_e1_2}.
+
+\begin{theorem}\label{ali_thm}
+Suppose that Assumptions~\ref{ali_hyp1},~\ref{ali_hyp2}, and~\ref{ali_hyp3} hold. Let the matrices $E$ and $D$, together with the scalars $\delta_1$ and $\delta_2$, be chosen such that the Assumption~\ref{ali_hyp4} is satisfied. For a given constant $\epsilon > 0$, assume further that there exist a symmetric positive definite matrix $\mathcal{P} \in \mathbb{R}^{n_{\zeta}\times n_{\zeta}}$ and a matrix $\mathcal{Q} \in \mathbb{R}^{n_{y}\times n_{\zeta}}$ such that the LMI conditions~\eqref{ali_LMI} are fulfilled. Then, the estimation error $\tilde{\zeta}$, with $K = \mathcal{P}^{-1}\mathcal{Q}^{\top}$, satisfies the $\mathcal{H}^{1}$-optimality bound~\eqref{ali_h1_e1_2} with the parameters given in~\eqref{ali_prop1_e3}--\eqref{ali_prop1_e5}, where $\vartheta_{\max} = \lambda_{\max}\!\left( \mathcal{P} \right)$ and $\mathcal{S} = \epsilon \mathcal{P}$ with $\lambda_{\min}\!\left( \mathcal{S} \right)= \epsilon\, \lambda_{\min}\!\left( \mathcal{P} \right)$.
+\end{theorem}
+
+%
+\begin{proof}
+Consider the quadratic Lyapunov function $\vartheta(\xi) := \xi^{\top} \mathcal{P} \xi$. Then, the derivative of $\vartheta(.)$ along the trajectories of~\eqref{ali_syst2_e6} is given as follows:
+\begin{multline}\label{ali_thm_e1}
+\dot{\vartheta}(\xi) = \xi^{\top} \left[ \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{P}\right. \\
++ \left. \mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) \right] \xi \\
++  \xi^{\top} \mathcal{P} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big) \bm{\omega}_{\delta} \\
++  \bm{\omega}^{\top}_{\delta} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{P} \xi .
+\end{multline}
+and
+\begin{multline}\label{ali_thm_e2}
+ \dot{\xi}^{\top} \mathcal{S} \dot{\xi}  = \xi^{\top} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S} \times \\ \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) \xi \\
++  \bm{\omega}^{\top}_{\delta} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top}\mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big) \bm{\omega}_{\delta} \\
++ 2 \xi^{\top} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big) \bm{\omega}_{\delta}.
+\end{multline}
+Then, we have
+\begin{multline}\label{ali_thm_e3}
+\dot{\vartheta}(\xi) + \| \xi \|^{2} + \dot{\xi}^{\top} \mathcal{S} \dot{\xi} - \lambda \| \bm{\omega}_{\delta} \|^{2} = \begin{bmatrix} \xi \\ \bm{\omega}_{\delta}\end{bmatrix}^{\top} \mathbb{M}\left( z,u \right) \begin{bmatrix} \xi \\ \bm{\omega}_{\delta}\end{bmatrix}
+\end{multline}
+where $\mathbb{M}\left( z,u \right)$ is defined in~\eqref{ali_thm_e4}. By applying Schur lemma, we deduce that $\mathbb{M}(z,u) < 0$ whenever inequality~\eqref{ali_thm_e5} holds. Consequently, by setting $\mathcal{S} = \epsilon \mathcal{P}$, introducing the change of variables $\mathcal{Q} := K^{\top} \mathcal{P}$, and invoking the convexity principle, we conclude that the inequality $\mathbb{M}(z,u) < 0$ is satisfied provided that the LMI conditions~\eqref{ali_LMI} hold. This, in turn, yields
+\begin{equation}\label{omega_delta_e1}
+\dot{\vartheta}(\xi) + \| \xi \|^{2}  + \dot{\xi}^{\top} \mathcal{S} \dot{\xi} - \lambda \| \bm{\omega}_{\delta} \|^{2} \leq 0.
+\end{equation}
+Hence, Proposition~\ref{ali_prop1} applies and the desired result follows.
+
+%=== M ===
+\begin{figure*}
+\hrule
+\vspace{0.2cm}
+%
+%\small
+\begin{equation}\label{ali_thm_e4}
+\begin{bmatrix}
+\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{P} 
++\mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)
+&&
+\left[\mathcal{P} + \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S}\right] \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)
+\\~\\
+\Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \left[ \mathcal{P} + \mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) \right] && 
+- \lambda \mathbb{I}_{2n_{\mu}} + \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)
+\end{bmatrix}
+\end{equation}
+%===
+%\medskip
+\bigskip
+%===
+
+\begin{equation}\label{ali_thm_e5}
+\begin{bmatrix}
+\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{P} 
++ \mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)
+&&
+\mathcal{P} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big) && \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S}
+\\~\\
+\Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{P} && 
+- \lambda \mathbb{I}_{2n_{\mu}} && \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{S}
+\\~\\
+\mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) && 
+\mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)&& - \mathcal{S}
+\end{bmatrix} 
+< 0
+\end{equation}
+%===
+%\medskip
+%\bigskip
+%===
+\dashedhrule{0.4pt}{2pt 2pt}
+%\hrule
+\begin{equation}\label{ali_LMI}
+\begin{bmatrix}
+\left( P_{\zeta} \mathcal{A}_{j}\right)^{\top} \mathcal{P} + \mathcal{P} \left( P_{\zeta} \mathcal{A}_{j} \right)  - \mathcal{H}^{\top} \mathcal{Q}  - \mathcal{Q}^{\top}  \mathcal{H}
+&&
+\mathcal{P} \mathcal{E}_{j} - \mathcal{Q}^{\top}  \mathcal{D}  && \left( P_{\zeta} \mathcal{A}_{j}\right)^{\top} \mathcal{P} - \mathcal{H}^{\top} \mathcal{Q}
+\\~\\
+\mathcal{E}^{\top}_{j} \mathcal{P} - \mathcal{D}^{\top} \mathcal{Q} && 
+- \lambda \mathbb{I}_{2n_{\mu}} && \mathcal{E}^{\top}_{j} \mathcal{P} - \mathcal{D}^{\top} \mathcal{Q}
+\\~\\
+\mathcal{P} \left( P_{\zeta} \mathcal{A}_{j} \right) - \mathcal{Q}^{\top}  \mathcal{H} && 
+\mathcal{P} \mathcal{E}_{j} - \mathcal{Q}^{\top}  \mathcal{D} && - \displaystyle\frac{1}{\epsilon} \mathcal{P}
+\end{bmatrix} 
+< 0
+\end{equation}
+where 
+$$
+\mathcal{E}_{j} := \bar{E} - P_{\zeta} \mathcal{A}_{j} Q_{\zeta} \bar{D}
+$$
+\hrule
+\end{figure*}
+%
+\end{proof}
+
+
+%
+
+
+\begin{remark}
+It is worth emphasizing that the choice $\mathcal{S} = \epsilon \mathcal{P}$ is neither arbitrary nor overly restrictive, although it represents a specific selection. The introduction of the matrix $\mathcal{P}$ serves to recover the decision variable $\mathcal{Q}$ and then to avoid bilinear matrix inequalities, which are generally unsuitable for numerical solvers. The scalar parameter $\epsilon$ is included as a {\it feasibility factor} to improve the feasibility of the LMI conditions~\eqref{ali_LMI}, and it should be chosen a priori.
+\end{remark}
+
+
+
+
+
+%=========================================================================
+\section{Output Derivative-Based Generalized UIO}\label{output_derivative}
+%=========================================================================
+The main limitation of the previous result is that the proposed method does not guarantee exponential convergence of the estimation error, even when condition~\eqref{rank} is satisfied. This represents a drawback of the proposed {\it regularization} technique and has motivated the development of a more general and robust method that overcomes this shortcoming.
+
+%----
+\subsection{Output derivative-based generalized model}\label{output_derivative_model}
+%--
+The key idea consists in introducing a generalized system imbedding the original model, the output $y$ and its derivative. To this end, let us consider $\chi_{1} \triangleq y$ and $\chi_{2} \triangleq \dot{y}$, which leads to the following generalized system:
+%-
+\begin{equation}\label{ali_syst3_e1}
+\left\{
+\begin{array}{rcl}
+\dot{\chi}_{1} & = & \chi_{2} 
+\\
+\dot{\chi}_{2} & = & C  \bar{\varphi}_{x}(x,u)  + C \frac{\partial \varphi}{\partial x}(x,u) B \mu_{x} + CB \dot{\mu}_{x}
+\\ 
+\dot{x} & = &  \varphi(x,u) + B \mu_{x} \\
+y_{\chi} & = &  \chi_{1} + C_{\chi} \chi_{2} + C x
+\end{array}
+\right.
+\end{equation}
+where $\bar{\varphi}_{x}(x,u) \triangleq \frac{\partial \varphi}{\partial x}(x,u) \varphi(x,u)$, and $C_{\chi} \in\mathbb{R}^{n_y\times n_y}$ is a given weighting matrix associated with the measured derivative $\dot{y}$.
+
+Clearly, if~\eqref{rank} is satisfied, then~\eqref{ali_syst3_e1} can be rewritten in the form of~\eqref{ali_syst2}, for which Assumption~\ref{ali_hyp4} holds. In this case, an exponential UIO for~\eqref{ali_syst3_e1} can be directly constructed if we add $\chi_{2}$ as output measurement. However, if~\eqref{rank} is not satisfied, the construction of an exponential UIO is not possible. In this situation, we can proceed as in the previous section by first regularizing the system~\eqref{ali_syst3_e1}. This approach leads to a design method that is more general than that of the previous section, as it ensures exponential convergence of the UIO whenever condition~\eqref{rank} is satisfied and the derivative $\dot{y}$ is used as a measurement.
+
+
+%=== y_{\chi} & = &  \chi_{1} + \delta_{2}\chi_{2} + C x
+
+%----
+\subsection{Regularization of the generalized model}
+%--
+System~\eqref{ali_syst3_e1} can be regularized as follows
+%-
+\begin{equation}\label{ali_syst3_e2}
+\left\{
+\begin{array}{rcl}
+\dot{\chi}_{1}  = & \chi_{2} 
+\\
+\dot{\chi}_{2} + \left( E_{\delta_{1}} - C B \right) \dot{\mu}_{x}   = & C  \bar{\varphi}_{x}(x,u)  + E\, \omega_{\delta_{1}}  \\
+&\quad+\displaystyle C \frac{\partial \varphi}{\partial x}(x,u) B \mu_{x}
+\\ 
+\dot{x}  = &  \varphi(x,u) + B \mu_{x} \\
+y_{\chi}  = &  \chi_{1} + C_{\chi} \chi_{2} + C x \\%+ \delta_{2} D \mu_{x}
+&\quad +D_{\delta_2} \mu_{x} + D\, \omega_{\delta_{2}} 
+\end{array}
+\right.
+\end{equation}
+where the scalars $\delta_1 \geq 0$, $\delta_2 \geq 0$, and the matrices $E\in\mathbb{R}^{n_{y}\times n_{\mu}}$ and $D\in\mathbb{R}^{n_{y}\times n_{\mu}}$ are the {\it regularization parameters}, with $E$ and $D$ chosen to be binary, i.e., their entries are restricted to $\{0,1\}$. This choice is motivated by the aim of controlling the estimation error bound exclusively through the scalar parameters $\delta_1$ and $\delta_2$. Moreover, $E$ and $D$ are selected to satisfy an appropriate rank condition, which will be specified later.
+
+
+First, system~\eqref{ali_syst1} can be rewritten under the compact form:
+\begin{equation}\label{ali_syst3_e3}
+    \begin{array}{l}
+        \mathbb{E} \dot{\zeta} = \varphi_{\zeta}(\zeta,u) + \bar{E} \bm{\omega}_{\delta} \\
+        y_{\chi} = \mathcal{H} \zeta + \bar{D} \bm{\omega}_{\delta}
+    \end{array}
+\end{equation}
+where
+\begin{subequations}\label{ali_syst3_e4}
+\begin{equation}\label{ali_syst3_e4_1}
+\mathbb{E} := 
+\begin{bmatrix}
+\mathbb{I}_{n_y} & 0 & 0 & 0\\
+0 & \mathbb{I}_{n_y} & 0 & - C B\\
+0 & 0 & \mathbb{I}_{n_x} & 0%E_{\delta_1} 
+\end{bmatrix},~
+\mathcal{H} := 
+\begin{bmatrix} 
+\mathbb{I}_{n_y} & C_{\chi} & C & D_{\delta_2}
+\end{bmatrix},
+\end{equation}
+%
+\begin{equation}\label{ali_syst3_e4_2}
+\bar{E} := 
+\begin{bmatrix} 
+0 & 0_{n_{y}\times n_{\mu}} \\
+E & 0_{n_{y}\times n_{\mu}} \\
+0 & 0_{n_{x}\times n_{\mu}} 
+\end{bmatrix},~
+\bar{D} := \begin{bmatrix} 0_{n_{y}\times n_{\mu}} & D \end{bmatrix},
+\end{equation}
+%
+\begin{align}\label{ali_syst3_e4_3}
+\zeta := 
+\begin{bmatrix} 
+\chi_{1} \\ \chi_{2} \\ x \\ \mu_{x} 
+\end{bmatrix},~
+\bm{\omega}_{\delta} := \begin{bmatrix} \omega_{\delta_{1}} \\ \omega_{\delta_{2}} \end{bmatrix},
+\end{align}
+%
+%\vspace{-0.7cm}
+\begin{align}\label{ali_syst3_e4_4}
+\varphi_{\zeta}(\zeta,u) := 
+\begin{bmatrix}
+\chi_{2} \\~\\
+C  \bar{\varphi}_{x}(x,u) + C \frac{\partial \varphi}{\partial x}(x,u) B \mu_{x}  \\~\\
+\varphi(x,u) + B \mu_{x}.
+\end{bmatrix}
+\end{align}
+\end{subequations}
+%==
+with $E_{\delta_1}, D_{\delta_2}$, $\omega_{\delta_{1}}$, and $\omega_{\delta_{2}}$ defined as in~\eqref{ali_syst1}.
+
+% \mathbb{I}_{n_{\mu}}
+
+
+
+
+%----
+\subsection{Generalized UIO}\label{generalized_uio}
+%--
+Here we provide the generalized UIO corresponding to the generalized and regularized system~\eqref{ali_syst3_e3}.
+
+\begin{assumption}\label{ali_gen_hyp1}
+The matrices $E$, $D$, and $C_{\chi}$, and the scalars $\delta_1$ and $\delta_2$ are chosen such that $\mathbb{E}$ and $\mathcal{H}$ satisfy the rank condition~\eqref{rank2}.
+\end{assumption}
+%--
+
+\begin{assumption}\label{ali_gen_hyp2}
+The function $\varphi_{\zeta}(.,u)$ defined in~\eqref{ali_syst3_e4_4} is globally Lipschitz, uniformly on $u$.
+\end{assumption}
+
+%----
+
+As in the previous section, from Assumption~\ref{ali_gen_hyp1},  there exist two matrices $P_{\zeta}$ and $Q_{\zeta}$ such that
+\begin{equation}\label{ali_syst3_e5'}
+ P_{\zeta} \mathbb{E} + Q_{\zeta} \mathcal{H} = \mathbb{I}_{n_{\zeta}}.
+\end{equation}
+where $n_{\zeta} := 2n_{y} + n_{x} + n_{\mu}$, and then an observer is constructed as in~\eqref{ali_syst2_e3} as follows: 
+\begin{equation}\label{ali_syst3_e5}
+\left\{
+\begin{array}{rcl}
+\dot{\eta} & = & P_{\zeta} \varphi_{\zeta}(\hat{\zeta},u) + K \left( y_{\chi} - \mathcal{H} \hat{\zeta} \right)
+\\
+\hat{\zeta} & = & \eta + Q_{\zeta} y_{\chi} 
+\end{array}
+\right.
+\end{equation}
+To avoid repetitions, under Assumption~\ref{ali_gen_hyp2}, assume that the Jacobian $\nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u)$ belongs to the convex polytopic set $\mathcal{H}_{\varphi} $ defined in~\eqref{varphi_zeta}.
+
+%It is useless to reproduce here a new theorem or a new proposition. Since we use the same notation as in Section~\ref{uio}, the results of Proposition~\ref{ali_prop1} and Theorem~\ref{ali_thm} apply directly under Assumptions~\ref{ali_gen_hyp1} and~\ref{ali_gen_hyp2}. That is, the observer~\eqref{ali_syst3_e5} with $K = \mathcal{P}^{-1}\mathcal{Q}^{\top}$, satisfies the $\mathcal{H}^{1}$-optimality bound~\eqref{ali_h1_e1_2} with the parameters given in~\eqref{ali_prop1_e3}--\eqref{ali_prop1_e5}, where $\vartheta_{\max} = \lambda_{\max}\!\left( \mathcal{P} \right)$ and $\mathcal{S} = \epsilon \mathcal{P}$ with $\lambda_{\min}\!\left( \mathcal{S} \right)= \epsilon\, \lambda_{\min}\!\left( \mathcal{P} \right)$. The matrices $\mathcal{P}, \mathcal{Q}$, and the scalar $\epsilon$ are provided by Theorem~\ref{ali_thm}.
+%==
+It is unnecessary to restate a new theorem or proposition here. Since we use the same notation as in Section~\ref{uio}, the results of Proposition~\ref{ali_prop1} and Theorem~\ref{ali_thm} apply directly under Assumptions~\ref{ali_gen_hyp1} and~\ref{ali_gen_hyp2}. 
+Specifically, the observer~\eqref{ali_syst3_e5} with $ K = \mathcal{P}^{-1}\mathcal{Q}^{\top} $ satisfies the $\mathcal{H}^{1}$-optimality bound~\eqref{ali_h1_e1_2}, with parameters given in~\eqref{ali_prop1_e3}--\eqref{ali_prop1_e5}, where $\vartheta_{\max} = \lambda_{\max}\!\left( \mathcal{P} \right)$ and $\mathcal{S} = \epsilon \mathcal{P}$, with $\lambda_{\min}\!\left( \mathcal{S} \right) 
+= \epsilon\, \lambda_{\min}\!\left( \mathcal{P} \right)$. The matrices $\mathcal{P}$, $\mathcal{Q}$, and the scalar $\epsilon$ are defined in Theorem~\ref{ali_thm}.
+
+
+
+
+
+
+
+
+
+
+%----
+\subsection{Specific cases and discussion}
+%--
+This section is devoted to discussing the general result established in Section~\ref{output_derivative}. In addition, several specific cases are analyzed to illustrate the benefits of the generalized UIO in Section~\ref{generalized_uio} relative to that of Section~\ref{uio}.
+
+%----
+\subsubsection{Case $\rank(CB) =\rank(B)$}
+%
+%We will show that in this case, we can guarantee exponential convergence of the estimation error towards zero. Indeed, if $\rank(CB) =\rank(B)$, to recover Assumption~\ref{ali_gen_hyp1}, we only need an appropriate matrix $C_{\chi} \neq 0$ independently from $\delta_{1}$ and $\delta_{2}$. Then, we can use $\delta_{1} = \delta_{2} = 0$, which means that $\lambda_{\delta} = 0$ in~\eqref{ali_prop1_e3} and $\bm{\omega}_{\delta}(t) \equiv 0$ in~\eqref{omega_delta_e1}. The bound~\eqref{ali_h1_e1_2} is reduced to the following one:
+%%
+%\begin{align}\label{ali_syst3_e6}
+%\| \tilde{\zeta} \|_{\mathcal{H}^{1}} &\leq  \beta \, \left\| \xi_0 \right\|,
+%\end{align}
+%which imply by uniform continuity of $\tilde{\zeta}(.)$ that 
+%$$
+%\displaystyle 
+%\lim_{t \to +\infty} \tilde{\zeta}(t) = 0.
+%$$
+%On other word, we have $\xi(t) = \tilde{\zeta}(t)$ and then the LMIs~\eqref{ali_LMI} ensure~\eqref{omega_delta_e1} which imply
+%\begin{equation*}\label{omega_delta_e1_reduce}
+%\dot{\vartheta}(\tilde{\zeta}(t)) + \| \tilde{\zeta}(t) \|^{2}  \leq 0
+%\end{equation*}
+%guaranteeing exponential convergence of $\tilde{\zeta}(t)$ towards zero.
+%--
+We show that in this case, exponential convergence of the estimation error to zero can be guaranteed. 
+Indeed, if $\operatorname{rank}(CB) = \operatorname{rank}(B)$, then to satisfy Assumption~\ref{ali_gen_hyp1}, it suffices to choose an appropriate matrix $C_{\chi}$, independently of $\delta_1$ and $\delta_2$. 
+We can then set $\delta_1 = \delta_2 = 0$, which implies $\lambda_\delta = 0$ in~\eqref{ali_prop1_e3} and $\bm{\omega}_\delta(t) \equiv 0$ in~\eqref{omega_delta_e1}. Under these conditions, the bound~\eqref{ali_h1_e1_2} reduces to
+\begin{align}\label{ali_syst3_e6}
+\| \tilde{\zeta} \|_{\mathcal{H}^{1}} \le \beta \, \|\xi_0\|,
+\end{align}
+which, combined with the uniform continuity of $\tilde{\zeta}(\cdot)$, implies
+\[
+\lim_{t \to +\infty} \tilde{\zeta}(t) = 0.
+\]
+
+In other words, we have $\xi(t) = \tilde{\zeta}(t)$, and the LMIs~\eqref{ali_LMI} ensure~\eqref{omega_delta_e1}, which reduces to
+\begin{equation*}\label{omega_delta_e1_reduce}
+\dot{\vartheta}(\tilde{\zeta}(t)) + \|\tilde{\zeta}(t)\|^2 \le 0,
+\end{equation*}
+thus guaranteeing the \emph{exponential convergence of $\tilde{\zeta}(t)$ to zero}.
+
+
+
+
+
+%----
+\subsubsection{Case $C_{\chi} = 0$}
+%
+In this case, the derivative of the output measurement, $\dot{y}$, is not used as an additional input to the observer. Unfortunately, even when $\rank(CB) = \rank(B)$, the only way to satisfy Assumption~\ref{ali_gen_hyp1} is to choose an appropriate nonzero matrix $D$ and $\delta_{2} > 0$. Consequently, we may set $\delta_{1} = 0$ to achieve a tighter $\mathcal{H}^{1}$ bound; however, exponential convergence of the estimation error to zero cannot be guaranteed.
+
+%----
+\subsubsection{Case $\rank(CB) < \rank(B)$}
+%
+In this case, exponential convergence of $\tilde{\zeta}$ to zero cannot be guaranteed; however, an $\mathcal{H}^{1}$ bound can still be obtained through regularization. By appropriately selecting the matrices $E$ and $D$, and choosing the scalars $\delta_{1}$ and $\delta_{2}$ such that Assumption~\ref{ali_gen_hyp1} is satisfied, the $\mathcal{H}^{1}$ bound~\eqref{ali_h1_e1_2} can be effectively adjusted by tuning the parameters $\delta_{1}$ and $\delta_{2}$.
+
+%----
+\subsubsection{On the use of $\dot{y}$}
+%
+The generalized UIO~\eqref{ali_syst3_e5} requires real-time knowledge of the derivative $\dot{y}$, which can be viewed as a drawback since this derivative must be estimated online. Nevertheless, the structure of the proposed observer naturally incorporates the estimation of $\dot{y}$ through the auxiliary state variable $\chi_{2}$. In particular, when $\rank(CB) = \rank(B)$, the estimate $\hat{\chi}_{2}$ converges exponentially to $\chi_{2}$, thereby providing an accurate estimation of $\dot{y}$. This represents a major improvement over conventional UIO design approaches, which typically estimate the unknown inputs by differentiating the estimated states or the measured output $y$ a posteriori.
+
+
+
+%%=========================================================================
+%\section{Online Learning--Based Neural Network Approximation of Unmodeled Nonlinearity $\mu_{x}$}\label{learning}
+%%=========================================================================
+
+%=========================================================================
+\section{UIO-Based Neural Online Approximation of Unmodeled Nonlinearity $\mu_{x}$}\label{learning}
+%=========================================================================
+As noted in the previous section, the approximation of the unmodeled nonlinearity $\mu_{x}$ is not yet final. We will employ neural network--based modeling to approximate it explicitly for control design purposes. The earlier UIO scheme serves only as a foundation for the online learning of $\mu_{x}$. Regarding the estimation of the system state $x$, two approaches are possible: (1) use $\hat{x}$ from the existing UIO, or (2) introduce a neuro-adaptive observer to simultaneously re-estimate $x$ and the weighting parameters in the neural network representation of $\mu_{x}$. In this paper, we will examine the first approach in detail.  
+
+First, we introduce the following assumption;
+\begin{assumption}\label{huy_hyp1}
+    The system can track the known trajectory $x_{\refx}$ under the observer-based controller as
+    \begin{equation}\label{control}
+        u := \kappa\left(x_\refx, u_{\refx},\hat{x}\right)
+    \end{equation}
+    where $\hat{x}$ is the estimation of $x$ \textcolor{black}{and $u_{\refx}$ is a reference controller such that the pair $\left(x_{\refx}, u_{\refx} \right)$ is an admissible trajectory of system~\eqref{sys_1}}.
+\end{assumption}
+
+
+
+%=========================================================================
+\subsection{Fully UIO-based learning}\label{learning_uio}
+%--
+The generalized UIO derived in Section IV yields the augmented estimate $\hat{\zeta}$. To facilitate the proposed learning strategy, we decompose this vector to isolate the physics-based state estimate, denoted $\hat{x}_{\text{UIO}}$, and the unknown input estimate, $\hat{\mu}_x$. This partition is defined as:
+\begin{equation}
+    \hat{\zeta} = \begin{bmatrix} \hat{\chi}_1 \\ \hat{\chi}_2 \\ \hat{x}_{\text{UIO}} \\ \hat{\mu}_x \end{bmatrix} \in \mathbb{R}^{2n_y + n_x + n_\mu}
+\end{equation}
+Leveraging these physics-based priors, we introduce a neural network approximation $\mu_{\theta}(\cdot)$ to capture the residual unmodeled dynamics. This data-driven term is integrated into the observer structure to refine the estimation of $\mu_x$ online.
+
+Let us consider $\mu_{\theta}(x)$, the neural network based approximation of $\hat{\mu}_{x}(t)$. In a general manner, we write
+\begin{equation}\label{learning_uio_e1}
+\mu_{\theta}(x) = \mathcal{N}_{\theta} (x,\hat{x}_{\uio}, \hat{\mu}_{x},u)
+\end{equation}
+where $\mathcal{N}_{\theta}(.)$ represents the neural network function and $\theta$ is the neural network parameters. Then, this approximation is substituted into an observer to improve estimation, as follows:
+\begin{equation}\label{learning_uio_e2}
+    \begin{array}{l}
+        \dot{\hat{x}}_{\nn} = \varphi(\hat{x}_{\nn},u) + B \mu_{\theta}(\hat{x}_{\nn}) + \Lo_{\nn} \left( y - y_{\nn} \right) \\
+        y_{\nn} = C \hat{x}_{\nn}
+    \end{array}
+\end{equation}
+where $\hat{x}_{\nn}\in \mathcal{X} \subseteq\mathbb{R}^{n_x}$ is the state of the observer~\eqref{learning_uio_e2} and $y_{\nn}$ is its output vector.
+
+The proposed hybrid strategy is depicted in Figure~\ref{fig_Adapt_observer_schema}. This framework combines a physics-based UIO, which exploits the measured output $y$ to provide reliable initial estimates $\hat{x}_{UIO}$ and $\hat{\mu}_{x}$, with a data-driven Neural Observer. A neural network learns the unmodeled dynamics $\mu_{\theta}$ to refine the state estimate $\hat{x}_{NN}$. This refined estimate is utilized by the controller for trajectory tracking, while the network parameters $\theta$ are updated online via a composite loss function that enforces consistency between the physics-based and data-driven models.
+
+%----------------------
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.37]{ch4/img/Apdapt_obs_shema_2_uio.png}
+    \caption{Diagram of the proposed hybrid estimation strategy.}
+    \label{fig_Adapt_observer_schema}
 \end{figure}
+% %----------------------
+% {\color{red}\it
+% This figure illustrates the hybrid estimation-learning framework combining a physics-based Unknown Input Observer (UIO) and a data-driven Neural Observer.
+% The UIO observer receives the measured system output $y$ and provides estimates of the state $\hat{x}_{UIO}$ and the unknown input $\hat{\mu}_x$. These serve as reliable, physics-consistent references.
+% A neural network, parameterized by $(\theta)$, learns an adaptive model $\mu_\theta$ of the unmodeled dynamics and feeds it into the Neural Observer, which refines the state estimate $\hat{x}_{NN}$.
+% The loss function aggregates multiple error terms-tracking $x_{ref}$ vs $\hat{x}_{NN}$, output, UIO consistency, and residual regularization to update $\theta$ through gradient descent.
+% Finally, the controller uses $\hat{x}_{NN}$ to drive the system along the reference trajectory $x_{ref}$, while continuous feedback from the measured output $y$ allows both observers to adapt online for robust and accurate state and disturbance estimation.}
 
-\subsection{Résultats avec un tableau}
-\lipsum[51]
 
-\begin{table}[H]\centering
-\begin{tabular}{lcc}
-                                 & \textit{In silico} & \textit{In vitro} \\ \hline
-Number of half cycles            & 2        & 4                    \\ \hline
-Duty cycle                       & \SI{33}{\%}     & \SI{45}{\%}                 \\ \hline
-\end{tabular}
-\caption{Un exemple de tableau}\label{tab2_num1}
-\end{table}
+
+The original system~\eqref{sys_1} can be written under the form:
+\begin{equation}\label{learning_uio_e3}
+        \dot{x} = \varphi(x,u) + B \mu_{\theta}(\hat{x}_{\nn}) + B \Delta_{x}(t)
+\end{equation}
+where $\Delta_{x}(t) \triangleq \mu_{x}(t) -  \mu_{\theta}(\hat{x}_{\nn}(t))$ represents the learning approximation error.
+
+
+
+
+
+
+%========
+\subsubsection{Design of the learning-based observer~\eqref{learning_uio_e2}}
+%--
+The objective consists in determining the observer gain $\Lo_{\nn}$ such that the estimation error, $\epsilon_{\nn} \triangleq x - \hat{x}_{\nn}$, satisfies the following $\mathcal{L}^{2}-$optimality criterion:
+\begin{equation}\label{learning_uio_e4}
+\| \epsilon_{\nn} \|_{\mathcal{L}^{2}} \leq \lambda_{\nn} \, \left\| \Delta_x \right\|_{\mathcal{L}^{2}}  + \beta_{\nn} \, \left\| \epsilon_{\nn}(0) \right\| 
+\end{equation}
+where $\lambda_{\nn}$ and $\beta_{\nn}$ are positive scalars. Towards this end, we employ the usual Lyapunov-based technique by using the quadratic Lyapunov function
+$$
+\vartheta\left( \epsilon_{\nn} \right) \triangleq \epsilon^{\top}_{\nn} \mathcal{P} \epsilon_{\nn}
+$$
+where $\mathcal{P} = \mathcal{P}^{\top} > 0$. Then, to satisfy~\eqref{learning_uio_e4}, we need to have
+$$
+\dot{\vartheta}\left( \epsilon_{\nn} \right) + \epsilon^{\top}_{\nn} \epsilon_{\nn} - \lambda^{2}_{\nn} \Delta^{\top}_x \Delta_x < 0.
+$$
+%--- \frac{\partial \vartheta}{\partial \rm t}\left( \epsilon_{\nn} \right)
+First, the estimation error dynamic is expressed by the following equation:
+\begin{equation}\label{learning_uio_e5}
+        \dot{\epsilon}_{\nn} = \Big( \nabla^{\varphi}_{x}(\bm{z}_{x},u) - \Lo_{\nn} C \Big) \epsilon_{\nn} + B \Delta_{x}(t)
+\end{equation}
+where $\nabla^{\varphi}_{x}(\bm{z}_{x},u) = \varphi(x,u) - \varphi(\hat{x}_{\nn},u)$ for a given $\bm{z}_{x} \in \mathbb{R}^{n_x}$, from the differential mean value theorem.
+According to Assumption~\ref{ali_hyp2}, there exist constant matrices $\mathcal{A}^{x}_{j} \in \mathbb{R}^{n_x \times n_x}$ and functions $\alpha_{j}(\bm{z}_x)$, $j=1,\dots \bar{n}_{x}$ such that the Jacobian $\nabla^{\varphi}_{x}(\bm{z}_{x},u)$ belongs to the convex polytopic set defined as:
+%--
+\begin{equation}\label{varphi_x}
+\mathcal{H}^{x}_{\varphi} \triangleq \left\{ \sum^{\bar{n}_{x}}_{j=1}\alpha_{j} (\bm{z}_{x}) \mathcal{A}^{x}_{j}, \sum^{\bar{n}_{x}}_{j=1}\alpha_{j}(\bm{z}_{x}) =1, \alpha_{j}(\bm{z}_{x}) \geq0 \right\}
+\end{equation}
+%-- 
+where $\mathcal{A}^{x}_{j} \in \mathbb{R}^{n_x \times n_x}$, are the vertices of the polytope $\mathcal{H}^{x}_{\varphi}$. 
+
+Now, we are ready to state the sufficient LMI conditions guaranteeing the criterion~\eqref{learning_uio_e4}.
+
+%=====
+\begin{theorem}\label{ali_thm2}
+Under the Assumption~\ref{ali_hyp2}, if there exist a symmetric positive definite matrix $\mathcal{P} \in \mathbb{R}^{n_{x}\times n_{x}}$, a matrix $\mathcal{Q} \in \mathbb{R}^{n_{y}\times n_{x}}$, and a positive scalar $\sigma$ such that the following LMI conditions~\eqref{ali_LMI_2} are fulfilled:
+\begin{equation}\label{ali_LMI_2}
+\begin{bmatrix}
+\left(\mathcal{A}^{x}_{j}\right)^{\top} \mathcal{P} + \mathcal{P} \left( \mathcal{A}^{x}_{j} \right)  - C^{\top} \mathcal{Q}  - \mathcal{Q}^{\top}  C
+&
+\mathcal{P} B
+\\~\\
+B^{\top} \mathcal{P} &
+- \sigma \mathbb{I}_{n_{\mu}}
+\end{bmatrix} 
+< 0
+\end{equation}
+then, the estimation error $\epsilon_{\nn}$, with $\Lo_{\nn} = \mathcal{P}^{-1} \mathcal{Q}^{\top}$, satisfies the $\mathcal{L}^{2}-$optimality criterion~\eqref{learning_uio_e4} with $\lambda_{\nn}=\sqrt{\sigma}$ and $\beta = \sqrt{\lambda_{\max} (\mathcal{P})}$.
+\end{theorem}
+%--
+\begin{proof}
+The proof is omitted, as it is straightforward and well-established in the literature on $\mathcal{L}^{2}-$optimality stability analysis.
+\end{proof}
+%=====
+
+
+
+
+%========
+\subsubsection{Computation of the learning parameter $\theta$}
+%--
+To approximate $\mu_{x}(t)$ via $\mu_{\theta}(\cdot)$, the parameter $\theta$ is optimized to minimize a specific loss function. Unlike classical supervised learning, where the ground truth $\mu_{x}(t)$ is accessible, we must rely on the UIO estimate $\hat{\mu}_{x}(t)$ as a proxy target (see Fig.~\ref{fig_Adapt_observer_schema}). Consequently, we define a composite loss function that incorporates tracking errors and regularization terms to ensure robust convergence:
+{\small
+\begin{align}\label{loss_fun}
+\mathcal{L}(\hat{x}_{\nn}(\theta)) &= \underbrace{(\hat{x}_{\nn} - x_{\text{ref}})^{\top} \mathcal{T}_{\refx}\,(\hat{x}_{\nn} - x_{\text{ref}})}_{\textit{Tracking error}} \notag \\
+&\quad+ 
+\underbrace{(y - y_{\nn})^{\top} \mathcal{T}_{y} (y - y_{\nn})}_{\textit{Output error}} \notag \\
+&+ \underbrace{(\hat{x}_{\nn} - \hat{x}_{\uio})^{\top} \mathcal{T}_{\uio} (\hat{x}_{\nn} - \hat{x}_{\uio})}_{\textit{Consistency with UIO}} \notag \\
+&\quad+ 
+\underbrace{\lambda \| \mu_{\theta}(\hat{x}_{\nn}) - \hat{\mu}_{x} \|^2}_{\textit{Residual regularization}}   
+\end{align}
+}
+where $\mathcal{T}_{\refx}, \mathcal{T}_{y}$, and $\mathcal{T}_{\uio}$ are symmetric and positive definite weight matrices of appropriate dimensions, and $\lambda > 0$ is a regularization gain.
+
+Each quadratic term in the loss function~\eqref{loss_fun} serves a specific purpose:
+\begin{itemize}
+    \item {\it Tracking error term $(\hat{x}_{\nn} - x_{\text{ref}})^{\top} \mathcal{T}_{\refx}\,(\hat{x}_{\nn} - x_{\text{ref}})$:} this term, retained from the original loss, penalizes deviations of the estimated state $\hat{x}_{\nn}$ from the reference trajectory $x_{\text{ref}}$, ensuring the observer meets its primary objective of accurate tracking.
+    \item {\it Output error term $(y - y_{\nn})^{\top} \mathcal{T}_{y} (y - y_{\nn})$:} by aligning the neural network predicted output $y_{\nn}$ with actual measurements $y$, this term provides direct supervision from sensor data. It stabilizes training, particularly in early stages, and enhances the observer ability to adapt to real-time conditions.
+    \item {\it Consistency with UIO associated term $(\hat{x}_{\nn} - \hat{x}_{\uio})^{\top} \mathcal{T}_{\uio} (\hat{x}_{\nn} - \hat{x}_{\uio})$:} this term forces the neural network state estimate $\hat{x}_{\nn}$ to remain consistent with the UIO-based estimate, leveraging the stability of the physics-based model. It facilitates a smooth transition from the UIO estimate to the neural network data-driven refinement, preventing significant divergence when the neural network is still learning.
+    \item {\it Residual regularization term $\lambda \| \mu_{\theta}(\hat{x}_{\nn}) - \hat{\mu}_{x} \|^2$:} this term regularizes the neural network learned dynamics $\mu_{\theta}(\hat{x}_{\nn})$ to stay plausible relative to the UIO-based estimate $\hat{\mu}_{x}$, mitigating overfitting and ensuring robustness.
+ 
+\end{itemize}
+
+
+% \mathcal{N}_{\theta} (\hat{x}_{\nn},\hat{x}_{\uio}, \hat{\mu}_{x},u)
+
+
+The procedure for minimizing the loss function $\mathcal{L}$ in order to determine the optimal value of $\theta$ will be described in the next section.
+
+
+
+%===============================
+\section{Conclusion}\label{sec7}
+This paper presented a robust hybrid estimation framework designed to address the challenges of vehicle motion tracking in the presence of unmodeled nonlinearities. We proposed a layered architecture that integrates a physics-based Generalized Unknown Input Observer (UIO) with a data-driven Neural Adaptive Observer. To overcome the structural limitations of standard observers, specifically when the rank condition $rank(CB) = rank(B)$ is not met, we introduced a regularization technique combined with an output-derivative based generalized model. This approach ensures the existence of the observer and provides a reliable initial estimate of the unknown dynamics. This estimate subsequently serves as a supervisor for a neural network, which refines the approximation of complex nonlinearities, such as variable tire-road friction, through online learning. Theoretical analysis demonstrated that the proposed method guarantees $\mathcal{H}^1$ and $\mathcal{L}^2$ stability for the estimation errors, provided that the derived Linear Matrix Inequality (LMI) conditions are satisfied. Future work will focus on the experimental validation of this framework using real driving data and its extension to discrete-time formulations for embedded implementation.
