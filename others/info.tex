@@ -1,0 +1,59 @@
+\usepackage[nomaketitle]{config/ul_cover/ul-cover}
+
+\sujet{Development of new advanced estimation algorithms for improving the resilience of the autonomous and
+connected vehicle}
+\author{Quang Huy NGUYEN}
+\encadrant{Ali ZEMOUCHE \\ Hugh Rafaralahy \\ Madjid HADDAD}
+
+\institute{Université de Lorraine}
+\doctoralschool{Titre de l'école doctorale}{xxx}
+\specialty{Automatique}
+\laboratory{Centre de Recherche Nancy}
+\date{xx mois 202x}
+
+\ulassetspath{config/ul_cover}
+
+\jurymember{1}{Prénom \textsc{Nom 1}}{Affiliation & \emph{Examinateur}}{} % le président doit être en premier
+\jurymember{2}{Prenom \textsc{Nom 2}}{Affiliation}{Rapporteur}
+\jurymember{3}{Prenom \textsc{Nom 3}}{Affiliation}{Rapporteur}
+\jurymember{4}{Prenom \textsc{Nom 4}}{Affiliation}{Rapporteur}
+\jurymember{5}{Prenom \textsc{Nom 5}}{Affiliation}{Rapporteur}
+\jurymember{6}{Prenom \textsc{Nom 6}}{DR Affiliation}{Directeur de thèse}
+% \jurymember{7}{Prénom NOM}{Titre, établissement}{Directeur de thèse}
+
+% entre 1700 et 4000 signes ? 
+\frabstract{
+% \lipsum[10-11]
+}
+
+\enabstract{
+% \lipsum[13-14]
+
+The reliability and safety of Connected and Autonomous Vehicles (CAVs) rely heavily on the real-time availability of precise dynamic variables. However, equipping vehicles with high-end sensors to measure every necessary variable—such as sideslip angles or vehicle trajectories—is often economically unfeasible or physically impossible. 
+Furthermore, CAVs are increasingly vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I), which can lead to critical failures. To address these challenges without incurring the high cost of physical hardware redundancy, this thesis proposes the development of an embedded electronic board functioning as a resilient "soft sensor" based on analytical redundancy.
+
+The research adopts a hybrid modeling methodology that integrates physical differential equations with online learning-based neuro-adaptive neural networks. 
+This approach allows for the accurate representation of complex, time-varying parameters and unknown inputs within the vehicle's dynamics. Based on these models, advanced nonlinear estimation algorithms—specifically Unknown Input Observers (UIO) and neuro-adaptive observers—are developed to reconstruct missing state variables and ensure system resilience against data loss and malicious signal injection.
+
+The proposed estimation strategies are applied to two primary control challenges:
+\begin{itemize}
+    \item Resilience to Cyber-Attacks in Adaptive Cruise Control (ACC): The thesis investigates specific architectures for detecting and mitigating cyber-attacks, such as Denial of Service (DoS) and False Data Injection (FDI), within autonomous and cooperative ACC systems.
+    \item Vehicle Tracking and Platooning: Novel estimation algorithms are proposed to handle the nonlinear dynamics and unknown forces inherent in tracking surrounding vehicles, which is essential for decision-making in maneuvers like lane changes and platooning.
+\end{itemize}
+
+
+The final contribution of this work is the design and fabrication of a prototype embedded electronic board. This hardware integrates the developed algorithms, validating the theoretical contributions and demonstrating a cost-effective, scalable solution for enhancing the autonomy, security, and fault tolerance of next-generation vehicles.
+}
+
+\frkeywords{Estimation, mot clé 2, mot clé 3, mot clé 4}
+\enkeywords{State Estimation, keyword 2, keyword 3, keyword 4}
+
+
+%%%%%%% Paramètres PDF
+\title{\sujet}
+\hypersetup{
+pdftitle={Thesis Year},
+pdfsubject={\sujet},
+pdfauthor={Quang Huy NGUYEN},
+pdfkeywords={Estimation, mot clé 2, mot clé 3, mot clé 4},
+}

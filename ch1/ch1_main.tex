@@ -1,0 +1,51 @@
+\chapter{Introduction générale}\label{chp1_intro}
+\objectif{Objectif rapide du chapitre \lipsum[30]}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quelques conseils d'utilisation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Organisation du projet}
+
+\paragraph{Fichier maître à compiler}
+Le fichier \texttt{main.tex} contient tous les sous-fichiers à inclure. C'est l'organisation du document.
+
+\paragraph{Configuration}
+Le dossier \texttt{config/} contient les fichiers de parametrage du document, les macros, ainsi que le package pour la couverture PSL (\cref{pslcover}).
+
+\paragraph{Chapitres}
+Ils sont situés dans des dossiers indépendants, avec des dossiers de figures associés (\texttt{.../fig/}). L'auto-complétion permet de trouver les figures associées au chapitre voulu : \texttt{ch1/fig/xxxx.jpeg}.
+
+\paragraph{Autres fichiers et pages}
+Les autres fichiers de texte (conclusion, remerciements), et information (info, liste des publications, glossaire) sont situés dans le dossier \texttt{others/}.
+
+\subsection{Couvertures par Pierre Guillou pour PSL}\label{pslcover}
+Seules les couvertures sont imposées par PSL. Le fichier ici a été réalisée par \href{https://pierre.guillou.net/psl-cover/2018/}{Pierre Guillou}\footnote{\url{https://pierre.guillou.net/psl-cover/2018/}} et est disponible sur le site dans les \href{https://collegedoctoral.psl.eu/doctorat-psl/espace-ressources/}{ressources du site de PSL}\footnote{\url{https://collegedoctoral.psl.eu/doctorat-psl/espace-ressources/}} (Version 1.2 - 20 juillet 2019).
+A noter que le président du jury doit être sur la première ligne de la liste du jury.
+
+\subsection{Illustrations}
+Overleaf propose l'auto-completion pour les figures de figures, ce qui est assez rapide et efficace.
+Un label est ajouté pour chaque figure afin de la citer après. La figure suivant est référencée par le label \texttt{fig1\_cir} car c'est une figure du chapitre 1. Pour une table du chapitre 1, on pourra utiliser \texttt{tab1\_power}.
+La figure [\cref{fig1_circsystem}a] illustre ce propos, pour plus de détails voir le \cref{chp2_chap}.
+
+\begin{figure}[H]\centering
+\subcaptionbox{Réseau vasculaire}[.4\linewidth]{\includegraphics[height=4cm]{ch1/fig/Circulatory_System_fr.jpg}}
+\subcaptionbox{Réseau capillaire sanguin}[.55\linewidth]{\includegraphics[height=4cm]{ch1/fig/Blood_vessels.png}}
+\caption{(a) Le réseau vasculaire est composé des réseaux artériel et veineux. (b) Les capillaires sanguins réalisent la jonction entre les deux réseaux. [Wikimedia]}
+\label{fig1_circsystem}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Une deuxième section}
+
+\subsection{Acronymes}
+C'est assez pratique d'utiliser des acronymes, mais il faut les définir avant. \todo[inline]{Ici, un commentaire}
+Ici on va utiliser le \acrshort{gpu} ou la \acrlong{ram}, ou encore \acrfull{ssd}\todo{A faire}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quelques citations}
+\subsubsection{Avec la commande Cite}
+On peut citer des références \cite{ueda_tissue_2020,thomas_microbubble_2013} pour appuyer le propos.
+La table des matières est réalisée avec \texttt{biblatex}.
+\subsubsection{En synchronisant Zotero}
+Zotero peut être synchronisé pour faire la gestion de la bibliographie. Il ne suffit que de mettre à jour le \texttt{.bib} de temps en temps.

@@ -1,0 +1,330 @@
+% LaTeX Université de Lorraine thesis cover template
+% Adapted from PSL template (c) 2018 Pierre Guillou
+% License: GNU General Public License v3
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ul-cover}
+
+\RequirePackage{tabularx}
+\RequirePackage{etoolbox}
+\RequirePackage{iftex}
+\RequirePackage{tikz}
+\usetikzlibrary{backgrounds}
+
+% --- UL BRANDING COLORS ---
+% Université de Lorraine Yellow is approx RGB 255, 205, 0 (Hex FFCD00)
+% But yellow text is hard to read. We use Black or Dark Gray for text headers.
+% You can change this to a UL Red or specific Grey if preferred.
+\definecolor{ulcolor}{RGB}{0, 0, 0} % Currently set to Black for readability
+\definecolor{ulaccent}{RGB}{255, 205, 0} % UL Yellow for graphical elements
+
+% --- VARIABLES ---
+\newcommand*{\institute}[1]{\gdef\@institute{#1}}
+\newcommand*{\laboratory}[1]{\gdef\@laboratory{#1}}
+\newcommand*{\specialty}[1]{\gdef\@specialty{#1}}
+\newcommand*{\doctoralschool}[2]{
+  \gdef\@doctoralschoolname{#1}%
+  \gdef\@doctoralschoolnumber{#2}
+}
+
+% --- JURY MANAGEMENT (UNCHANGED) ---
+\newcommand{\jurymember}[4]{
+  \ifnum#1=1 \gdef\@jiname{#2}\gdef\@jitt{#3}\gdef\@jirole{#4}\fi
+  \ifnum#1=2 \gdef\@jiiname{#2}\gdef\@jiitt{#3}\gdef\@jiirole{#4}\fi
+  \ifnum#1=3 \gdef\@jiiiname{#2}\gdef\@jiiitt{#3}\gdef\@jiiirole{#4}\fi
+  \ifnum#1=4 \gdef\@jivname{#2}\gdef\@jivtt{#3}\gdef\@jivrole{#4}\fi
+  \ifnum#1=5 \gdef\@jvname{#2}\gdef\@jvtt{#3}\gdef\@jvrole{#4}\fi
+  \ifnum#1=6 \gdef\@jviname{#2}\gdef\@jvitt{#3}\gdef\@jvirole{#4}\fi
+  \ifnum#1=7 \gdef\@jviiname{#2}\gdef\@jviitt{#3}\gdef\@jviirole{#4}\fi
+  \ifnum#1=8 \gdef\@jviiiname{#2}\gdef\@jviiitt{#3}\gdef\@jviiirole{#4}\fi
+  \ifnum#1=9 \gdef\@jixname{#2}\gdef\@jixtt{#3}\gdef\@jixrole{#4}\fi
+  \ifnum#1=10 \gdef\@jxname{#2}\gdef\@jxtt{#3}\gdef\@jxrole{#4}\fi
+  \ifnum#1=11 \gdef\@jxiname{#2}\gdef\@jxitt{#3}\gdef\@jxirole{#4}\fi
+  \ifnum#1=12 \gdef\@jxiiname{#2}\gdef\@jxiitt{#3}\gdef\@jxiirole{#4}\fi
+}
+
+%% Initialize empty jury variables
+\newcommand*{\@jiname}{} \newcommand*{\@jitt}{} \newcommand*{\@jirole}{}
+\newcommand*{\@jiiname}{} \newcommand*{\@jiitt}{} \newcommand*{\@jiirole}{}
+\newcommand*{\@jiiiname}{} \newcommand*{\@jiiitt}{} \newcommand*{\@jiiirole}{}
+\newcommand*{\@jivname}{} \newcommand*{\@jivtt}{} \newcommand*{\@jivrole}{}
+\newcommand*{\@jvname}{} \newcommand*{\@jvtt}{} \newcommand*{\@jvrole}{}
+\newcommand*{\@jviname}{} \newcommand*{\@jvitt}{} \newcommand*{\@jvirole}{}
+\newcommand*{\@jviiname}{} \newcommand*{\@jviitt}{} \newcommand*{\@jviirole}{}
+\newcommand*{\@jviiiname}{} \newcommand*{\@jviiitt}{} \newcommand*{\@jviiirole}{}
+\newcommand*{\@jixname}{} \newcommand*{\@jixtt}{} \newcommand*{\@jixrole}{}
+\newcommand*{\@jxname}{} \newcommand*{\@jxtt}{} \newcommand*{\@jxrole}{}
+\newcommand*{\@jxiname}{} \newcommand*{\@jxitt}{} \newcommand*{\@jxirole}{}
+\newcommand*{\@jxiiname}{} \newcommand*{\@jxiitt}{} \newcommand*{\@jxiirole}{}
+
+% --- ASSETS ---
+\newcommand*{\ulassetspath}[1]{\gdef\@ulassetspath{#1}}
+\newcommand*{\@ulassetspath}{.}
+
+% --- ABSTRACTS ---
+\newcommand{\frabstract}[1]{\long\gdef\@frabstract{#1}}
+\newcommand*{\@frabstract}{}
+\newcommand{\enabstract}[1]{\long\gdef\@enabstract{#1}}
+\newcommand*{\@enabstract}[1]{}
+\newcommand*{\frkeywords}[1]{\gdef\@frkeywords{#1}}
+\newcommand*{\@frkeywords}{\par}
+\newcommand*{\enkeywords}[1]{\gdef\@enkeywords{#1}}
+\newcommand*{\@enkeywords}[1]{\par}
+
+% Public accessors for use in document
+\newcommand{\getfrabstract}{\@frabstract}
+\newcommand{\getenabstract}{\@enabstract}
+\newcommand{\getfrkeywords}{\@frkeywords}
+\newcommand{\getenkeywords}{\@enkeywords}
+
+% --- FONTS ---
+\ifLuaTeX{}
+\newfontfamily\ulfont{Arial}
+\newenvironment{ulfontenv}{\ulfont}{\par}
+\else
+\fi
+\ifXeTeX{}
+\newfontfamily\ulfont{Arial}
+\newenvironment{ulfontenv}{\ulfont}{\par}
+\else
+\fi
+\ifPDFTeX{}
+\newenvironment{ulfontenv}{\fontfamily{phv}\selectfont}{\par}
+\else
+\fi
+
+% --- OPTIONS ---
+\newif\if@nomaketitle\@nomaketitlefalse
+\DeclareOption{nomaketitle}{ \@nomaketitletrue }
+
+\newif\if@cotutelle\@cotutellefalse
+\DeclareOption{cotutelle}{ \@cotutelletrue }
+
+\ProcessOptions{}\relax{}
+
+\if@nomaketitle
+\else
+\renewcommand*{\maketitle}{ \ulcover{} }
+\fi
+
+\if@cotutelle
+\newcommand{\entitle}[1]{\gdef\@entitle{#1}}
+\newcommand{\otherinstitute}[1]{\gdef\@otherinstitute{#1}}
+\newcommand{\logootherinstitute}[1]{\gdef\@logootherinstitute{#1}}
+\fi
+
+%% --- MAIN COMMANDS ---
+\newcommand*{\ulcover}{
+  \AfterPreamble{\ulfrontcover{}}
+  \AtEndDocument{\ulbackcover{}}
+}
+
+%% --- FRONT COVER ---
+\newcommand*{\ulfrontcover}{
+  \begin{ulfontenv}
+    \thispagestyle{empty}
+    \begin{tikzpicture}[overlay, remember picture, text centered, align=center]
+
+      % 1. Background image (Optional - commented out by default as UL is usually white)
+      % \node[on background layer] at (current page.center) {\includegraphics{\@ulassetspath/front-bg.jpg}};
+
+      \coordinate (o) at (current page.center);
+      \coordinate[yshift=-0mm] (o2) at (o);
+      
+      % 2. Institute Name (Top Left)
+      \node[xshift=-86mm, yshift=75mm, anchor=north west] at (o) {
+        \begin{minipage}[h]{.55\paperwidth}
+          \color{ulcolor}
+          \fontsize{14}{17}\selectfont
+          Pr\'{e}par\'{e}e \`{a} \@institute{}\unskip\strut\par
+          \if@cotutelle
+          Dans le cadre d'une cotutelle avec \@otherinstitute{}\unskip\strut\par
+          \fi
+        \end{minipage}
+      };
+
+      % 3. Thesis Title
+      \if@cotutelle
+      \node[yshift=0mm] at (o2) {
+        \begin{minipage}[h]{.85\paperwidth}
+          \centering
+          \fontsize{18}{22}\selectfont
+          \textbf{\@title{}}\unskip\strut\par
+          \vspace{5mm}
+          \color{ulcolor}
+          \@entitle{}\unskip\strut\par
+        \end{minipage}
+      };
+      \else
+      \node[yshift=31mm] at (o2) {
+        \begin{minipage}[h]{.85\paperwidth}
+          \centering
+          \fontsize{18}{22}\selectfont
+          \textbf{\@title{}}\unskip\strut\par
+        \end{minipage}
+      };
+      \fi
+        
+      \coordinate[yshift = 10mm] (o3) at (o2);
+
+      % 4. Author
+      \node[xshift=-86mm, yshift=-8mm, anchor=north west] (autho) at (o3) {
+        \begin{minipage}[h]{.3\paperwidth}
+          \ulbluelabel{Soutenue par}\unskip\strut\par
+          \vspace{1mm}
+          {\fontsize{16}{19}\selectfont\textbf{\@author{}}}\unskip\strut\par
+          \vspace{1mm}
+          {\fontsize{12}{15}\selectfont Le \@date{}}\unskip\strut\par
+        \end{minipage}
+      };
+
+      % 5. Doctoral School
+      \node[xshift=0mm, yshift=-7mm, anchor=north west] (docsc) at (autho.south west) {
+        \begin{minipage}[h]{.3\paperwidth}
+          \ulbluelabel{\'{E}cole doctorale n\textsuperscript{o}\@doctoralschoolnumber{}}
+          \unskip\strut\par
+            \vspace{1mm}
+            \begin{flushleft} \unskip
+            {\fontsize{14}{17}\selectfont\textbf{\@doctoralschoolname{}}}
+            \end{flushleft} 
+        \end{minipage}
+      };
+
+      % 6. Specialty
+      \node[xshift=0mm, yshift=-7mm, anchor=north west] (docspe) at (docsc.south west) {
+        \begin{minipage}[h]{.3\paperwidth}
+          \ulbluelabel{Sp\'{e}cialit\'{e}}
+          \unskip\strut\par
+          \vspace{1mm}
+          {\fontsize{14}{17}\selectfont\textbf{\@specialty{}}}
+        \end{minipage}
+      };
+
+      % 7. Lab
+      \node[xshift=0mm, yshift=-7mm, anchor=north west] (labo) at (docspe.south west) {
+        \begin{minipage}[h]{.4\paperwidth}
+          \ulbluelabel{Pr\'{e}par\'{e}e au}
+            \unskip\strut\par
+            \vspace{1mm}
+            \begin{flushleft} \unskip
+            {\fontsize{12}{15}\selectfont \@laboratory{}}
+            \end{flushleft} 
+        \end{minipage}
+      };
+
+      % 8. Jury
+      \node[fill=lightgray!10, xshift=-15mm, yshift=-6.5mm, anchor=north west] (compo) at (o3) {
+        \begin{minipage}[h]{100mm}
+          \vspace{2mm}
+          {\hspace{1mm}\color{ulcolor}\fontsize{12}{15}\selectfont Composition du jury :}
+          \vspace{5mm}
+          \hspace{-2mm}
+          \fontsize{9}{11}\selectfont
+          \begin{tabularx}{100mm}{p{70mm}p{30mm}}
+            \uljurystylepresident{\@jiname}{\@jitt}
+            \uljurystyle{\@jiiname}{\@jiitt}{\@jiirole}
+            \uljurystyle{\@jiiiname}{\@jiiitt}{\@jiiirole}
+            \uljurystyle{\@jivname}{\@jivtt}{\@jivrole}
+            \uljurystyle{\@jvname}{\@jvtt}{\@jvrole}
+            \uljurystyle{\@jviname}{\@jvitt}{\@jvirole}
+            \uljurystyle{\@jviiname}{\@jviitt}{\@jviirole}
+            \uljurystyle{\@jviiiname}{\@jviiitt}{\@jviiirole}
+            \uljurystyle{\@jixname}{\@jixtt}{\@jixrole}
+            \uljurystyle{\@jxname}{\@jxtt}{\@jxrole}
+            \uljurystyle{\@jxiname}{\@jxitt}{\@jxirole}
+            \uljurystyle{\@jxiiname}{\@jxiitt}{\@jxiirole}
+          \end{tabularx}
+          \vspace{0mm}
+        \end{minipage}
+      };
+
+      % 9. LOGO - Université de Lorraine
+      % Ensure you have logo-ul.jpg or .png in your folder
+       \node[xshift=0mm, yshift=-124mm] at (o) {
+          \includegraphics[width=6cm]{\@ulassetspath/logo-Lorraine.png} 
+       };
+
+      % Cotutelle logo
+      \if@cotutelle
+      \node[xshift=65mm, yshift=125mm] at (o) {
+        \includegraphics[height=1.8cm]{\@logoinstitute}
+      };
+      \fi
+
+    \end{tikzpicture}
+  \end{ulfontenv}
+  \clearpage
+  \mbox{}
+  \thispagestyle{empty}
+  \clearpage
+  \setcounter{page}{1}
+}
+
+%% --- BACK COVER ---
+\newcommand*{\ulbackcover}{
+  \pagestyle{empty}
+  \cleardoublepage{}
+  \ifodd\value{page}\hbox{}\newpage\fi
+  \begin{ulfontenv}
+    \begin{tikzpicture}[overlay, remember picture, text centered, align=center]
+
+      \coordinate (o) at (current page.center);
+
+      % Removed the PSL specific graphics (semi-circle and star background)
+      % Added a simple bottom line in UL accent color
+      \coordinate[xshift=0mm, yshift=0mm] (bottomline) at (current page.south);
+      \fill[ulaccent] (current page.south west) rectangle ([yshift=10mm]current page.south east);
+
+      \fontsize{11}{13}\selectfont
+      
+      % Keywords / Abstracts
+      \node[yshift=0mm, above] (frKeywords) at (o) {
+        \ulbacknode{MOTS CL\'{E}S}{\@frkeywords{}}{10}{12}
+      };
+      \node[yshift=2mm, above] at (frKeywords.north) {
+        \ulbacknode{R\'{E}SUM\'{E}}{\@frabstract{}}{9}{11}
+      };
+      \node[yshift=-6mm, below] (enAbstract) at (o) { 
+        \ulbacknode{ABSTRACT}{\@enabstract{}}{9}{11}
+      };
+      \node[yshift=-2mm, below] at (enAbstract.south) {
+        \ulbacknode{KEYWORDS}{\@enkeywords{}}{10}{12}
+      };
+
+      % Add Logo at the top of back cover
+      \node[yshift=-20mm] at (current page.north) {
+         \includegraphics[width=4cm]{\@ulassetspath/logo-Lorraine.png}
+      };
+
+    \end{tikzpicture}
+  \end{ulfontenv}
+}
+
+%% --- STYLING HELPERS ---
+\newcommand{\ulbluelabel}[1]{{\color{ulcolor}\fontsize{12}{15}\selectfont #1}}
+
+\newcommand{\uljurystyle}[3]{
+  \ifdefempty{#1}{}{
+    \fontsize{10}{12}\selectfont #1 & \emph{#3}\\
+    #2 &  \\[3mm]
+  }
+}
+
+\newcommand{\uljurystylepresident}[2]{
+  \ifdefempty{#1}{}{
+    \fontsize{10}{12}\selectfont #1 & \emph{Président du jury}\\
+    #2 \\[3mm]
+  }
+}
+
+\newcommand{\ulbacknode}[4]{
+  \begin{minipage}[h]{.8\paperwidth}
+    {\color{ulcolor}\fontsize{12}{15}\selectfont #1}\unskip\strut\par
+    \vspace{-2.5mm}
+    \tikz{\draw[ulcolor, line width=.5mm] (0, 0) -- (16.8, 0);}
+    \vspace{1mm} 
+    {\color{black}\fontsize{#3}{#4}\selectfont #2}\unskip\strut\par
+  \end{minipage}
+}
+
+\endinput
