@@ -5,41 +5,39 @@
 \contentsline {chapter}{Table des matières}{iii}{section*.4}%
 \contentsline {chapter}{Liste des figures}{vi}{chapter*.7}%
 \contentsline {chapter}{Liste des tableaux}{vii}{chapter*.9}%
-\contentsline {chapter}{\numberline {1}Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {1}Learning with Unknown Input Observers for Robust Nonlinear Estimation}{1}{chapter.1}%
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1}General introduction}{2}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.2}Graph theory}{3}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.3}Vehicle mathematical model}{3}{subsection.1.1.3}%
-\contentsline {section}{\numberline {2}Distributed State Observer Architecture}{4}{section.1.2}%
-\contentsline {subsection}{\numberline {2.1}General structure of the observer}{4}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {2.2}On the structure of the observer~(\ref {eq_observer})}{5}{subsection.1.2.2}%
-\contentsline {subsection}{\numberline {2.3}Introduction of a virtual communication graph}{5}{subsection.1.2.3}%
-\contentsline {subsection}{\numberline {2.4}Main objectives}{6}{subsection.1.2.4}%
-\contentsline {section}{\numberline {3}Trust Score Framework}{6}{section.1.3}%
-\contentsline {subsection}{\numberline {3.1}Data validity indicator}{7}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {3.2}Local trust}{7}{subsection.1.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Velocity consistency:}{7}{subsubsection.1.3.2.1}%
-\contentsline {subsubsection}{\numberline {3.2.2}Distance consistency:}{8}{subsubsection.1.3.2.2}%
-\contentsline {subsubsection}{\numberline {3.2.3}Acceleration consistency:}{8}{subsubsection.1.3.2.3}%
-\contentsline {subsubsection}{\numberline {3.2.4}Fusion and update rule:}{8}{subsubsection.1.3.2.4}%
-\contentsline {subsection}{\numberline {3.3}Distributed trust}{9}{subsection.1.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.1}Consistency with host's global estimate:}{9}{subsubsection.1.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.2}Consistency with host's local measurement:}{10}{subsubsection.1.3.3.2}%
-\contentsline {subsection}{\numberline {3.4}Target trust and temporal evolution}{10}{subsection.1.3.4}%
-\contentsline {subsubsection}{\numberline {3.4.1}Discretization into trust quality:}{11}{subsubsection.1.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.4.2}Accumulated trust history:}{11}{subsubsection.1.3.4.2}%
-\contentsline {subsubsection}{\numberline {3.4.3}Normalized trust distribution:}{11}{subsubsection.1.3.4.3}%
-\contentsline {subsubsection}{\numberline {3.4.4}Expected trust level:}{11}{subsubsection.1.3.4.4}%
-\contentsline {subsection}{\numberline {3.5}Generalized trust vector}{12}{subsection.1.3.5}%
-\contentsline {section}{\numberline {4}Weight Design for observer based on the trust}{13}{section.1.4}%
-\contentsline {subsection}{\numberline {4.1}Weight based on the trust}{13}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {4.2}Stability of the error}{14}{subsection.1.4.2}%
-\contentsline {section}{\numberline {5}Simulation Results}{15}{section.1.5}%
-\contentsline {subsection}{\numberline {5.1}Simulation setup}{15}{subsection.1.5.1}%
-\contentsline {subsection}{\numberline {5.2}Attack scenarios}{16}{subsection.1.5.2}%
-\contentsline {subsection}{\numberline {5.3}Results}{16}{subsection.1.5.3}%
-\contentsline {section}{\numberline {6}Conclusion and Future Work}{18}{section.1.6}%
-\contentsline {chapter}{Conclusion et perspectives}{19}{chapter*.16}%
-\contentsline {section}{\numberline {1}Conclusions de l'étude}{19}{section.2.1}%
-\contentsline {section}{\numberline {2}Ouverture et perspectives}{19}{section.2.2}%
-\contentsline {chapter}{Liste des publications}{20}{chapter*.18}%
+\contentsline {section}{\numberline {2}Problem Formulation and Motivation}{3}{section.1.2}%
+\contentsline {section}{\numberline {3}LMI-Based $\mathcal {H}^{1}$ UIO Design}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {3.1}System transformation}{5}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {3.2}UIO structure and error dynamics}{6}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {3.3}New LMI-based UIO design conditions}{7}{subsection.1.3.3}%
+\contentsline {section}{\numberline {4}Output Derivative-Based Generalized UIO}{11}{section.1.4}%
+\contentsline {subsection}{\numberline {4.1}Output derivative-based generalized model}{11}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {4.2}Regularization of the generalized model}{11}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {4.3}Generalized UIO}{12}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {4.4}Specific cases and discussion}{13}{subsection.1.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Case $\mathop {{\rm rank}}(CB) =\mathop {{\rm rank}}(B)$}{13}{subsubsection.1.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Case $C_{\chi } = 0$}{13}{subsubsection.1.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}Case $\mathop {{\rm rank}}(CB) < \mathop {{\rm rank}}(B)$}{14}{subsubsection.1.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.4}On the use of $\dot {y}$}{14}{subsubsection.1.4.4.4}%
+\contentsline {section}{\numberline {5}UIO-Based Neural Online Approximation of Unmodeled Nonlinearity $\mu _{x}$}{14}{section.1.5}%
+\contentsline {subsection}{\numberline {5.1}Fully UIO-based Learning Architecture}{15}{subsection.1.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Design of the Neural Observer}{16}{subsubsection.1.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Optimization of the Learning Parameter $\theta $}{16}{subsubsection.1.5.1.2}%
+\contentsline {subsection}{\numberline {5.2}Minimization of the Loss Function}{17}{subsection.1.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Discretization of the Neural Observer}{17}{subsubsection.1.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}Gradient Computation via Sensitivity Analysis}{17}{subsubsection.1.5.2.2}%
+\contentsline {section}{\numberline {6}Continuous Learning Strategy}{18}{section.1.6}%
+\contentsline {section}{\numberline {7}Simulation Results}{19}{section.1.7}%
+\contentsline {subsection}{\numberline {7.1}Vehicle Lateral Dynamics Model}{19}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {7.2}Observer Design and Implementation}{20}{subsection.1.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Generalized Unknown Input Observer (UIO)}{20}{subsubsection.1.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Neural Adaptive Observer (NAO)}{21}{subsubsection.1.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3}Gradient Computation via Sensitivity Analysis}{21}{subsubsection.1.7.2.3}%
+\contentsline {subsection}{\numberline {7.3}Results and Discussion}{22}{subsection.1.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1}State Estimation}{22}{subsubsection.1.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}Uncertainty Estimation}{22}{subsubsection.1.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3}Convergence Analysis}{23}{subsubsection.1.7.3.3}%
+\contentsline {section}{\numberline {8}Conclusion}{24}{section.1.8}%
+\contentsline {chapter}{Bibliographie}{25}{chapter*.17}%

@@ -16,8 +16,8 @@
 \node[title] at (box.north west) {\color{curcolor}  Objectifs};
 \end{tikzpicture}\bigskip%
 \vspace{.1cm}
-\minitoc
 \end{singlespace}
+\minitoc
 \newpage
 }
 
@@ -40,6 +40,7 @@
 \newcommand{\addchapnonumber}[1]{
 \phantomsection
 \addtocounter{chapter}{1}
+\mtcaddchapter[#1] % Properly register with minitoc
 \chapter*{#1}
 \addcontentsline{toc}{chapter}{#1}
 \markboth{#1}{#1}

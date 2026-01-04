@@ -6,6 +6,10 @@
 \usepackage[english,french]{babel}
 \usepackage{textgreek}
 
+% Keep proof headings in English even when French is the active babel language.
+% (babel's French captions set \proofname to "Démonstration" by default.)
+\addto\extrasfrench{\renewcommand{\proofname}{Proof}}
+
 \setcounter{tocdepth}{3} % Pour que les subsubsections n'apparaissent pas dans la TOC
 \setcounter{secnumdepth}{3} % Pour que les subsubsections ne soient pas numérotées
 \usepackage{fixltx2e}
@@ -14,13 +18,14 @@
 \usepackage{geometry} % Si on a besoin d'une configuration plus précise des marges
 \geometry{a4paper,                % format de papier
 % Définition des marges :
-  left= 3cm,right = 2cm,  % marge intérieure extérieure à la page
+  left= 2.5cm,right = 2.5cm,  % marge identique des deux côtés
   top = 3cm,bottom = 3cm,
 % En-tête et pied de page :
   headheight=6mm,         % espace réservé à l'en-tête dans la marge top
   %headsep=3mm,            % espace entre le corps et l'en-tête
   %footskip=9mm            % espace entre le corps et le pied de page
-  marginparwidth = 16mm
+  marginparwidth = 16mm,
+  asymmetric              % toutes les pages ont les mêmes marges
 }
 
 \raggedbottom
@@ -84,12 +89,11 @@ decorations.pathreplacing}
 
 %%%%%%%%%%% Page normale
 \pagestyle{fancy}
-    % \renewcommand{\chaptermark}[1]{\markboth{\chaptername \ \thechapter.\ #1}{}} % sert à personnaliser l'affichage de \leftmark (ici : le mot "Chapitre", le numéro, un point, et le titre du chapitre, sans écrire en majuscules)
+    \renewcommand{\chaptermark}[1]{\markboth{\chaptername \ \thechapter.\ #1}{}} % sert à personnaliser l'affichage de \leftmark (ici : le mot "Chapitre", le numéro, un point, et le titre du chapitre, sans écrire en majuscules)
     % \renewcommand{\chaptermark}[1]{\markleft{\chaptername \ \thechapter.\ #1}{}}
     % \renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}} % sert à personnaliser l'affichage de \rightmark (ici : le numéro et le titre de la section en cours, sans écrire en majuscules)
     \fancyhf{} % assure que les entête et pieds de page sont vides au départ
-    \fancyhead[LE]{\selectfont\nouppercase{\leftmark}}
-    \fancyhead[RO]{\selectfont\nouppercase{\rightmark}}
+    \fancyhead[C]{\selectfont\nouppercase{\leftmark}}
     \fancyfoot[C]{\thepage}
 % Explications :
 % L = left, R = right, C = center, E = even pages, O = odd pages

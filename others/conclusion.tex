@@ -1,7 +1,38 @@
 \addchapnonumber{Conclusion et perspectives}
+% \chapter[Conclusion and Perspectives]{Conclusion and Perspectives}\label{chp_conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusions de l'étude}
-\lipsum[11]
-\section{Ouverture et perspectives}
-\lipsum[13]
+% \chapter{Conclusion and Perspectives}
+
+\section{General Conclusion}
+
+This thesis addressed the problem of resilience in autonomous and connected vehicles through the development of advanced state estimation algorithms. As autonomous driving systems increasingly rely on interconnected sensors, embedded computation, and wireless communications, their vulnerability to sensor faults, modeling uncertainties, and cyber-attacks has become a major safety concern. In particular, false data injection attacks targeting vehicle-to-vehicle communication channels pose a serious threat to cooperative driving functionalities such as Adaptive Cruise Control (ACC), Cooperative Adaptive Cruise Control (CACC), and vehicle platooning.
+
+The main objective of this research was to design estimation frameworks capable of maintaining reliable state information under adverse conditions, thereby ensuring safe and robust control performance. To this end, several complementary observer-based approaches were developed, analyzed, and validated within the context of autonomous and connected vehicle systems.
+
+First, a discrete-time unknown input observer was proposed to estimate both vehicle states and malicious disturbances affecting communication signals. By employing an advanced discretization strategy and appropriate state transformations, the observer overcomes classical existence constraints and significantly reduces estimation delay. This contribution enables fast and accurate reconstruction of cyber-attack signals, allowing the controller to compensate for their effects in real time rather than merely detecting their presence.
+
+Second, to address nonlinearities and modeling uncertainties inherent to vehicle dynamics, a neural network-based observer was introduced. This observer integrates learning capabilities into a model-based estimation framework, allowing online adaptation to unknown dynamics and external perturbations. The proposed architecture preserves stability while improving estimation accuracy in scenarios where classical models alone are insufficient, such as aggressive maneuvers or varying road conditions.
+
+Third, the estimation framework was extended to cooperative and distributed scenarios involving vehicle platoons and mixed traffic environments. A distributed observer architecture combined with a trust management mechanism was developed to evaluate the reliability of information received through vehicle-to-vehicle communication. This approach limits the influence of compromised or unreliable data and enhances the collective resilience of the platoon, preventing the propagation of malicious effects from a single vehicle to the entire formation.
+
+The proposed methods were extensively validated through high-fidelity simulations using MATLAB/Simulink, CARLA, and Quanser QLabs environments. Various scenarios were considered, including nominal operation, sensor faults, communication disturbances, and cyber-attacks. The results demonstrate that the developed estimation algorithms significantly improve robustness, estimation accuracy, and safety compared to conventional approaches. Furthermore, the preparation for embedded implementation confirms the feasibility of deploying the proposed observers in real-time automotive systems.
+
+Overall, this thesis contributes novel theoretical developments and practical solutions for resilient autonomous and connected vehicles. By combining model-based estimation, learning techniques, and cooperative trust mechanisms, it provides a unified framework capable of addressing both physical and cyber-related uncertainties in modern intelligent transportation systems.
+
+\section{Ouverture et Perspectives}
+
+Although the results obtained in this thesis represent a significant step toward resilient autonomous driving, several promising research directions remain open and deserve further investigation.
+
+A first perspective concerns large-scale experimental validation. While the proposed algorithms were tested in realistic simulation environments and prepared for embedded implementation, full-scale experiments on real vehicles in diverse traffic conditions would provide valuable insights into their real-world performance. Such experiments could include highway platooning, urban driving, and interaction with non-cooperative road users.
+
+A second perspective involves extending the estimation framework to cooperative perception systems. Future autonomous vehicles will increasingly rely on shared perception data, such as camera images, LiDAR point clouds, and radar detections exchanged through V2V and V2I communications. Integrating resilient estimation algorithms with cooperative perception would enable robust fusion of heterogeneous data sources while mitigating the impact of corrupted or delayed information.
+
+Another important direction concerns the interaction between estimation, control, and decision-making layers. In this thesis, the focus was placed on state estimation and its role in ensuring reliable control. 
+Future work could explore tighter integration between resilient observers and higher-level planning or decision-making modules, allowing autonomous vehicles to adapt their behavior dynamically in response to detected threats or uncertainty levels.
+
+From a methodological standpoint, further research could investigate advanced learning techniques, such as adaptive neural ordinary differential equations or hybrid physics-informed learning models, to enhance estimation accuracy while maintaining stability guarantees. Additionally, incorporating uncertainty quantification into the estimation process could provide confidence measures that inform both control actions and trust management strategies.
+
+Finally, extending the proposed framework to multi-agent traffic networks and infrastructure-assisted systems represents a long-term perspective. In such systems, vehicles, roadside units, and cloud services collaborate to optimize traffic flow and safety. Developing scalable, resilient estimation algorithms capable of operating across multiple layers of this ecosystem remains a challenging and impactful research direction.
+
+In conclusion, the work presented in this thesis lays a solid foundation for resilient estimation in autonomous and connected vehicles. It opens the door to numerous future developments aimed at enhancing safety, reliability, and trust in next-generation intelligent transportation systems.

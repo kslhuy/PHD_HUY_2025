@@ -1,7 +1,9 @@
-\chapter[Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons]{Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons}\label{chp2_chap}
+% % Adjust chapter counter for skipped chapters 2-4
+% \setcounter{chapter}{4}
+\chapter[Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons]{Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons}\label{chp5_chap}
 % \chaptermark{Resilient Trust--Aware Distributed Observer Design for Connected Vehicle Platoons}
 
-\objectif{This paper proposes a trust-aware distributed observer for vehicle platoons that maintains resilient state estimation under cyberattacks. 
+\objectif{This chapter proposes a trust-aware distributed observer for vehicle platoons that maintains resilient state estimation under cyberattacks. 
 A behavioral divergence metric evaluates the reliability of shared data, forming a dynamic neighbor set used to adapt observer's weighting gains. 
 Stability conditions are derived via Lyapunov analysis. 
 Simulations under bogus, replay, and DoS attacks demonstrate robust performance and stable platoon behavior.
@@ -133,7 +135,121 @@ However, in the context of the platoon dynamic~\eqref{eq_paltoon}, the pair $((I
 
 
 \section{Distributed State Observer Architecture}\label{sec_Distributed Observer}
-The distributed observer provides an effective approach to estimate the full platoon state $x$. In this section, we introduce a new distributed observer architecture that incorporates trust-function mechanisms, which will be detailed later in Section~\ref{sec_trust_score}. To achieve full-state estimation of all vehicles, two complementary layers are employed: a Local Observer $(\LO)$ that uses onboard sensors, and a Distributed Observer $(\DO)$ that fuses information exchanged through communication links.
+The distributed observer provides an effective approach to estimate the full platoon state $x$. 
+In this section, we introduce a new distributed observer architecture that incorporates trust-function mechanisms, 
+which will be detailed later in Section~\ref{sec_trust_score}. 
+To achieve full-state estimation of all vehicles, 
+two complementary layers are employed: 
+a Local Observer $(\LO)$ that uses onboard sensors, and a Distributed Observer $(\DO)$ that fuses information exchanged through communication links.
+Fig.~\ref{fig_observer_diagram} illustrates the architecture of the proposed distributed observer for vehicle platoons.  
+\begin{figure*}
+\centering
+    \begin{tikzpicture}[
+    vehicle/.style={draw=blue1, fill=blue1!20, thick, minimum width=2cm, minimum height=1cm},
+    localobs/.style={draw=orange1, fill=orange1!20, thick, minimum width=2cm, minimum height=1cm},
+    distobs/.style={draw=purple1, fill=purple1!20, thick, minimum width=2cm, minimum height=1cm},
+    sigarrow/.style={-stealth, thick, color=blue1},
+    commarrow/.style={
+    double,
+    double distance=1pt,
+    line width=0.7pt,
+    draw=green1,
+    {Stealth[scale=1.2]}-{Stealth[scale=1.2]}
+    },
+    physics/.style={draw=blue1, shape=rectangle, fill=blue1!10,line width=0.75pt,dashed,minimum width=3cm, minimum height=4.5cm}, %
+    trust/.style={draw=rose1, shape=rectangle, fill=rose1!10,thick,minimum width=14cm, minimum height=1cm}
+]
+  %       		\draw [help lines,step=0.5cm] (0,0) grid (18,10); % 辅助网格 
+		% % 画x和y轴坐标
+		% \draw[stealth-,line width=2pt] (0,0)--(15,0);
+		% % 画刻度
+		% \foreach \x in {0,1,...,5}
+		% {
+		% 	\draw[xshift=\x cm] (0,0) -- (0,0.5);
+		% };  
+		% % 标坐标原点
+		% \node[below] at (0,0){0};
+		% %标x轴刻度值
+		% \foreach \y in {1,2,...,18}
+		% \node[below] at(\y,0){\y};
+
+    \node[cloud,
+            draw =green1,
+            line width=1.5pt,
+            text=cyan,
+            cloud puffs = 30,
+            cloud puff arc = 50,
+            fill = green1!15,
+            minimum width = 18cm,
+            minimum height = 5cm,
+            label=above:{Virtual Communication Graph $\bar{\G}^{(j)}$}
+        ] (c) at(8.5, 4.5) {};
+    
+    \draw[draw=blue1,fill=blue1!10,dashed,line width=0.75pt] (4.5,4) -- (4.5,6)--(16.5,6) -- (16.5,4) -- (12,4) -- (12,-1) -- (9,-1) -- (9,4) -- (4.5,4) ;
+    \draw [decorate, decoration={brace, mirror, amplitude=20pt}, thick]
+    (4.75,4.5) -- (16.25,4.5);
+    \draw [decorate, decoration={brace, mirror, amplitude=10pt}, thick]
+    (4.25,-1) -- (16.75,-1)
+    node[midway, below=6pt, name=followers] {Followers};
+    \draw [decorate, decoration={brace, mirror, amplitude=10pt}, thick]
+    (-0.25,-1) -- (3.25,-1)
+    node[midway, below=6pt, name=leader] {Leader};
+              
+    \foreach \n in {1,2,3,4}
+		{    
+            \ifnum\n=3
+                \node [name=PV\n,line width=0.75pt,minimum width=3cm, minimum height=4.5cm] at (4.5*\n-3,1.5) {};
+            \else
+                \node [physics,line width=0.75pt,name=PV\n] at (4.5*\n-3,1.5) {};
+            \fi
+            
+            \ifnum\n=3
+                \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle $i$: $x^{(i)}$}; 
+                \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_i$: $\hat{x}_{0}^{(i)}$};
+                \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_i$: $\hat{x}_{i}$};
+            \else
+                \ifnum\n=4
+                    \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle $N$: $x^{(N)}$};
+                    \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_N$: $\hat{x}_{0}^{(N)}$};
+                    \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_N$: $\hat{x}_{N}$};
+                \else
+                    \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle \n: $x^{(\n)}$}; 
+                    \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_{\n}$: $\hat{x}_{0}^{(\n)}$};
+                    \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_{\n}$: $\hat{x}_{\n}$};
+                \fi
+            \fi       
+		};
+    \foreach \j in {1,2,3,4}
+    {
+        \ifnum\j=2
+                \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(j)}$: $\hat{x}_{i}^{(j)}$};
+            \else
+                \ifnum\j=4
+                    \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(N)}$: $\hat{x}_{i}^{(N)}$};
+                \else
+                    \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(\j)}$: $\hat{x}_{i}^{(\j)}$};
+                \fi
+            \fi
+    
+    };
+
+    \node[localobs,name=node0,dashed] at(3,5) {Node 0: $\hat{x}_{0}^{(j)}$};
+    \node[] at(8.25,0.75) {\large$\cdots$};
+    \node[] at(12.75,0.75) {\large$\cdots$};
+
+    \draw[commarrow,-{Stealth[scale=1.2]}] (leader) -- (followers) node[midway, below] {$v_{\text{L}}$, $a_{\text{L}}$};
+    
+    \draw[commarrow] (PV1) -- (PV2);
+    \draw[commarrow] (PV2) -- (PV3);
+    \draw[commarrow] (PV3) -- (PV4);
+
+    \node[trust] at(8.25,-2.5) {Trust Layer};
+    
+    \end{tikzpicture}
+    \caption{Schematic diagram of the estimation method.}
+    \label{fig_observer_diagram}
+\end{figure*}
+
 
 %--
 \subsection{General structure of the observer}
@@ -141,21 +257,17 @@ The distributed observer provides an effective approach to estimate the full pla
 %===
 The distributed state observer architecture considered in this study is characterized by the following set of equations~\eqref{eq_observer}:
 \begin{subequations}\label{eq_observer}
-\begin{small}
-\begin{align}\label{eq_LO}
-(\LO_i): \hat{x}_{0}^{(i)}(t+1)
-&= A_{\text{b}} \hat{x}_{0}^{(i)}(t) + B_{\text{b}} u_i(t)\notag \\
-&\quad + F_i\big(y_i(t) - C_{\text{b}} \hat{x}_{0}^{(i)}(t)\big) %\tag{\LO$_i$}
-\end{align}
-\begin{align}\label{eq_DO}
-(\DO_i^{(j)}): \hat{x}^{(j)}_i(t+1)
-&= A_{\text{b}} \hat{x}_i^{(j)}(t) + B_{\text{b}} \hat{u}_j(t) \notag\\
-&\quad+ A_{\text{b}}\sum_{l \in \mathcal{N}_i} w_{i l}^{(j)}(t)
-   \big(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\big)  \notag\\
-&\quad + A_{\text{b}} w_{i 0}^{(j)}(t)
-   \Big(\hat{x}_0^{(j)}(t)-\hat{x}_i^{(j)}(t)\Big) %\tag{\DO$_i^{(j)}$}
-\end{align}
-\end{small}
+% \begin{small}
+\begin{equation}\label{eq_LO}
+(\LO_i): \hat{x}_{0}^{(i)}(t+1) = A_{\text{b}} \hat{x}_{0}^{(i)}(t) + B_{\text{b}} u_i(t)
++ F_i\big(y_i(t) - C_{\text{b}} \hat{x}_{0}^{(i)}(t)\big) %\tag{\LO$_i$}
+\end{equation}
+\begin{equation}\label{eq_DO}
+(\DO_i^{(j)}): \hat{x}^{(j)}_i(t+1) = A_{\text{b}}\left( \hat{x}_i^{(j)}(t)  + \sum_{l \in \mathcal{N}_i} w_{i l}^{(j)}(t)
+   \big(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\big) +  w_{i 0}^{(j)}(t)
+   \Big(\hat{x}_0^{(j)}(t)-\hat{x}_i^{(j)}(t)\Big) \right) + B_{\text{b}} \hat{u}_j(t)%\tag{\DO$_i^{(j)}$}
+\end{equation}
+% \end{small}
 \end{subequations}
 where 
 \begin{itemize}
@@ -183,34 +295,7 @@ where
 \end{itemize}
 
 
-%========================================================
-%========================================================
-% \begin{comment}
 
-% \begin{figure*}[!t]
-%     \centering
-%     \hrule
-% \begin{subequations}
-%     \begin{equation}
-%         \LO_{i} :  \hat{x}_{0}^{(i)}(t+1) =  A_{\text{b}} \hat{x}_{0}^{(i)}(t)+B_{\text{b}} u_i(t)+F_i\left(y_i(t)-C_{\text{b}} \hat{x}_{0}^{(i)}(t)\right),
-%         \label{eq_LO}
-%     \end{equation}
-%         \begin{align}
-%         \DO_{i}^{(j)} :   \hat{x}^{(j)}_i(t+1) =    A_{\text{b}} \left(  \hat{x}_i^{(j)}(t) + \sum_{l \in \{{\N}_i \}} w_{i l}^{(j)}(t)\left(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\right)  +  w_{i 0}^{(j)}(t)\left(\hat{x}_0^{(j)}(t)-\hat{x}_i^{(j)}(t)\right) \right)  + B_{\text{b}} \hat{u}_j(t) , 
-%         % \left(  \hat{x}_i^{(j)}(t)+\sum_{l \in \{\bar{\N}_i  \}} w_{i l}\left(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\right)  \right)  
-%   % +B_{\text{b}} u_i(t) \ | \ i, j \in \V  \right\} ,
-%   \label{eq_DO}
-%         \end{align}
-%   %      \begin{align}
-%   %      \DO_{i}^{(j)} :   \hat{x}^{(j)}_i(t+1) =    A_{\text{b}} \left(  \hat{x}_i^{(j)}(t) + \sum_{l \in \{{\N}_i \cup \{ 0 \} \}} w_{i l}^{(j)}\left(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\right)  \right)  + B_{\text{b}} u_i(t) , 
-%   % \label{eq_DO}
-%   %      \end{align}
-%         \label{eq_observer}
-% \end{subequations}
-% \hrule
-% \end{figure*}
-% %==
-% \end{comment}
 
 \begin{remark}\label{rem1}
 If a host forms $\hat{u}_j(t)$ (e.g., from a known controller law or an input estimator), the mismatch 
@@ -697,7 +782,7 @@ In the following subsections, we will explain how to calculate the trust. After 
 
 Before trust computation, every received V2V packet data is validated for authenticity and freshness:
 \begin{equation}
-    \small
+    % \small
     \delta_{i,l}(t)=
     \begin{cases}
         1, & \text{if message}\text{ is authenticated and fresh}, \\
@@ -1661,6 +1746,138 @@ Overall, the relatively low mean normalized impact scores across all cases indic
 In Figure~\ref{fig:trust_Dos}, the trust score evolution for the DoS attack (Case~6) is illustrated. During the attack period $[10, 15]$~s, these 3 vehicles (V2, V3, V4) exhibit a noticeable drop in trust values below the threshold of 0.5, indicating successful detection of the communication disruption. Once the attack ceases, the trust scores gradually recover, demonstrating the system ability to restore confidence and resume normal operation. This behavior confirms the effectiveness of the proposed trust mechanism in identifying and isolating malicious data in real time.
 
 
+
+
+
+
+\subsection{Distributed State Estimation for Platoon Control}
+% Introducing the platoon control framework using distributed state estimation
+In this section, we present a platoon control framework that leverages distributed state estimation to enhance longitudinal control performance. The approach adopts a constant time headway spacing (CTHS) policy to maintain small inter-vehicle distances, improving traffic flow and safety. Two controllers are employed: an inner controller, based on the Intelligent Driver Model (IDM), for local longitudinal control using estimates from the local observer, and an outer controller, the Cooperative Adaptive Cruise Control (CACC), for distributed coordination using estimates from the distributed observer. These controllers are combined to form a robust final control strategy, balancing local responsiveness and platoon-wide consensus.
+
+% Clarifying notation for state estimates
+\subsubsection{Notation}
+
+% For clarity, we define the notation for the estimated states used in the controllers:
+% \begin{itemize}
+%     \item \textbf{Local Observer ($\LO_i$)}: Each vehicle $i$ estimates its own state as $\hat{x}_0^{(i)} = [\hat{s}_0^{(i)}, \hat{v}_0^{(i)}, \hat{a}_0^{(i)}]^\top$, where $\hat{s}_0^{(i)}$, $\hat{v}_0^{(i)}$, and $\hat{a}_0^{(i)}$ are the estimated position, velocity, and acceleration of vehicle $i$, respectively.
+%     \item \textbf{Distributed Observer ($\DO_i^{(j)}$)}: Each vehicle $i$ estimates the state of vehicle $j$ as $\hat{x}_i^{(j)} = [\hat{s}_i^{(j)}, \hat{v}_i^{(j)}, \hat{a}_i^{(j)}]^\top$, where $\hat{s}_i^{(j)}$, $\hat{v}_i^{(j)}$, and $\hat{a}_i^{(j)}$ are the estimated position, velocity, and acceleration of vehicle $j$ from the perspective of vehicle $i$.
+% \end{itemize}
+
+% Describing the inner controller: IDM
+\subsubsection{Inner/Local Controller: Intelligent Driver Model (IDM)}
+% Introducing the IDM and its purpose
+The IDM is a car-following model that computes a vehicle's desired acceleration based on its own state and the relative state to its predecessor. Here, it serves as the inner controller for local longitudinal control, utilizing the local observer's estimate of the vehicle's own state, $\hat{x}_0^{(i)}$. The IDM acceleration for vehicle $i$ is given by:
+\begin{equation}
+    a_{\text{IDM},i} = \alpha \left[ 1 - \left( \frac{\hat{v}_0^{(i)}}{v_0} \right)^\delta - \left( \frac{s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i})}{s_{i-1,i}} \right)^2 \right],
+\end{equation}
+where:
+\begin{itemize}
+    \item $\hat{v}_0^{(i)}$ is the estimated velocity of vehicle $i$ from $\LO_i$.
+    \item $s_{i-1,i} = s_{i-1} - s_i - L$ is the actual relative distance to the predecessor, with $L$ as the vehicle length (assuming direct sensor measurement for simplicity, as the query specifies IDM uses only local observer estimates, but relative distance typically requires predecessor data).
+    \item $\Delta v_{i-1,i} = v_{i-1} - \hat{v}_0^{(i)}$ is the actual relative velocity, using the predecessor's true velocity $v_{i-1}$ from sensors.
+    \item $s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i}) = s_0 + T \hat{v}_0^{(i)} + \frac{\hat{v}_0^{(i)} \Delta v_{i-1,i}}{2 \sqrt{\alpha \beta}}$ is the desired minimum gap.
+    \item $\alpha$, $\beta$, $\delta$, $v_0$, $s_0$, and $T$ are model parameters: maximum acceleration, comfortable deceleration, free-flow exponent, desired velocity, minimum gap, and time headway, respectively.
+\end{itemize}
+% Noting the limitation and practical assumption
+Since $\LO_i$ provides only $\hat{x}_0^{(i)}$ and not the predecessor's state, we assume vehicle $i$ uses sensor data (e.g., radar) for $s_{i-1,i}$ and $\Delta v_{i-1,i}$, consistent with standard IDM implementations, while adhering to the query's directive to use local observer estimates for the vehicle's own state.
+
+% Describing the outer controller: CACC
+\subsubsection{Cooperative Controller: Cooperative Adaptive Cruise Control (CACC)}
+% Introducing the CACC and its cooperative purpose
+The CACC enhances platoon coordination by leveraging information from multiple preceding vehicles via the distributed observer $\DO_{i}$. For vehicle $i$, the CACC control input is:
+\begin{align}
+    u_{\text{CACC},i}(k) = \sum_{j=1}^{i-1} [ \kappa_s \left( \hat{s}_i^{(j)}(k) - \hat{s}_0^{(i)}(k) - d_{i,j}(k) \right) \\ \notag +  \kappa_v \left( \hat{v}_i^{(j)}(k) -  \hat{v}_0^{(i)}(k) \right) + \kappa_a \left( \hat{a}_i^{(j)}(k) - \hat{a}_0^{(i)}(k) \right)]
+\end{align}
+
+where:
+\begin{itemize}
+    \item $\hat{s}_i^{(j)}(k)$, $\hat{v}_i^{(j)}(k)$, $\hat{a}_i^{(j)}(k)$ are the estimated position, velocity, and acceleration of vehicle $j$ from $\DO_i^{(j)}$.
+    \item $\hat{s}_0^{(i)}(k)$, $\hat{v}_0^{(i)}(k)$, $\hat{a}_0^{(i)}(k)$ are the estimated position, velocity, and acceleration of vehicle $i$ from $\LO_i$ (included for consistency, though the query specifies distributed observer estimates for CACC).
+    \item $d_{i,j}(k) = d + h \hat{v}_0^{(i)}(k)$ is the desired spacing between vehicles $i$ and $j$, with $d$ as a constant gap and $h$ as the time headway (for $j = i-1$, this aligns with the CTHS policy).
+    \item $\kappa_s$, $\kappa_v$, $\kappa_a$ are control gains for position, velocity, and acceleration errors, respectively.
+\end{itemize}
+% Explaining the cooperative mechanism
+This formulation ensures that vehicle $i$ adjusts its behavior based on the estimated states of all preceding vehicles, promoting consensus and stability across the platoon.
+
+% Combining the controllers into a final strategy
+\subsubsection{Final Controller}
+% Defining the combined control input
+The final control input integrates the IDM and CACC controllers to balance local and cooperative objectives. The target acceleration is:
+\begin{equation}
+    a_{\text{target},i} = (1 - \gamma(t)) a_{\text{IDM},i} + \gamma(t) u_{\text{CACC},i},
+\end{equation}
+where \(\gamma(t) \in [0,1]\) is a tuning parameter that is influenced by the opinion score mentioned in Section \ref{sec_trust_score}. For this context, we choose \(\gamma(t) = \min(\mathcal{O}_i)\).
+% \begin{itemize}
+%     \item $\gamma = 0$: Relies solely on IDM (local control).
+%     \item $\gamma = 1$: Relies solely on CACC (cooperative control).
+% \end{itemize}
+% Applying a filter for smooth control
+To prevent abrupt changes of the mixing 2 type controller, a first-order filter is applied:
+\begin{equation}
+    u_i(t) = u_i(t-1) + \tau_f (a_{\text{target},i} - u_i(t-1)),
+\end{equation}
+where $\tau_f$ is the filter time constant. 
+
+% The vehicle's velocity is then updated as:
+% \begin{equation}
+%     v_i(t) = v_i(t-1) + u_i(t) \Delta t,
+% \end{equation}
+% with $\Delta t$ as the time step.
+
+% Analyzing expected spacing for validation
+\subsubsection{Expected Distance (Spacing)}
+% Deriving steady-state spacing for evaluation
+To validate the control strategy, we derive the expected steady-state spacing:
+\begin{itemize}
+    \item \textbf{IDM Steady-State Spacing}: When $a_{\text{IDM},i} = 0$ and $\Delta v_{i-1,i} = 0$:
+    \[
+    1 - \left( \frac{\hat{v}_0^{(i)}}{v_0} \right)^\delta = \left( \frac{s_0 + T \hat{v}_0^{(i)}}{s_{i-1,i}} \right)^2,
+    \]
+    yielding:
+    \[
+    s_{i-1,i} = \frac{s_0 + T \hat{v}_0^{(i)}}{\sqrt{1 - \left( \frac{\hat{v}_0^{(i)}}{v_0} \right)^\delta}}.
+    \]
+    \item \textbf{CACC Steady-State Spacing}: For the CTHS policy, when the platoon reaches consensus (all velocities equal), the spacing between vehicle $i$ and $i-1$ is:
+    \[
+    \boxed{s_i = d + \frac{h\,\hat{v}_0^{(i)}}{\,i-1}\,.}
+    \]
+\end{itemize}
+% Explaining the validation process
+These expressions allow comparison with simulation results, assessing the controllers' ability to maintain desired spacing under various conditions, including cyber-attacks.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=1\linewidth]{ch5/img/controller_3.eps}
+        % \caption{Compare with and without the local data exchange (Instance 1).}
+        \label{fig:controller_3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=1\linewidth]{ch5/img/controller_4.eps}
+        % \caption{Compare with and without the local data exchange (Instance 2).}
+        \label{fig:controller_4}
+    \end{subfigure}
+    
+    \caption{Controller of vehicle 2 and 3.}
+    \label{fig:controller_23}
+\end{figure}
+
+
+In figure \ref{fig:controller_23}, we can see the control input of vehicle 2 and 3, which is the acceleration of the vehicle. Smoothly switched between 2 controllers, and no abrupt change in the control input.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{ch5/img/relative_final_true.eps}
+    \caption{Relative state of the vehicle in platoon}
+    \label{fig:relative_final_true}
+\end{figure}
+
+
+In figure \ref{fig:relative_final_true}, we can see the relative state of the vehicle in platoon, which is the difference between the position of the vehicle and the position of its predecessor.
+That prouve even in attack scenario, the vehicle can keep good distance No accident or crash happen in the platoon, which is a good sign of the robustness of the platoon control framework. 
+Also that show the expected distance between the vehicle and its predecessor is maintained, which is the desired spacing in the platoon.
 
 
 \section{Conclusion and Future Work}\label{sec_conclusion}

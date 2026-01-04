@@ -1,51 +1,69 @@
 \chapter{Introduction générale}\label{chp1_intro}
-\objectif{Objectif rapide du chapitre \lipsum[30]}
+\objectif{Objectif rapide du chapitre }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Quelques conseils d'utilisation}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Organisation du projet}
+\section{Background and Context}
 
-\paragraph{Fichier maître à compiler}
-Le fichier \texttt{main.tex} contient tous les sous-fichiers à inclure. C'est l'organisation du document.
+Autonomous and connected vehicles represent one of the most significant technological transformations in modern transportation systems. By integrating advanced sensing technologies, embedded computation, artificial intelligence, and wireless communication, these vehicles aim to enhance road safety, improve traffic efficiency, and reduce human-related driving errors. In particular, vehicle-to-vehicle (V2V) and vehicle-to-infrastructure (V2I) communications enable cooperative behaviors that were previously unattainable, such as coordinated platooning, cooperative adaptive cruise control, and collective perception.
 
-\paragraph{Configuration}
-Le dossier \texttt{config/} contient les fichiers de parametrage du document, les macros, ainsi que le package pour la couverture PSL (\cref{pslcover}).
+Autonomous vehicles are inherently cyber-physical systems, where software-based decision-making is tightly coupled with physical vehicle dynamics. This strong interconnection introduces new challenges related to reliability, safety, and security. The correct operation of autonomous driving functions relies on the availability, accuracy, and integrity of sensor measurements and communicated data. However, sensors may be affected by noise, faults, or temporary failures, while communication channels are vulnerable to delays, packet losses, and malicious cyber-attacks.
 
-\paragraph{Chapitres}
-Ils sont situés dans des dossiers indépendants, avec des dossiers de figures associés (\texttt{.../fig/}). L'auto-complétion permet de trouver les figures associées au chapitre voulu : \texttt{ch1/fig/xxxx.jpeg}.
+Among autonomous driving functionalities, Adaptive Cruise Control (ACC) and Cooperative Adaptive Cruise Control (CACC) play a crucial role in longitudinal vehicle control and platooning applications. These systems regulate the vehicle speed and maintain safe inter-vehicle distances by exploiting onboard sensors and, in the case of CACC, information received from neighboring vehicles. Although CACC improves traffic flow and string stability, it also increases the system’s exposure to cyber threats, as corrupted V2V data can directly affect control decisions.
 
-\paragraph{Autres fichiers et pages}
-Les autres fichiers de texte (conclusion, remerciements), et information (info, liste des publications, glossaire) sont situés dans le dossier \texttt{others/}.
+False data injection (FDI) attacks represent one of the most critical threats to connected vehicles. By injecting malicious signals into sensor measurements or communication channels, an attacker can mislead the control system without necessarily triggering conventional fault detection mechanisms. In the context of ACC and CACC systems, such attacks may lead to unsafe spacing, degraded performance, or even collisions. Consequently, ensuring resilience against cyber-attacks and sensor faults has become a fundamental requirement for the deployment of autonomous and connected vehicles.
 
-\subsection{Couvertures par Pierre Guillou pour PSL}\label{pslcover}
-Seules les couvertures sont imposées par PSL. Le fichier ici a été réalisée par \href{https://pierre.guillou.net/psl-cover/2018/}{Pierre Guillou}\footnote{\url{https://pierre.guillou.net/psl-cover/2018/}} et est disponible sur le site dans les \href{https://collegedoctoral.psl.eu/doctorat-psl/espace-ressources/}{ressources du site de PSL}\footnote{\url{https://collegedoctoral.psl.eu/doctorat-psl/espace-ressources/}} (Version 1.2 - 20 juillet 2019).
-A noter que le président du jury doit être sur la première ligne de la liste du jury.
+\section{Research Objectives and Hypotheses}
 
-\subsection{Illustrations}
-Overleaf propose l'auto-completion pour les figures de figures, ce qui est assez rapide et efficace.
-Un label est ajouté pour chaque figure afin de la citer après. La figure suivant est référencée par le label \texttt{fig1\_cir} car c'est une figure du chapitre 1. Pour une table du chapitre 1, on pourra utiliser \texttt{tab1\_power}.
-La figure [\cref{fig1_circsystem}a] illustre ce propos, pour plus de détails voir le \cref{chp2_chap}.
+The main objective of this thesis is the development of new advanced estimation algorithms to improve the resilience of autonomous and connected vehicles. The focus is placed on estimation techniques capable of reconstructing vehicle states and unknown disturbances in the presence of sensor failures, communication uncertainties, and cyber-attacks.
 
-\begin{figure}[H]\centering
-\subcaptionbox{Réseau vasculaire}[.4\linewidth]{\includegraphics[height=4cm]{ch1/fig/Circulatory_System_fr.jpg}}
-\subcaptionbox{Réseau capillaire sanguin}[.55\linewidth]{\includegraphics[height=4cm]{ch1/fig/Blood_vessels.png}}
-\caption{(a) Le réseau vasculaire est composé des réseaux artériel et veineux. (b) Les capillaires sanguins réalisent la jonction entre les deux réseaux. [Wikimedia]}
-\label{fig1_circsystem}
-\end{figure}
+More specifically, this research aims to:
+\begin{itemize}
+    \item Design robust state observers capable of estimating unmeasured vehicle states under normal and adversarial conditions.
+    \item Develop estimation algorithms able to detect, isolate, and reconstruct cyber-attack signals, particularly false data injection attacks affecting V2V communications.
+    \item Extend estimation strategies to cooperative driving scenarios, including semi-autonomous adaptive cruise control (SA-ACC), cooperative adaptive cruise control (CACC), and vehicle platooning.
+    \item Incorporate learning-based components to handle nonlinear dynamics and modeling uncertainties that cannot be accurately captured by classical vehicle models.
+    \item Validate the proposed estimation frameworks through high-fidelity simulations and prepare them for real-time embedded implementation.
+\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Une deuxième section}
+The central hypothesis of this thesis is that combining model-based estimation techniques with adaptive and learning-based approaches enables accurate and fast reconstruction of unknown inputs and cyber-attacks, thereby preserving control performance and safety. In particular, unknown input observers, neural observers, and sliding-mode-based estimators can complement each other to provide both robustness and adaptability in dynamic and uncertain environments.
 
-\subsection{Acronymes}
-C'est assez pratique d'utiliser des acronymes, mais il faut les définir avant. \todo[inline]{Ici, un commentaire}
-Ici on va utiliser le \acrshort{gpu} ou la \acrlong{ram}, ou encore \acrfull{ssd}\todo{A faire}.
+\section{Literature Review Summary}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Quelques citations}
-\subsubsection{Avec la commande Cite}
-On peut citer des références \cite{ueda_tissue_2020,thomas_microbubble_2013} pour appuyer le propos.
-La table des matières est réalisée avec \texttt{biblatex}.
-\subsubsection{En synchronisant Zotero}
-Zotero peut être synchronisé pour faire la gestion de la bibliographie. Il ne suffit que de mettre à jour le \texttt{.bib} de temps en temps.
+Extensive research has been conducted on vehicle modeling, adaptive cruise control, and cooperative driving systems. Classical ACC and CACC models often rely on linear longitudinal vehicle dynamics described by position, velocity, and acceleration states. These models have been widely used to design spacing policies and control laws ensuring string stability in vehicle platoons.
+
+In parallel, significant efforts have been devoted to cyber-security in intelligent transportation systems. Various detection techniques have been proposed to identify cyber-attacks, including statistical methods, machine learning approaches, and model-based observers. While learning-based techniques can achieve high detection accuracy, they often require large datasets and significant computational resources, making them less suitable for real-time embedded automotive applications.
+
+Model-based estimation methods, particularly unknown input observers, have emerged as promising tools for cyber-attack detection and estimation. These observers treat malicious signals as unknown inputs and aim to decouple their effects from the state estimation error. However, classical unknown input observer designs impose restrictive existence conditions and often suffer from estimation delays when implemented in discrete time.
+
+Sliding-mode observers and differentiators provide an alternative solution due to their robustness and finite-time convergence properties. Nevertheless, their implementation may introduce chattering and increased computational complexity. More recently, hybrid approaches combining observers with neural networks have been proposed to handle nonlinearities and modeling uncertainties. Although these methods show strong potential, stability guarantees and real-time feasibility remain active research challenges.
+
+Despite the progress achieved, several gaps remain in the literature. Most existing works focus on attack detection rather than exact attack reconstruction. Moreover, lateral vehicle dynamics and mixed traffic scenarios involving human-driven vehicles are often neglected. These limitations motivate the development of advanced estimation algorithms that are accurate, fast, robust, and suitable for real-world autonomous driving systems.
+
+\section{Methodological Overview}
+
+To address the identified challenges, this thesis follows a structured methodology combining theoretical development, simulation-based validation, and embedded system considerations.
+
+The first stage focuses on system modeling and problem formulation. Longitudinal and lateral vehicle dynamics are modeled using a combination of linear and nonlinear representations. Cooperative driving architectures, including SA-ACC, CACC, and leading cruise control scenarios, are formulated while explicitly incorporating cyber-attack inputs and communication uncertainties.
+
+The second stage is dedicated to observer design. Discrete-time unknown input observers are developed using advanced discretization techniques to reduce estimation delays and relax existence conditions. In parallel, neural observers are introduced to learn unmodeled dynamics and uncertainties online. Distributed estimation strategies are also explored to enable cooperative state estimation in vehicle platoons, incorporating trust mechanisms to mitigate the impact of compromised information.
+
+The third stage involves extensive simulation and validation. The proposed algorithms are evaluated using numerical simulations in MATLAB/Simulink and high-fidelity virtual environments such as CARLA and Quanser QLabs. Various scenarios are considered, including nominal operation, sensor faults, communication disturbances, and cyber-attacks.
+
+Finally, the last stage prepares the transition toward real-world deployment. The observers are implemented on embedded hardware platforms, and preliminary tests are conducted on scaled autonomous vehicle platforms. This step ensures that the proposed solutions are compatible with real-time constraints and embedded automotive systems.
+
+\section{Contributions of the Thesis}
+
+The main contributions of this thesis can be summarized as follows:
+\begin{itemize}
+    \item Development of novel discrete-time unknown input observers with reduced estimation delay for cyber-attack reconstruction.
+    \item Design of neural network-based observers for handling nonlinear vehicle dynamics and modeling uncertainties.
+    \item Integration of distributed estimation and trust management mechanisms for cooperative vehicle platooning.
+    \item Validation of the proposed methods through realistic simulations and embedded implementations.
+\end{itemize}
+
+These contributions advance the state of the art in resilient autonomous vehicle control and provide practical solutions for enhancing safety and security in connected transportation systems.
+
+\section{Organization of the Thesis}
+
+The remainder of this thesis is organized as follows. Chapter~2 presents a detailed literature review on vehicle dynamics, cooperative control, and cyber-security in autonomous vehicles. Chapter~3 introduces the system models and problem formulation. Chapter~4 focuses on unknown input observer design for resilient cruise control systems. Chapter~5 presents neural observer architectures for lateral and longitudinal dynamics. Chapter~6 extends the estimation framework to distributed platooning scenarios with trust management. Chapter~7 discusses simulation results and embedded implementation aspects. Finally, Chapter~8 concludes the thesis and outlines future research directions.

@@ -1,4 +1,4 @@
-\chapter[Resilient State Estimation and Cyber-Attack Reconstruction]{Resilient State Estimation and Cyber-Attack Reconstruction for Connected Autonomous Vehicles}\label{chp2_chap}
+\chapter[Resilient State Estimation and Cyber-Attack Reconstruction]{Resilient State Estimation and Cyber-Attack Reconstruction for Connected Autonomous Vehicles}\label{chp3_chap}
 \chaptermark{Resilient State Estimation and Cyber-Attack Reconstruction}
 
 \objectif{The primary objective of this work is to develop a resilient controller and state observers capable of:
@@ -9,30 +9,61 @@ Detecting and reconstructing false data injected into the communication channel 
 
 Compensating for these attack signals to maintain vehicle autonomy.}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction and Problem Statement}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Context}
-The advent of autonomous and connected vehicles (CAVs) represents the future of mobility, leveraging advanced technologies such as artificial intelligence to ensure automated driving. These systems promise increased safety, improved energy efficiency, and a comfortable driving experience by utilizing Vehicle-to-Vehicle (V2V) and Vehicle-to-Infrastructure (V2I) communication. However, the reliability and availability of sensors constitute critical challenges that hinder the full development of these vehicles.
 
 
+%----------------------------
+\section{Introduction}
+%------
+Connected autonomous vehicles (CAVs) have revolutionized conventional transportation systems through the facilitation of wireless communication and interaction among vehicles~{\cite{Bu2012}}. A significant stride in this domain is the emergence of Cooperative Adaptive Cruise Control (CACC), which builds upon the capabilities of Adaptive Cruise Control (ACC). While ACC autonomously adjusts vehicle speeds based on preceding traffic, CACC elevates this functionality by integrating inter-vehicle communication. %This communication enables vehicles to seamlessly form platoons, ensuring consistent distances between them and enhancing traffic flow.
+%
+As wireless communication and data exchange become more prevalent in CAVs, there is a growing concern about cyberattacks. It is essential to detect these attacks to maintain the safety, reliability, and integrity of vehicular communication systems. These attacks can take many forms, such as false data injection,
+Denial of Service~(DoS), eavesdropping, or interference, targeting communication channels or sensor systems. Hence, detecting and mitigating these attacks is crucial for ensuring that CAVs function correctly and road safety is maintained~{\cite{khalil2020fault,huang2022detection,mousavinejad2019distributed,SVD}.
 
-\subsection{The Cyber-Security Challenge}
+%Several \textcolor{blue}{techniques in the literature} have focused on cyberattack detection. However, in this paper, we focus only on methods similar to the one
+%The authors in~\cite{khalil2020fault} have studied transmissibility identification to detect, localize, and mitigate faults in autonomous vehicle platoons.
+%A robust state observer in~\cite{huang2022detection} has been proposed for the detection and isolation of false data injection attacks. Authors in \cite{mousavinejad2019distributed} have proposed a membership state estimation to detect cyber attacks and recovery mechanisms. Using support vector machines, \textcolor{blue}{the results in}~\cite{SVD} classifies data packets transmitted as either trusted or malicious.
 
-A specific vulnerability in CAVs is the susceptibility of the communication channels to cyber-attacks. The VEHALSECU project specifically addresses the problem of estimating necessary variables for a Semi-Autonomous Adaptive Cruise Control (SA-ACC) system when communication is corrupted by cyber-attacks. Specifically, False Data Injection (FDI) attacks can bypass conventional security measures, allowing attackers to compromise sensor measurements and disrupt network operations.
+%In control systems, the term "attack" refers to an unknown input that complicates the control \textcolor{blue}{design}.
+{In prior work, a proportional integral observer was introduced in~\cite{simutal_PIO} for state estimation and spoofing attack detection, and in~\cite{DOS_attack_2023} for addressing the DoS attack issue by estimating data transmission delays. Nevertheless, these results are limited to scenarios where the attack evolves slowly}. {Some other work} such as~\cite{yamamoto2021attack} {and}~\cite{cheng2023adaptive} utilize the concept of unknown input observer~(UIO) residual. This residual is used to detect attacks and is enhanced by setting an adaptive threshold that considers the impact of disturbances, thereby improving the accuracy of the attack detector. {This UIO-based technique, as utilized also in~\cite{jeon2020simultaneous} within the ACC framework, is specifically designed for constant cyberattack signals. %There are several other types of methods in the literature focused on cyberattack detection, namely~\cite{khalil2020fault,huang2022detection,mousavinejad2019distributed,SVD}
+}
+
+% The literature on cyberattack detection and isolationy
+% mechanisms lacks focus on the estimated quantity of signal
+% attacks
+%One challenge in research on such systems is to automatically compensate for deliberate faults and maintain the system's performance at an acceptable level. 
+In this paper, we address {the challenge of cyberattack detection} by utilizing an UIO to estimate attacks and create an observer-based control to mitigate their adverse effects on platoons with CACC. This algorithm can also be used to monitor cyberattack status with different types of control and modifications. A significant difference in our method is that we transmit data using the acceleration of the preceding vehicle rather than the control input. The advantage of this approach is that in a platoon, we cannot have the same control input, and using acceleration data is more {suitable}. {In contrast to the methodology presented in~\cite{simutal_PIO,DOS_attack_2023,jeon2020simultaneous}, our proposed approach demonstrates the capability to effectively handle time-varying cyberattack. Unlike the framework outlined in~\cite{simutal_PIO,DOS_attack_2023,jeon2020simultaneous}, which offers adaptability to dynamic cyberattack scenarios}.
+
+On each vehicle, the UIO-based estimator computes the relative state between the preceding and following vehicles while examining any potentially erroneous communication signal data. In the event of a cyberattack, a resilience-controlled system is activated, leveraging the state estimated from UIO. Simulation experiments have demonstrated that the proposed mechanism accurately estimates the system state with a 1-step delay and detects attacks with a 2-step delay. This mechanism not only enhances the system stability but also mitigates safety losses induced by cyberattacks. %Throughout the simulations, we analyzed false data injection attacks on V2V communications. %The findings unequivocally affirm the effectiveness of the proposed mechanism.
 
 
-While machine learning techniques have been proposed for detection, they are often computationally expensive and unsuitable for the real-time constraints of embedded vehicle control. Furthermore, existing research often assumes attack signals are constant, which limits the scope of protection against time-varying or arbitrary unbounded attacks.
 
-% \begin{figure}[H]\centering
-% \includegraphics[width=.5\linewidth]{ch2/fig/Saturation_voxel_size.png}
-% \caption{Une description avec la légende associée et sa référence.}
-% \label{fig2_example}
-% \end{figure}
 
-\section{Design of Resilient Observers}
-The core scientific challenge lies in the "Unknown Input Observer" (UIO) design. Standard UIOs require two mathematical conditions: strong detectability and a specific rank condition on the system matrices18181818. While the SA-ACC model satisfies the detectability condition 19, it fails the rank condition ($rank(CW) \neq rank(W)$)20. Consequently, standard UIOs cannot be directly applied.To overcome this, two distinct methodological approaches were developed: a discrete-time approach using delayed observations and a continuous-time approach using sliding mode differentiation.
+%$$
+% \textcolor{red}{***\text{ BEGIN ALI ***}}
+%$$
+
+%=====================================
+\section{Problem Formulation}
+
+%===================
+\subsection{General description of the CACC system}\label{cacc_description}
+%
+The CACC scenario working on a platoon can be illustrated as in Figure~\ref{fig_pre_fol}.
+ %===
+ \begin{figure}[h!]
+    \centering
+    \includegraphics[width=8cm]{ch3/img/fig_11.png}
+    \caption{Illustration of CACC working on a vehicle platoon.}
+    \label{fig_pre_fol}
+\end{figure} 
+ %=====
+In Figure~\ref{fig_pre_fol}, $a_{i-1}$ represents the acceleration of the preceding vehicle transmitted through a wireless communication channel to the following vehicle; $\delta_{i}$ denotes the distance between the rear of the preceding vehicle and the bumper of the following vehicle; $l_{i}$ is the length of the following vehicle; $p_{i}$ and $p_{i-1}$ correspond to the positions of the following and preceding vehicles, respectively.
+
+The CACC control system of a vehicle comprises two controllers: an upper-level controller and a lower-level controller. The lower-level controller is responsible for utilizing throttle and/or brake control inputs to achieve the desired acceleration tracking. On the other hand, the upper-level controller is tasked with calculating the desired acceleration to maintain the desired spacing with respect to a preceding vehicle. In line with the approach discussed in~\cite{rajamani2002semi}, this paper focuses exclusively on the investigation of the upper-level controller, operating under the assumption that a suitable lower-level controller is already in place.
+ 
+
+% \section{Design of Resilient Observers}
+% The core scientific challenge lies in the "Unknown Input Observer" (UIO) design. Standard UIOs require two mathematical conditions: strong detectability and a specific rank condition on the system matrices18181818. While the SA-ACC model satisfies the detectability condition 19, it fails the rank condition ($rank(CW) \neq rank(W)$)20. Consequently, standard UIOs cannot be directly applied.To overcome this, two distinct methodological approaches were developed: a discrete-time approach using delayed observations and a continuous-time approach using sliding mode differentiation.
 
 \subsection{CACC modeling subject to cyberattack}
 %----
@@ -410,7 +441,7 @@ Assume there exist two symmetric and positive definite matrices $\mathcal{P}$ an
 Then the estimation error $\tilde{\xi}_{k}$, with $K = \mathcal{P}^{-1} \mathcal{Z}^{\top}$, satisfies the following exponential Input-to-State Stable~(ISS) bound:
 %\begin{multline}\label{ali_eISS} % \mathcal{P} \mathcal{A}_z - \mathcal{Z}^{\top} C_\xi
 \begin{empheq}[box = \widebox]{multline}\label{ali_eISS}
-\left\| \tilde{\xi}_{t}\right\| \leq \sqrt{\frac{\lambda_{\max}(\mathcal{P})}{\lambda_{\min}(\mathcal{P})}} \left\| \tilde{\xi}_{0}\right\| \displaystyle\alpha^{\frac{t}{2}} \\ 
+\left\| \tilde{\xi}_{t}\right\| \leq \sqrt{\frac{\lambda_{\max}(\mathcal{P})}{\lambda_{\min}(\mathcal{P})}} \left\| \tilde{\xi}_{0}\right\| \displaystyle\alpha^{\frac{t}{2}} 
 + \sqrt{\frac{\lambda_{\max}(\mathcal{S})}{(1-\alpha) \lambda_{\min}(\mathcal{P})}} \max_{0\leq k\leq t}\left\| \bar{\omega}_{k}\right\|.
 \end{empheq}
 %\end{multline}
@@ -448,6 +479,7 @@ with the condition $h > 2\tau $ and $\lambda > 0$ in order to ensure the string 
 % \end{align}
 %============
 \begin{figure}[h!]
+    \centering
     \includegraphics[width=0.4\textwidth]{ch3/img/bla_bla.png}
     \caption{Resilient control for CACC system.}
     \label{figobser_control}
@@ -466,7 +498,7 @@ with the condition $h > 2\tau $ and $\lambda > 0$ in order to ensure the string 
 
 
 %============
-\section{Simulation results by Using Matlab and Carla Platform}\label{sec4}
+\section{Simulation results by Using Matlab and Carla Platform}\label{ch3_secs_sim}
 %--
 We demonstrate the effectiveness of the proposed observer by conducting MATLAB and CARLA simulations with two cyberattack scenarios. The parameters of the CACC system and its controller are given in Table~\ref{tab:simple}. 
 \begin{table}[h!]
@@ -652,7 +684,7 @@ Our future endeavors will focus on exploring the challenge in the presence of mo
 
 
 %======
-\section{Exact discretization}\label{sec3}
+\section{Exact discretization}\label{sec_Exact discretization}
 %---
 
 To overcome the above limitation, we propose discretizing the system. Previous studies \cite{nguyen2020cyberattack} have applied state discretization with a delay that satisfies the necessary rank condition. 
@@ -676,7 +708,7 @@ The discrete-time version of equation is presented as follows, according to the 
 
 
 
-\begin{equation}\label{CACC_discrete}
+\begin{equation}\label{CACC_discrete_2}
 %\displaystyle
       \left\{ \begin{array}{l}
         x_{k+1} = A_d x_{k} + B_d v_{i,k} +F_d  \mu_{k}+ \hat{\Delta} - W_d  f^c_{k} \\
