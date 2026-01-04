@@ -684,7 +684,7 @@ Our future endeavors will focus on exploring the challenge in the presence of mo
 
 
 %======
-\section{Exact discretization}\label{sec_Exact discretization}
+\section{Use Exact discretization}\label{sec_Exact discretization}
 %---
 
 To overcome the above limitation, we propose discretizing the system. Previous studies \cite{nguyen2020cyberattack} have applied state discretization with a delay that satisfies the necessary rank condition. 
@@ -751,3 +751,122 @@ The rank condition is satisfied:
 \]
 
 
+
+%============
+\subsection{Simulation results and comparaison}\label{sec4}
+%--
+To demonstrate the effectiveness of the exact discretization method used in our study and the developed observer, we conducted simulations in MATLAB and CARLA, following the same procedures outlined in the paper by \cite{nguyen2020cyberattack}. This section will be divided into two parts: Matlab results and Carla results. In each part, we will present our findings and compare them with those from the study by \cite{nguyen2020cyberattack}.
+
+
+
+
+\subsubsection{Using Matlab}
+The observer developed based on the descriptor system for cyber-attack detection, along with the controllers described in the previous section, has been evaluated through simulations. For the CACC system, the system and controller parameters are as follows: $\tau= 0.4 s$, $L=7.3 m$, $l_i=5 m$, $h= 0.5 s$, $k_1= -0.8$, $k_1= 2.5$, $t_s= 0.01$
+
+
+We solve (11) for the observer gain using YALMIP Tollbox, with the exponential stability parameter $\alpha=0.5$. By solving the LMI condition, we obtain the observer gain \( K \):
+\[
+K = \begin{pmatrix}
+0.5 & -0.005 \\
+-0.001 & 0.7 \\
+-0.2 & -68.0 \\
+2.2 & 1004.2 
+\end{pmatrix}
+\]
+
+
+\begin{figure}[h!]
+   % \begin{minipage}[b]{0.5\linewidth}
+        \centering \includegraphics[scale=0.45]{ch3/img/error_state_mat.png}
+%la commande \centering permet de centre juste la ligne
+        \caption{The error state estimation}
+        \label{est_error_sel_fig}
+%\caption sert à inserer une légende
+ %   \end{minipage}\hfill
+  %  \begin{minipage}[b]{0.5\linewidth}
+        \centering \includegraphics[scale=0.3]{ch3/img/erreur.png}
+        \caption{The error state estimation \cite{nguyen2020cyberattack}}
+        \label{est_error_sel_fig_huy}
+   % \end{minipage}
+\end{figure}
+
+The figures (Fig. \ref{est_error_sel_fig} and Fig. \ref{est_error_sel_fig_huy}) illustrate the estimation errors of system states within the CACC framework, including position, velocity, and acceleration. These figures allow a comparison between the method applied in our study (Fig. \ref{est_error_sel_fig}) and the method used in the study referenced as \cite{nguyen2020cyberattack} (Fig. \ref{est_error_sel_fig_huy}).
+In Fig. \ref{est_error_sel_fig_huy}, which represents the results from \cite{nguyen2020cyberattack}, the estimation errors for position, velocity, and acceleration exhibit significant initial oscillations. These oscillations persist for about 5 seconds before the system stabilizes around zero. Additionally, the amplitude of the noise affecting these errors is substantial, indicating a less accurate state estimation under the influence of cyberattacks and noise.
+Conversely, Fig. \ref{est_error_sel_fig}, derived from our study, demonstrates that the estimation errors using an exact discretization method show less pronounced initial oscillations. The system stabilizes more rapidly, within approximately 3 seconds, and the noise amplitudes in both position and velocity errors are significantly reduced. This highlights the superiority of our method in improving state estimation accuracy, effectively mitigating the impact of cyberattacks and noise.
+Moreover, a notable difference in velocity error can be observed: the method from \cite{nguyen2020cyberattack} results in larger velocity estimation errors compared to our method, where the errors are less significant. This further supports the conclusion that our exact discretization method offers a more robust and precise approach to state estimation in the CACC system.
+
+
+
+
+
+
+
+\begin{figure}[h!]
+    \centering \includegraphics[scale=0.4]{ch3/img/photo1.png}
+    \centering 
+    \caption{Cyber-attack estimation and error }
+
+    \centering \includegraphics[scale=0.4]{ch3/img/cyberattack.png}
+    \caption{Cyber-attack estimation and error\cite{nguyen2020cyberattack}}
+\end{figure}
+
+The figures presented depict the actual cyberattacks (in blue) and the estimated values (in green). In the second subfigure, the estimation error for cyberattacks is compared between our study (Fig. 6) and the study in \cite{nguyen2020cyberattack} (Fig. 7). Both methods demonstrate a rapid and accurate capacity to detect cyberattacks, as evidenced by the alignment of the estimated cyberattack curves with the actual value. However, a more detailed comparative analysis reveals significant differences in terms of accuracy and noise.
+
+First, our method exhibits superior performance in terms of estimation accuracy for cyberattacks. As illustrated in Fig. 6, the estimates obtained with our approach show reduced fluctuations and greater stability compared to the method from \cite{nguyen2020cyberattack}, represented in Fig. 7. This difference indicates that our method is more robust and less sensitive to variations.
+
+Second, the figures also highlight a notable difference in the estimation errors of cyberattacks. In our method (Fig. 6), the estimation error is primarily centered around zero, with minimal fluctuations up to approximately 0.6. In contrast, the method from study \cite{nguyen2020cyberattack} (Fig. 7) shows an estimation error reaching an amplitude of around 2. This higher level of noise in the results from \cite{nguyen2020cyberattack} could lead to less reliable performance, where precise and stable responses are critical for maintaining security.
+
+
+\subsubsection{Using CARLA Simulator}
+To evaluate the effectiveness of the discretization method applied to the system, which will subsequently enable the development of an observer to estimate states (position, speed, and acceleration) as well as detect cyberattacks, it is imperative to conduct tests under realistic conditions. This validation was carried out using the CARLA simulator.
+
+
+We implemented the same simulation scenario \cite{nguyen2020cyberattack} on the CARLA platform, including two vehicles: a lead vehicle and a following vehicle. The objective was to test the system under real conditions, which allowed us to confirm our theoretical results previously obtained with MATLAB and to compare our discretization method with that developed in \cite{nguyen2020cyberattack}. The speed of the lead vehicle is maintained using a PID controller to stabilize the reference speed at 10 m/s. To ensure the reproducibility of the results and the precise tracking of the following vehicle, we strictly adhered to the CACC system parameters defined in the previous section (MATLAB simulation). Additionally, we discretized the system with a simulation time step of 0.04 seconds, which allowed us to accurately capture the dynamic evolutions of the vehicles in real-time on CARLA.
+
+
+
+The comparison between Figures 9 and 10 highlights the performance differences between our system, simulated in the CARLA environment, and the one described in reference \cite{nguyen2020cyberattack}. These figures illustrate the estimation errors of the system states.
+In our study, the estimation errors for speed and position converge more rapidly to zero compared to the study conducted in \cite{nguyen2020cyberattack}. However, the estimation of acceleration takes approximately 5 seconds to stabilize around zero, a delay similar to that observed in \cite{nguyen2020cyberattack}.
+
+\begin{figure}[h!]
+    \centering \includegraphics[scale=0.32]{ch3/img/err_moi.png}
+    \caption{The error state estimation }
+    \centering \includegraphics[scale=0.45]{ch3/img/carla erreur.png}
+    \caption{The error state estimation \cite{nguyen2020cyberattack}}
+\end{figure}
+
+
+
+
+ 
+The Figures 11 and 12 present a comparison of the cyberattack estimation results obtained respectively with our discretization method applied in the CARLA environment and with the reference approach described in \cite{nguyen2020cyberattack}. A detailed analysis highlights significant differences in terms of robustness, convergence speed, and accuracy.
+
+Firstly, Figure 12 shows larger initial fluctuations, illustrating a notable transient instability in the method of \cite{nguyen2020cyberattack}. Conversely, Figure 11 demonstrates a transient phase with more limited fluctuations, reflecting better initial error management. This difference highlights the ability of our method to better dampen disturbances at the startup phase.
+
+Secondly, convergence speed is a key factor in this comparison. Our method achieves rapid convergence and begins to accurately estimate the cyberattack within 3 seconds. In contrast, the method in \cite{nguyen2020cyberattack} requires more than 5 seconds to stabilize the estimations, which can be a critical limitation in applications requiring high responsiveness, particularly in dynamic and complex environments.
+
+Finally, in terms of long-term accuracy, our method demonstrates a better ability to track the actual variations of the cyberattack, with a close match between 
+\(f^c\) (the actual value) and \(\hat{f_c}\) (the estimation). In comparison, although the approach in \cite{nguyen2020cyberattack} manages to stabilize errors, it provides lower accuracy, limiting its effectiveness in scenarios requiring precise estimation.
+
+%In conclusion, our method offers optimal handling of initial fluctuations, rapid convergence (within 3 seconds), and superior global accuracy compared to the reference approach. These characteristics make it a robust and suitable solution for critical applications, such as simulations in the CARLA environment, where reliable and fast detection of cyberattacks is required.
+
+\begin{figure}[h!]
+ %   \begin{minipage}[b]{0.5\linewidth}
+        \centering \includegraphics[scale=0.52]{ch3/img/fc_moi.png}
+%la commande \centering permet de centre juste la ligne
+        \caption{Cyber-attack estimation }
+%\caption sert à inserer une légende
+  %  \end{minipage}\hfill
+ %   \begin{minipage}[b]{0.5\linewidth}
+        \centering \includegraphics[scale=0.47]{ch3/img/fc_huy.png}
+        \caption{Cyber-attack estimation \cite{nguyen2020cyberattack}}
+ %   \end{minipage}
+\end{figure}
+%In conclusion, while our CACC system experiences more significant initial fluctuations, it ultimately converges more precisely and quickly following a cyberattack. The system described in \cite{nguyen2020cyberattack} stabilizes more rapidly, but with lower accuracy in the detection and tracking of cyberattacks.
+
+
+
+\subsection{Conclusion}
+In our study, we introduced a new exact discretization technique that guarantees the rank condition for UIO existence and developed an LMI-based observer ensuring an ISS bound on cyberattack detection error in a CACC system. The method was compared with a previous discretization approach that introduced output delay. Simulations in MATLAB and CARLA confirmed the improved performance and effectiveness of the proposed method.
+
+Future work includes extending the approach to multi-vehicle platoons for greater realism and applying it to other systems such as Mixed Traffic Flow, highlighting its adaptability and potential to enhance the safety and resilience of autonomous vehicle control against cyberattacks.

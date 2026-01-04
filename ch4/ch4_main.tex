@@ -967,7 +967,25 @@ The nominal matrices are: \textcolor{red}{model not correct yet, to be fixed}
 \end{equation*}
 The term $\mu_x(x, u)$ lumps the unmodeled nonlinear tire dynamics (and may also capture residual parameter mismatches through their effect on the lateral tire forces).
 For the simulation, we introduce a significant parametric uncertainty: the "true" mass and cornering stiffnesses are set to be $20\%$ higher than the nominal values used in the observer design ($m_{true} = 1.2 m_{nom}$, etc.). This creates a challenging scenario for the estimator.
-
+{\color{blue}
+\subsubsection{Rank Condition Check (Why a Generalized/Regularized UIO Is Needed)}
+In the vehicle model~\eqref{vehicleLPV}, the unknown input is $\mu_x=[f_{yf}(\alpha_f),\, f_{yr}(\alpha_r)]^{\top}\in\mathbb{R}^{2}$ and enters the state dynamics through $E\in\mathbb{R}^{4\times 2}$, while the measured output is $y=Cx\in\mathbb{R}^{3}$.
+In classical UIO theory, a necessary rank condition for unknown-input reconstruction/decoupling is
+\begin{equation}\label{rank_vehicle_classical}
+\mathrm{rank}(CE)=\mathrm{rank}(E).
+\end{equation}
+With the matrices defined above, we have
+\[
+CE=\begin{bmatrix}
+0 & 0\\
+0 & 0\\
+\frac{l_f}{I_z} & -\frac{l_r}{I_z}
+\end{bmatrix},
+\]
+so that, under the standard assumptions $l_f>0$, $l_r>0$, $I_z>0$, one obtains $\mathrm{rank}(E)=2$ whereas $\mathrm{rank}(CE)=1$.
+Therefore, the classical rank condition~\eqref{rank_vehicle_classical} is \emph{not satisfied} for the considered sensor set $y=[v_x,\,\psi,\,r]^{\top}$. This means that a standard UIO cannot reconstruct the two components of $\mu_x$ from the available measurements.
+This motivates the use of the generalized/regularized UIO developed in Section~\ref{uio}, which restores the structural rank condition for the augmented descriptor system (Assumption~\ref{ali_hyp4} and~\eqref{rank2}) at the expense of introducing additional bounded disturbance terms.
+}
 \subsection{Observer Design and Implementation}
 
 \subsubsection{LPV Scheduling and Polytopic Embedding}
@@ -980,6 +998,13 @@ Assuming $v_x(t) \in [\underline{v}_x, \overline{v}_x]$, we have $\rho_1 \in [\u
 A(v_x(t)) \in \mathrm{Co}\{A_1,\dots,A_{\bar n}\},
 \]
 where the vertices $A_j$ are obtained by evaluating $A(v_x)$ at the corners of $(\rho_1,\rho_2)$ (typically $\bar n=4$). This polytopic description is used to synthesize constant observer gains via LMIs.
+
+{\color{blue}
+\paragraph{Remark (Number of gains vs number of vertices).}
+The presence of $\bar n=4$ vertices does not necessarily imply that four different observer gains must be implemented.
+In this chapter, we follow a \emph{common-gain} LPV design: the LMIs are enforced at all vertices $A_j$, but the decision variables are shared, yielding a \emph{single constant} gain (e.g., $K=\mathcal{P}^{-1}\mathcal{Q}^{\top}$) that is valid for all $A(v_x)$ in the convex hull.
+An alternative (not pursued here) is a gain-scheduled design with vertex gains $\{K_j\}_{j=1}^{\bar n}$ interpolated online as $K(\rho)=\sum_{j=1}^{\bar n}\alpha_j(\rho)K_j$.
+}
 
 \subsubsection{UIO for the LPV Vehicle Model (Gain $K$)}
 We adopt the LMI-based UIO framework developed in Section~\ref{uio} to estimate simultaneously the state $x$ and the unknown input $\mu_x$. To satisfy the structural rank condition~\eqref{rank2} for the augmented variable $\zeta := [x^\top,\mu_x^\top]^\top$, we use the regularized output
@@ -1034,8 +1059,8 @@ with the vehicle-dependent Jacobians
 \end{align}
 This shows explicitly that the gradient computation uses the physical LPV model through $A(\rho_k)$ at each time step.
 
-\subsection{Results and Discussion}
-
+\subsection{Results and Discussion } 
+\textcolor{red}{Not finshed yet, to be completed}
 The performance of the proposed Neural Adaptive Observer (NAO) is compared against a standard Proportional-Integral (PI) observer and a baseline UIO.
 
 \subsubsection{State Estimation}
