@@ -767,6 +767,37 @@ This is achieved through a multi-layer trust framework that quantifies how much 
     \label{fig_trust_framework}
 \end{figure}
 
+    \begin{table}[!t]
+    \centering
+    \caption{Summary of observer notation, trust variables, and index meaning.}
+    \label{tab:notation_summary}
+    \begin{tabular}{@{}p{0.22\linewidth}p{0.28\linewidth}p{0.44\linewidth}@{}}
+    	\toprule
+    Category & Notation & Meaning \\
+    \midrule
+    	\textbf{Observers}
+    & $\LO_i$, $\DO_i$ & Local observer at vehicle $i$ (sensor-based), and distributed observer at vehicle $i$ (V2V fusion). \\
+    & $\hat{x}_{0}^{(i)}(t)$ & Local state estimate of vehicle $i$ produced by $\LO_i$. \\
+    & $\DO_i^{(j)}$, $\hat{x}_{i}^{(j)}(t)$ & Vehicle $i$'s estimate of the target vehicle $j$'s state (distributed layer). \\
+    \addlinespace
+    	\textbf{Trust variables}
+    & $\delta_{i,l}(t)$ & Packet validity indicator (authenticated and fresh). \\
+    & $\LT_{i,l}$, $\DT_{i,l}$ & Local trust (local-observer consistency) and distributed/global trust (agreement of distributed estimates). \\
+    & $\gamma_{i,l}^{\text{self}}$ & Self-consistency factor: checks whether the host's own distributed observer global estimate is consistent with local relative measurements. \\
+    & $\T_{i,l}$, $\VT_i$ & Target trust for vehicle $l$ and its smoothed evolution (vehicle trust). \\
+    & $O_i$, $O_i(j)$ & Generalized trust/opinion vector of vehicle $i$ over all platoon members, with entry $O_i(j)\in[0,1]$ the opinion toward vehicle $j$. \\
+    & $w_{il}^{(j)}(t)$, $w_{i0}^{(j)}(t)$ & Trust-adaptive gain scaling factors (neighbor $l$ and anchor node $0$) used in the distributed observer. \\
+    \addlinespace
+    	\textbf{Indices / sets}
+    & $i$ & Host vehicle (computes trust and runs $\DO_i$). \\
+    & $l$ & Target neighbor whose data is assessed (typically $l\in\mathcal{N}_i$). \\
+    & $j$ & Target vehicle whose state is being estimated by $\DO_i^{(j)}$. \\
+    & $t$ & Discrete-time index. \\
+    & $0$, $N$, $\mathcal{N}_i$ & Anchor node (local-observer reference), number of vehicles, and neighbor set of vehicle $i$ in the communication graph. \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+
 In this context, we define the following types of trust:
 \begin{itemize}
     \item \textbf{Local Trust $\LT_{i,l}$}: evaluates the reliability of the local observer $\LO_{l}$ data from vehicle $l$ based on consistency and timeliness.
@@ -983,8 +1014,10 @@ Same concept of Local Trust but in the context of the distributed data. We denot
         (1 - \lambda_h)\DT_{i,l}(t-1), & \text{otherwise} \\
     \end{cases}
 \end{equation}
-where $\gamma_{l}^{\text{host}}$ and $\gamma_{i,l}^{\text{local}}$ are applied to check if the global estimates from neighbor $l$ are consistent with the host's and the local measurements, respectively; 
-Both of them will be illustrated in the following. 
+where $\gamma_{i,l}^{\text{host}}$ and $\gamma_{i,l}^{\text{local}}$ are applied to check if the global estimates from neighbor $l$ are consistent with the host's global estimate and the host's local measurements, respectively;
+$\gamma_{i,l}^{\text{self}}$ checks whether the global estimates from the host's own distributed observer are consistent with the local measurements.
+They will be illustrated in the following. 
+The resulting $\DT_{i,l}$ is later fused with the local trust to build the target/vehicle trust and ultimately contributes to the generalized trust (opinion) vector $O_i$ in Subsection~\ref{subsec_generalized_trust_vector}.
 
 
 \subsubsection{Consistency with host's global estimate:}
@@ -1014,25 +1047,23 @@ where $\gamma_{i,l}^{\text{host}} \in (0, 1]$. A value near 1 means high trust (
 
 
 \subsubsection{Consistency with host's local measurement:}
-\textcolor{red}{2 Thing : Use Self and Target Value Distributed state 
-}
-Host vehicle  $i$  have relative measurement to nearby vehicles (e.g., distance and relative velocity to a predecessor and a follower) and use that to checks if the distributed estimates from target $l$ are consistent with these measurements.
+Host vehicle $i$ has relative measurements to nearby vehicles (e.g., distance and relative velocity to a predecessor and a follower) and uses them to check if the distributed estimates received from target $l$ are consistent with these measurements.
 
-Let $y_{i,j}(t) \in R^{m_{ij}} $ is the relative measurement of vehicle  $i$ to vehicle $ j $ (e.g., $ y_{i,j}(t) = s_{j}(t) - s_{i}(t) $ for relative position).
+Let $y_{i,j}(t) \in \mathbb{R}^{m_{ij}}$ be the relative measurement of vehicle $i$ to vehicle $j$ (e.g., $y_{i,j}(t) = s_{j}(t) - s_{i}(t)$ for relative position).
 
-The distributed estimate of target $l$  should satisfy expectively:
+The distributed estimate received from target $l$ should satisfy, ideally:
 \begin{equation*}
-    H(\hat{x}_l^{(j)}(t) - \hat{x}_l^{(i)}(t)) \approx y_{i,j}(t).
+    H\big(\hat{x}_l^{(j)}(t) - \hat{x}_l^{(i)}(t)\big) \approx y_{i,j}(t).
 \end{equation*}
-where $H \in R^{m_{ij} \times n}$ is the measurement matrix that extracts the relevant states (e.g., position) from the state vector.
+where $H \in \mathbb{R}^{m_{ij} \times n}$ is the measurement matrix that extracts the relevant states (e.g., position) from the state vector.
 
-Define the error between the global estimate and the local measurement as
+Define the error between the predicted relative output and the local measurement as
 \begin{equation}
-    \varepsilon_{i,l}^{(j)}(t) = \left( \hat{x}_l^{(j)}(t) - \hat{x}_l^{(i)}(t) \right) - y_{i,j}(t), 
+    \varepsilon_{i,l}^{(j)}(t) = H\big( \hat{x}_l^{(j)}(t) - \hat{x}_l^{(i)}(t) \big) - y_{i,j}(t), 
 \end{equation}
 Similar with the \eqref{eq_dis_glo}, by applying the covariance matrix $\Sigma_{\text{local}}$, we can get 
 \begin{equation}
-    E_{i,l}^{(j)}(t) = (\varepsilon_{i,l}^{(j)}(t))^{-1} \Sigma_{\text{local}}^{-1} \varepsilon_{i,l}^{(j)}(t).
+    E_{i,l}^{(j)}(t) = (\varepsilon_{i,l}^{(j)}(t))^{\top} \Sigma_{\text{local}}^{-1} \varepsilon_{i,l}^{(j)}(t).
 \end{equation}
 
 Then, the total consistency error can be get by summing up the errors over all measurable vehicles:
@@ -1046,6 +1077,25 @@ Convert the error into a trust factor as
     \gamma_{i,l}^{\text{local}}(t) = \exp\left( -{E_{i,l}(t)} \right),
 \end{equation}
 where $\gamma_{i,l}^{\text{local}}(t) \in (0, 1]$, with lower values indicating poor consistency. 
+
+\subsubsection{Self-consistency with host's local measurement:}
+The host also checks whether its \emph{own} global estimates produced by the distributed observer are consistent with its local relative measurements. Specifically, the host's global estimate should satisfy, ideally,
+\begin{equation*}
+    H\big(\hat{x}_i^{(j)}(t) - \hat{x}_i^{(i)}(t)\big) \approx y_{i,j}(t),\quad j\in\mathcal{N}_i.
+\end{equation*}
+Define the self-consistency error
+\begin{equation}
+    \varepsilon_{i,\text{self}}^{(j)}(t) = H\big(\hat{x}_i^{(j)}(t) - \hat{x}_i^{(i)}(t)\big) - y_{i,j}(t),
+\end{equation}
+and the corresponding aggregate score
+\begin{equation}
+    E_{i,\text{self}}(t) = \sum_{j\in\mathcal{N}_i} (\varepsilon_{i,\text{self}}^{(j)}(t))^{\top}\Sigma_{\text{local}}^{-1}\varepsilon_{i,\text{self}}^{(j)}(t).
+\end{equation}
+Then the self-consistency factor is defined as
+\begin{equation}
+    \gamma_{i,l}^{\text{self}}(t) = \exp\left(-E_{i,\text{self}}(t)\right),
+\end{equation}
+which is shared across all targets $l$ (it depends only on the host's internal consistency at time $t$).
 \begin{remark}
 We can estimated covariance $\Sigma_{\text{host}}$ and $\Sigma_{\text{local}}$ by collecting the differences in vehicle \(i\) from a window of recent received data from \(l\) in normal condition.
 This avoids the need for each node to transmit its own covariance.
@@ -1230,6 +1280,7 @@ While $\VT_{i,l}$ provides a stable, pairwise evaluation between directly connec
 % \end{remark}
 \vspace*{-0.3cm}
 \subsection{Generalized trust vector}
+\label{subsec_generalized_trust_vector}
 \vspace*{-0.2cm}
 The target trust value $VT_{i,l}$ obtained in the previous subsection quantifies how much the host vehicle $i$ trusts a specific neighbor $l$.
 However, for the distributed observer to operate reliably, each vehicle must maintain an opinion about all other vehicles in the platoon, including those beyond its direct communication range.
@@ -1321,6 +1372,63 @@ where $|i - k|$ is the index distance between vehicles $i$ and $k$.
 The closer a neighbor $k$ is to host $i$, the larger its influence $g_{i,k}$.
 This fallback guarantees that the trust vector remains fully populated even when 
 no verified propagated opinion exists.
+
+
+\begin{figure}[ht!]
+    \centering       
+    \begin{tikzpicture}[
+    every node/.style={minimum size=8mm, anchor=center},
+    myarrow/.style={-Stealth, thick, green1},
+    highlight/.style={circle, draw=rose1,  fill = rose1!10, thick},
+    colframe/.style={rectangle,draw=blue1, fill = blue!10, thick, rounded corners}
+]
+% Matrix with placeholders
+\matrix (m) [matrix of math nodes, 
+nodes in empty cells, 
+left delimiter={[}, right delimiter={]}, row sep=0.15cm, 
+column sep=0.15cm
+] {
+    1 & 0.6 & * & * \\
+    0.8 & 1 & 0.8 & * \\
+    * & 0.9 & 1 & 0.9 \\
+    * & * & 0.8 & 1 \\
+};
+
+% Draw arrows for row names
+\foreach \i in {1,...,4} {
+    \node[right=1.25cm of m-\i-4] (r\i) {$\O_{\i}$};
+    \node[right=-0.25cm of m-\i-4] (b\i) {};
+    \draw[myarrow] (b\i) -- (r\i);
+}
+
+% Highlight the element at (4,2)
+\node[highlight, minimum size=7mm, name=m42] at (m-4-2) {};
+\node [below=0.1cm of m-4-3] (text) {Vehicle $i=4$ doesn't have the trust for the vehicle $j=2$};
+% \node [below=0.75cm of m-4-3] (eq) {$\O_{i,j}^{\text{dis}} = \displaystyle \sum_{k \in \N_{j}  } \left( g_{i,k} \cdot \O_{k}(j) \right)$};
+
+% Rectangle around 2nd column except (2,2)
+\node[colframe, minimum size=7mm, name=m12, label=above:{$k \in \N_{j} = \{1,3\}$}] at (m-1-2) {};
+\node[colframe, minimum size=7mm,name=m32] at (m-3-2) {};
+
+\draw[myarrow] (m12) .. controls +(-2.75,-1.25) .. node[midway,left] {$g_{i,k}$}(m42);
+\draw[myarrow] (m32) .. controls +(0.5,-0.5) .. node[midway,right] {$g_{i,k}$}(m42);
+
+\matrix (m2) [matrix of math nodes, 
+nodes in empty cells, 
+left delimiter={[}, right delimiter={]}, row sep=0.15cm, 
+column sep=0.15cm
+] {
+    1 & 0.6 & * & * \\
+    0.8 & 1 & 0.8 & * \\
+    * & 0.9 & 1 & 0.9 \\
+    * & * & 0.8 & 1 \\
+};
+
+\end{tikzpicture}
+    \caption{Weight based distance for $\O_{i,j}^{\text{dis}} $.}
+    \label{fig_VT_distance}
+\end{figure}
+    
 
 % \vspace{1ex}
 % \noindent\textbf{5) Dwell-Time Update Rule.}
@@ -1420,6 +1528,9 @@ According to the weight gain, the communication graph will be switched depending
 There exists a scalar constant $T > 0$ such that for all $t\geq 0$, the union graph $\cup _{[t, t+ T]}\bar{\G}^{(j)}(t)$ contains a spanning tree.
 \end{assumption}
 Assumption~\ref{ass_graph} means that for all $t\geq 0$, every node $i \in\V$ is reachable from node ``0 in the union graph $\cup _{[t, t+ T]}\bar{\G}^{(j)}(t)$. This ensures the connectivity of the proposed switching communication topology, which is required for our observer design method. For more details on this assumption, we refer the reader to~\cite{hao2024eventtriggered}.
+
+% The role of the trust mechanism is not to identify attacks perfectly, but to bound the contribution of unreliable nodes through nonnegative, normalized weights so that the resulting switched virtual Laplacian remains uniformly contractive.
+
 
 %{\color{ForestGreen}
 %To ensure the connectivity of the communication graph, which is a required condition for our observer design method, we assume that \textcolor{red}{???} according to Definition~\ref{def1}.
@@ -1531,6 +1642,40 @@ Then, the estimation error~\eqref{eq_e0}--\eqref{eq_error} is ISS. In particular
 
 \end{theorem}
 
+{\color{blue}
+\noindent\textbf{Intuition (cascade + switching).}
+Intuitively, the local observer $\LO_j$ stabilizes the \emph{self-estimation} error $e_0^{(j)}$ because $A_{\ell,j} \triangleq A_{\text{b}}-F_jC_{\text{b}}$ is Schur (Condition~1), so $e_0^{(j)}$ is ISS with respect to the bounded disturbance $d_0^j$. The distributed layer then behaves as a switched consensus-like filter driven by $e_0^{(j)}$ and $d^j_{\mathrm{DO}}$:
+\begin{equation*}
+e_{\mathrm{DO}}^{(j)}(t+1)=A_{\mathrm{DO}}^{(j)}(t)e_{\mathrm{DO}}^{(j)}(t)+B_{0}^{(j)}(t)e_0^{(j)}(t)+d_{\mathrm{DO}}^j(t),
+\end{equation*}
+with $A_{\mathrm{DO}}^{(j)}(t)=\big(I_N-\bar{\L}^{(j)}(t)\big)\otimes A_{\text{b}}$ and $B_{0}^{(j)}(t)=w_0^{(j)}(t)\otimes A_{\text{b}}$. The trust mechanism enforces a uniformly jointly connected virtual graph (Assumption~\ref{ass_graph}) and bounded nonnegative weights (Condition~2); combined with the uniform contraction bound in Condition~3 ($\|A_{\mathrm{DO}}^{(j)}(t)\|_*\le\alpha<1$ for all admissible switches), this prevents switching from destroying stability and yields an ISS cascade.
+
+\begin{proof}[A sketch of the proof]
+The argument relies on Assumptions~\ref{ass_graph} and~\ref{assum_distur} and on the cascade structure of~\eqref{eq_e0}--\eqref{eq_error}.
+
+\emph{Step 1 (local loop).} Fix $j\in\V$ and set $A_{\ell,j}\triangleq A_{\text{b}}-F_jC_{\text{b}}$. Under Condition~(1), $A_{\ell,j}$ is Schur, so there exist $c_{\ell,j}>0$ and $\lambda_{\ell,j}\in(0,1)$ such that $\|A_{\ell,j}^t\|\le c_{\ell,j}\lambda_{\ell,j}^t$ for all $t\ge 0$. Unrolling~\eqref{eq_e0} yields
+\begin{equation*}
+e_0^{(j)}(t)=A_{\ell,j}^t e_0^{(j)}(0)+\sum_{k=0}^{t-1}A_{\ell,j}^{t-1-k} d_0^j(k),
+\end{equation*}
+and by Assumption~\ref{assum_distur} we obtain an ISS estimate of the form
+\begin{equation*}
+\|e_0^{(j)}(t)\|\le c_{\ell,j}\lambda_{\ell,j}^t\|e_0^{(j)}(0)\|+\frac{c_{\ell,j}}{1-\lambda_{\ell,j}}\,\bar d_0.
+\end{equation*}
+
+\emph{Step 2 (distributed loop under switching).} Rewrite~\eqref{eq_error} as
+\begin{equation*}
+e_{\mathrm{DO}}^{(j)}(t+1)=A_{\mathrm{DO}}^{(j)}(t)e_{\mathrm{DO}}^{(j)}(t)+B_{0}^{(j)}(t)e_0^{(j)}(t)+d_{\mathrm{DO}}^j(t),
+\end{equation*}
+with $A_{\mathrm{DO}}^{(j)}(t)=\big(I_N-\bar{\L}^{(j)}(t)\big)\otimes A_{\text{b}}$ and $B_{0}^{(j)}(t)=w_0^{(j)}(t)\otimes A_{\text{b}}$. Condition~(3) provides a uniform contraction $\|A_{\mathrm{DO}}^{(j)}(t)\|_*\le\alpha<1$ for all admissible switches. Using the induced norm $\|\cdot\|_*$ and unrolling the recursion gives
+\begin{align*}
+\|e_{\mathrm{DO}}^{(j)}(t)\|_* &\le \alpha^t\,\|e_{\mathrm{DO}}^{(j)}(0)\|_* \\
+&\quad+\sum_{k=0}^{t-1}\alpha^{t-1-k}\Big(\|B_{0}^{(j)}(k)\|_*\,\|e_0^{(j)}(k)\|_*+\|d_{\mathrm{DO}}^j(k)\|_*\Big).
+\end{align*}
+Condition~(2) (nonnegative weights with row-sum bounded by 1) implies $\|w_0^{(j)}(t)\|$ is uniformly bounded, hence $\|B_{0}^{(j)}(t)\|_*$ is uniformly bounded as well. Combining this inequality with the bound from Step~1 and Assumption~\ref{assum_distur} yields the ISS bounds stated in the theorem.
+\end{proof}
+}
+
+
 \begin{proof}[A sketch of the proof]
 The proof is straightforward and relies on Assumptions~\ref{ass_graph} and~\ref{assum_distur}. Its simplicity stems from the fact that the coupled system~\eqref{eq_e0}--\eqref{eq_error} has a cascade structure. Condition~(1) guarantees that~\eqref{eq_e0} is ISS. Condition~(2), ensured by Assumption~\ref{ass_graph}, makes it possible to verify Condition~(3) by applying the Gershgorin theorem. Finally, Condition~(3), together with~(2), ensures that~\eqref{eq_error} is ISS.
 \end{proof}
@@ -1563,6 +1708,19 @@ By \eqref{assume3}, $\big|\big(I-\bar L^{(j)}(t)\big)\otimes A_b\big|\le \alpha<
 The conditions of Theorem~\ref{thm_observer} can be verified using a Lyapunov stability approach. This analysis yields explicit expressions for the matrix $F_{j}$ and the constants $c_0$, $c_1$, $\alpha$, and $\lambda$, depending on the selected Lyapunov functions. Since the overall system exhibits a cascade structure, system~\eqref{eq_e0} can be analyzed independently from system~\eqref{eq_error}, which effectively leads to a separation principle. Due to the page limit constraint, these detailed results are not presented as a separate theorem.
 \end{remark}
 \vspace*{-0.3cm}
+
+\begin{remark} (Limitations of the Stability Guarantees).
+The ISS guarantees of Theorem 1 rely critically on (i) bounded influence of each neighbor ensured by trust-based weight normalization, and (ii) uniform joint connectivity of the virtual graph, which guarantees repeated anchoring through the local observer node.
+
+These conditions may be violated under the following scenarios:
+\begin{itemize}
+    \item Stealthy Byzantine attacks, where adversarial vehicles generate physically consistent but biased data, maintaining high trust and inducing convergence to an incorrect equilibrium.
+    \item Colluding attacks, in which multiple compromised vehicles mutually reinforce false estimates, undermining trust propagation mechanisms.
+    \item Persistent DoS or network partition attacks, which permanently disconnect vehicles from anchoring local observers, rendering absolute state reconstruction impossible.
+\end{itemize}
+
+These scenarios correspond to fundamental identifiability limits of distributed estimation and cannot be addressed without additional assumptions such as cryptographic authentication, majority-honest agents, or infrastructure-based anchoring.
+\end{remark}
 
 %--------------------------------------------------------
 \section{Simulation Results}\label{sec_simulation}
@@ -1887,6 +2045,37 @@ This paper presented a distributed observer-based platoon control framework capa
 %
 %The proposed trust-based observer effectively protects the platoon by isolating malicious agents and preventing the propagation of corrupted data. However, it does not allow accurate estimation of the states of those malicious vehicles themselves. Once a vehicle's trust score falls below the threshold, its information is excluded from neighbor updates and is no longer corrected by trusted nodes. Consequently, its state estimate cannot converge to the true state. The framework thus prioritizes platoon safety and resilience over reconstructing the exact behavior of compromised vehicles a limitation shared by most existing distributed observer designs.
 %
-Future work will focus on enhancing the trust mechanism by coupling it more closely with the controller, enabling trust evaluation for non-neighboring vehicles, and improving adaptability under dynamic communication topologies. We will also investigate machine-learning based trust estimation and extend the observer design by using matrix gains to improve estimation accuracy and performance.
+
+\subsection{Open Problems and Future Directions}
+\vspace*{-0.2cm}
+The analysis in this chapter focuses on stability and boundedness (ISS) under bounded disturbances and a trust-driven switching topology. Several open problems remain before such architectures can be made both sharper (less conservative) and more resilient in practice:
+\begin{itemize}
+    \item \textbf{Matrix-valued (channel-wise) trust weights.}
+    In~\eqref{eq_observer}--\eqref{design_gain}, the coupling weights $w_{il}^{(j)}(t)$ are scalar and therefore apply the same attenuation to all state channels. A promising extension is to replace them with \emph{matrix} gains $W_{il}^{(j)}(t)\in\mathbb{R}^{n_x\times n_x}$ (e.g., diagonal or block-diagonal), allowing the trust mechanism to down-weight only the corrupted channels (e.g., acceleration) while preserving reliable channels (e.g., position). This leads to a matrix-weighted virtual Laplacian and stability conditions of the form
+    $\|\mathcal{A}_{\mathrm{DO}}^{(j)}(t)\|_*\le \alpha<1$ for a suitably defined induced norm, or equivalently LMI-type contraction constraints on the lifted (block) error dynamics.
+
+    \item \textbf{Trust/detection delay and rollback mechanisms.}
+    In realistic networks, trust values are computed from time windows and may be delayed; consequently, false data can enter the distributed observer before a node is flagged, degrading the estimate. Moreover, abruptly cutting a node can temporarily reduce information flow and worsen estimation during the transition.
+    A natural direction is to equip each host with a \emph{rollback buffer}: store a fixed window of past estimates and received packets. When the trust of a node drops below threshold, roll back to time $t-T_{\mathrm{w}}$ (window length) and re-propagate the observer using (i) only trusted neighbors and (ii) model-based prediction/local-observer anchoring to bridge the missing information. This resembles fixed-lag smoothing with trust-aware data rejection and could mitigate transient corruption while preserving stability, provided the reset/rollback map is bounded and updates satisfy a dwell-time or bounded-variation condition.
+
+    \medskip
+    \noindent\emph{Contamination rollback (compact recipe).}
+    If a neighbor $l^{\star}$ is flagged at time $t$, undo the last $K$ steps by keeping a buffer of the \emph{innovation terms} appearing in~\eqref{eq_DO}. For each step $k$, store $\hat{x}_i^{(j)}(k)$ and
+    \begin{align*}
+    \eta_{il}^{(j)}(k) &\triangleq w_{il}^{(j)}(k)\big(\hat{x}_l^{(j)}(k)-\hat{x}_i^{(j)}(k)\big),\quad l\in\mathcal{N}_i,\\
+    \eta_{i0}^{(j)}(k) &\triangleq w_{i0}^{(j)}(k)\big(\hat{x}_0^{(j)}(k)-\hat{x}_i^{(j)}(k)\big),
+    \end{align*}
+    as well as the input term $\hat{u}_j(k)$. When $l^{\star}$ is flagged, set $x\leftarrow\hat{x}_i^{(j)}(t-K)$ and replay for $k=t-K,\ldots,t-1$ using the same observer update but excluding $l^{\star}$ (or a malicious set $\mathcal{M}$):
+    \begin{equation*}
+    x \leftarrow A_{\text{b}}\Big(x + \sum_{l\in\mathcal{N}_i\setminus\mathcal{M}} \eta_{il}^{(j)}(k) + \eta_{i0}^{(j)}(k)\Big) + B_{\text{b}}\hat{u}_j(k),
+    \end{equation*}
+    and finally set $\hat{x}_i^{(j)}(t)\leftarrow x$.
+
+    \item \textbf{Data-driven trust and learned uncertainty (with model-based safety layer).}
+    Machine learning can be used to \emph{learn the mapping from signals to reliability}, while keeping the stability guarantee in the model-based layer by enforcing bounded weights. Concretely: (i) learn a calibrated trust score or anomaly probability from a feature vector built from innovation/residual signals (e.g., $\hat{x}_l^{(j)}-\hat{x}_i^{(j)}$, $\varepsilon_{i,l}^{(j)}$, packet age/loss, and consistency indicators), using change-point detection, self-supervised prediction, or lightweight sequence models; (ii) learn state-dependent covariance/uncertainty (heteroscedastic models) to adapt $\Sigma_{\text{local}}$ and thresholding; and (iii) implement the learned output only through a saturation/projection step that maps it to admissible weights satisfying Condition~(2) and preserving contraction in Condition~(3).
+\end{itemize}
+
+Future work will also focus on enhancing the trust mechanism by coupling it more closely with the controller, enabling trust evaluation for non-neighboring vehicles, and improving adaptability under dynamic communication topologies. 
+We will also investigate machine-learning based trust estimation.
 % \newpage
 % \appendix

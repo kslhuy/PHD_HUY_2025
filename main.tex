@@ -23,35 +23,35 @@
 \begin{document}
 \ulcover{} % création des couvertures, avec résumé/abstract
 
-% \frontmatter
-% \include{others/remerciements}
-% \AddResumeAbstract % macro pour résumé et abstract
+\frontmatter
+\include{others/remerciements}
+\AddResumeAbstract % macro pour résumé et abstract
 
-% \begin{singlespace} % réduction de l'interligne pour condenser
-% % Utiliser \adjustmtc si un décalage apparaît dans les petites tables des matières
-% \phantomsection \addcontentsline{toc}{chapter}{Table des matières}\adjustmtc
-% \tableofcontents\newpage
-% \renewcommand{\listfigurename}{Liste des figures}
-% \phantomsection\listoffigures\adjustmtc % Liste des figures
-% \phantomsection\listoftables\adjustmtc % Liste des tableaux
-% {\printglossary[type=\acronymtype,title=Acronymes et anglicismes]}\adjustmtc
-% \end{singlespace}
+\begin{singlespace} % réduction de l'interligne pour condenser
+% Utiliser \adjustmtc si un décalage apparaît dans les petites tables des matières
+\phantomsection \addcontentsline{toc}{chapter}{Table des matières}\adjustmtc
+\tableofcontents\newpage
+\renewcommand{\listfigurename}{Liste des figures}
+\phantomsection\listoffigures\adjustmtc % Liste des figures
+\phantomsection\listoftables\adjustmtc % Liste des tableaux
+{\printglossary[type=\acronymtype,title=Acronymes et anglicismes]}\adjustmtc
+\end{singlespace}
 
 %%%%%%%%%%%%%%%% CHAPITRES %%%%%%%%%%%%%%%%%%
 \mainmatter
 \setcounter{page}{1}
-% \include{ch1/ch1_main}
+\include{ch1/ch1_main}
 % \include{ch2/ch2_main}
-% \include{ch3/ch3_main}
-% \include{ch4/ch4_main}
+\include{ch3/ch3_main}
+\include{ch4/ch4_main}
 \include{ch5/ch5_main}
 
 
-% %%%%%%%%%%%%%%%% AUTRES PAGES %%%%%%%%%%%%%%%%%%
-% \mtcaddchapter % Close last chapter's minitoc before backmatter
-% \backmatter
-% \include{others/conclusion}
-% \include{others/liste_publi}
+%%%%%%%%%%%%%%%% AUTRES PAGES %%%%%%%%%%%%%%%%%%
+\mtcaddchapter % Close last chapter's minitoc before backmatter
+\backmatter
+\include{others/conclusion}
+\include{others/liste_publi}
 
 \begin{singlespace}
 \setlength\labelalphawidth{0em}

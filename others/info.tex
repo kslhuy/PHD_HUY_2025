@@ -27,22 +27,17 @@ connected vehicle}
 }
 
 \enabstract{
-% \lipsum[13-14]
+The reliability and safety of Connected and Autonomous Vehicles (CAVs) critically depend on the real-time availability of precise dynamic state information. However, equipping vehicles with comprehensive high-end sensor suites is often limited by economic and physical constraints. Furthermore, CAVs are increasingly vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I), which pose significant risks to system integrity. To address these challenges without incurring the prohibitive costs of hardware redundancy, this thesis proposes a resilient ``soft sensor'' framework based on analytical redundancy.
 
-The reliability and safety of Connected and Autonomous Vehicles (CAVs) rely heavily on the real-time availability of precise dynamic variables. However, equipping vehicles with high-end sensors to measure every necessary variable—such as sideslip angles or vehicle trajectories—is often economically unfeasible or physically impossible. 
-Furthermore, CAVs are increasingly vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I), which can lead to critical failures. To address these challenges without incurring the high cost of physical hardware redundancy, this thesis proposes the development of an embedded electronic board functioning as a resilient "soft sensor" based on analytical redundancy.
+This research adopts a hybrid modeling methodology that integrates physical differential equations with online learning-based neuro-adaptive neural networks. This approach enables the accurate representation of complex, time-varying parameters and unmodeled dynamics. Building on these models, advanced nonlinear estimation algorithms—specifically discrete-time Unknown Input Observers (UIO) and neuro-adaptive observers—are developed to reconstruct unmeasured states and ensure system resilience against data loss and malicious signal injection.
 
-The research adopts a hybrid modeling methodology that integrates physical differential equations with online learning-based neuro-adaptive neural networks. 
-This approach allows for the accurate representation of complex, time-varying parameters and unknown inputs within the vehicle's dynamics. Based on these models, advanced nonlinear estimation algorithms—specifically Unknown Input Observers (UIO) and neuro-adaptive observers—are developed to reconstruct missing state variables and ensure system resilience against data loss and malicious signal injection.
-
-The proposed estimation strategies are applied to two primary control challenges:
+The effectiveness of the proposed strategies is demonstrated in two primary control scenarios:
 \begin{itemize}
-    \item Resilience to Cyber-Attacks in Adaptive Cruise Control (ACC): The thesis investigates specific architectures for detecting and mitigating cyber-attacks, such as Denial of Service (DoS) and False Data Injection (FDI), within autonomous and cooperative ACC systems.
-    \item Vehicle Tracking and Platooning: Novel estimation algorithms are proposed to handle the nonlinear dynamics and unknown forces inherent in tracking surrounding vehicles, which is essential for decision-making in maneuvers like lane changes and platooning.
+    \item \textbf{Cyber-Secure Cooperative Adaptive Cruise Control (CACC):} Novel observer architectures are designed to detect and mitigate cyber-threats, such as Denial of Service (DoS) and False Data Injection (FDI). These fast-converging discrete-time observers enable the reconstruction of attack signals, ensuring robust longitudinal control.
+    \item \textbf{Resilient Platooning and Vehicle Tracking:} A distributed estimation framework, enhanced by a trust management mechanism, is proposed to handle nonlinear dynamics and filter out unreliable data, thereby maintaining platoon cohesion during complex maneuvers like lane changes.
 \end{itemize}
 
-
-The final contribution of this work is the design and fabrication of a prototype embedded electronic board. This hardware integrates the developed algorithms, validating the theoretical contributions and demonstrating a cost-effective, scalable solution for enhancing the autonomy, security, and fault tolerance of next-generation vehicles.
+Finally, the theoretical contributions are validated through the development of a prototype embedded electronic board. This hardware platform demonstrates a cost-effective and scalable solution for enhancing the autonomy, security, and fault tolerance of next-generation vehicles.
 }
 
 \frkeywords{Estimation, mot clé 2, mot clé 3, mot clé 4}
