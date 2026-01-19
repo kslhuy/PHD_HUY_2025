@@ -1,17 +1,24 @@
 \documentclass[a4paper, 11pt]{book}
 
-\usepackage{fontspec}
-\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+\fi
 \usepackage{lipsum}
-\usepackage{psl-cover}
+\usepackage{ul-cover}
+% \usepackage{ul-cover-hasni}
 
 \title{Developpement Observer}
 
 \author{Quang Huy NGUYEN}
 
-\institute{Université Lorraine}
-\doctoralschool{Dénomination de l'ED}{XXX}
-\specialty{Voir spécialités ED}
+\institute{Universit\'e de Lorraine}
+\laboratory{Nom du laboratoire}
+\doctoralschool{D\'enomination de l'ED}{XXX}
+\specialty{Voir sp\'ecialit\'es ED}
 \date{jj mois aaaa}
 
 %% cotutelle
@@ -19,16 +26,16 @@
 % \otherinstitute{CEA Saclay}
 % \logootherinstitute{logo-institute}
 
-\jurymember{1}{Prénom NOM}{Titre, établissement}{Président}
-\jurymember{2}{Prénom NOM}{Titre, établissement}{Rapporteur}
-\jurymember{3}{Prénom NOM}{Titre, établissement}{Rapporteur}
-\jurymember{4}{Prénom NOM}{Titre, établissement}{Examinateur}
-\jurymember{5}{Prénom NOM}{Titre, établissement}{Examinateur}
-\jurymember{6}{Prénom NOM}{Titre, établissement}{Examinateur}
-\jurymember{7}{Prénom NOM}{Titre, établissement}{Examinateur}
-\jurymember{8}{Prénom NOM}{Titre, établissement}{Directeur de thèse}
-% \jurymember{9}{Prénom NOM}{Titre, établissement}{Invité}
-% \jurymember{10}{Prénom NOM}{Titre, établissement}{Invité}
+\jurymember{1}{Pr\'enom NOM}{Titre, \'etablissement}{Pr\'esident}
+\jurymember{2}{Pr\'enom NOM}{Titre, \'etablissement}{Rapporteur}
+\jurymember{3}{Pr\'enom NOM}{Titre, \'etablissement}{Rapporteur}
+\jurymember{4}{Pr\'enom NOM}{Titre, \'etablissement}{Examinateur}
+\jurymember{5}{Pr\'enom NOM}{Titre, \'etablissement}{Examinateur}
+\jurymember{6}{Pr\'enom NOM}{Titre, \'etablissement}{Examinateur}
+\jurymember{7}{Pr\'enom NOM}{Titre, \'etablissement}{Examinateur}
+\jurymember{8}{Pr\'enom NOM}{Titre, \'etablissement}{Directeur de th\`ese}
+% \jurymember{9}{Pr\'enom NOM}{Titre, \'etablissement}{Invit\'e}
+% \jurymember{10}{Pr\'enom NOM}{Titre, \'etablissement}{Invit\'e}
 
 \frabstract{
   Cuius acerbitati uxor grave accesserat incentivum,
@@ -65,7 +72,7 @@
   Verum ad istam omnem orationem brevis est defensio. Nam
   quoad aetas M. Caeli dare potuit isti suspicioni locum, fuit
   primum ipsius pudore, deinde etiam patris diligentia
-  disciplinaque munita. Qui ut huic virilem togam deditšnihil
+  disciplinaque munita. Qui ut huic virilem togam dedit nihil
   dicam hoc loco de me; tantum sit, quantum vos existimatis;
   hoc dicam, hunc a patre continuo ad me esse deductum; nemo
   hunc M. Caelium in illo aetatis flore vidit nisi aut cum
@@ -74,7 +81,7 @@
 
   Et eodem impetu Domitianum praecipitem per scalas itidem
   funibus constrinxerunt, eosque coniunctos per ampla spatia
-  civitatis acri raptavere discursu.\ iamque artuum et
+  civitatis acri raptavere discursu. iamque artuum et
   membrorum divulsa conpage superscandentes corpora mortuorum
   ad ultimam truncata deformitatem velut exsaturati mox
   abiecerunt in flumen.

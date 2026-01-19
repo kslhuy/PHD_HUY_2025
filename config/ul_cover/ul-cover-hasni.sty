@@ -1,0 +1,152 @@
+% UL cover style matching front_thesis_hasni.pdf/png
+% License: GNU General Public License v3 (consistent with ul-cover.sty)
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ul-cover-hasni}
+
+\RequirePackage{graphicx}
+\RequirePackage{tabularx}
+\RequirePackage{etoolbox}
+\RequirePackage{iftex}
+\RequirePackage{tikz}
+\usetikzlibrary{backgrounds}
+
+% Serif text close to the reference cover (fallback if missing).
+\IfFileExists{newtxtext.sty}{\RequirePackage{newtxtext}}{}
+
+% --- VARIABLES ---
+\newcommand*{\institute}[1]{\gdef\@institute{#1}}
+\newcommand*{\degree}[1]{\gdef\@degree{#1}}
+\newcommand*{\mention}[1]{\gdef\@mention{#1}}
+\newcommand*{\coverdate}[1]{\gdef\@coverdate{#1}}
+\newcommand*{\directors}[1]{\gdef\@directors{#1}}
+\newcommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
+\newcommand*{\footerlinea}[1]{\gdef\@footerlinea{#1}}
+\newcommand*{\footerlineb}[1]{\gdef\@footerlineb{#1}}
+
+% Default values
+\newcommand*{\@institute}{}
+\newcommand*{\@degree}{}
+\newcommand*{\@mention}{}
+\newcommand*{\@coverdate}{}
+\newcommand*{\@directors}{}
+\newcommand*{\@thesistype}{Th\`ese}
+\newcommand*{\@footerlinea}{}
+\newcommand*{\@footerlineb}{}
+
+% --- LOGOS ---
+\newcommand*{\@logoApath}{}
+\newcommand*{\@logoBpath}{}
+\newcommand*{\@logoAwidth}{2.6cm}
+\newcommand*{\@logoBwidth}{2.6cm}
+
+\newcommand*{\logoA}[2][]{%
+  \ifstrempty{#1}{}{\gdef\@logoAwidth{#1}}%
+  \gdef\@logoApath{#2}%
+}
+\newcommand*{\logoB}[2][]{%
+  \ifstrempty{#1}{}{\gdef\@logoBwidth{#1}}%
+  \gdef\@logoBpath{#2}%
+}
+
+% Top row logos (horizontal)
+\newcommand*{\@logoTopApath}{}
+\newcommand*{\@logoTopBpath}{}
+\newcommand*{\@logoTopAwidth}{2.2cm}
+\newcommand*{\@logoTopBwidth}{2.2cm}
+
+\newcommand*{\logoTopA}[2][]{%
+  \ifstrempty{#1}{}{\gdef\@logoTopAwidth{#1}}%
+  \gdef\@logoTopApath{#2}%
+}
+\newcommand*{\logoTopB}[2][]{%
+  \ifstrempty{#1}{}{\gdef\@logoTopBwidth{#1}}%
+  \gdef\@logoTopBpath{#2}%
+}
+
+% --- JURY MANAGEMENT ---
+\newcommand*{\@jurylist}{}
+\newcommand{\jurymember}[3]{%
+  \g@addto@macro\@jurylist{%
+    \textit{#1} & \textbf{#2} \\[-0.2em]
+    & #3 \\[0.6em]
+  }%
+}
+
+% --- MAIN COMMANDS ---
+\newcommand*{\ulfrontcover}{%
+  \thispagestyle{empty}
+  \begin{tikzpicture}[overlay, remember picture]
+    \coordinate (nw) at (current page.north west);
+    \coordinate (ne) at (current page.north east);
+    \ifdefempty{\@logoTopApath}{}{%
+      \node[anchor=north west, xshift=12mm, yshift=-10mm] at (nw) {%
+        \includegraphics[width=\@logoTopAwidth]{\@logoTopApath}%
+      };
+    }
+    \ifdefempty{\@logoTopBpath}{}{%
+      \node[anchor=north east, xshift=-12mm, yshift=-10mm] at (ne) {%
+        \includegraphics[width=\@logoTopBwidth]{\@logoTopBpath}%
+      };
+    }
+  \end{tikzpicture}
+  \begin{center}
+    \vspace*{8mm}
+    {\Large\bfseries \@title\par}
+    \vspace{6mm}
+    {\large \@thesistype\par}
+    \vspace{4mm}
+    {\small Pr\'esent\'ee et soutenue publiquement le \@coverdate\ pour l'obtention du titre de\par}
+    \vspace{2mm}
+    {\small\scshape \@degree\par}
+    \ifdefempty{\@mention}{}{%
+      \vspace{1mm}
+      {\small (\@mention)\par}
+    }
+    \vspace{4mm}
+    {\small par\par}
+    \vspace{2mm}
+    {\large \@author\par}
+    \vspace{4mm}
+    {\small Sous la direction de\par}
+    \vspace{2mm}
+    {\small \@directors\par}
+  \end{center}
+
+  \vspace{6mm}
+  {\noindent\small\textbf{Composition du jury}\par}
+  \vspace{2mm}
+  {\small
+  \begin{tabularx}{\textwidth}{p{0.23\textwidth}X}
+    \@jurylist
+  \end{tabularx}
+  }
+
+  % Bottom logos and affiliations
+  \begin{tikzpicture}[overlay, remember picture]
+    \coordinate (sw) at (current page.south west);
+    \coordinate (se) at (current page.south east);
+
+    \ifdefempty{\@logoApath}{}{%
+      \node[anchor=south west, xshift=12mm, yshift=12mm] at (sw) {%
+        \includegraphics[width=\@logoAwidth]{\@logoApath}%
+      };
+    }
+    \ifdefempty{\@logoBpath}{}{%
+      \node[anchor=south west, xshift=12mm, yshift=40mm] at (sw) {%
+        \includegraphics[width=\@logoBwidth]{\@logoBpath}%
+      };
+    }
+
+    \ifdefempty{\@footerlinea}{}{%
+      \node[anchor=south east, xshift=-12mm, yshift=14mm, align=right] at (se) {%
+        \footnotesize \@footerlinea\par
+        \footnotesize \@footerlineb\par
+      };
+    }
+  \end{tikzpicture}
+}
+
+\renewcommand*{\maketitle}{\ulfrontcover}
+
+\endinput

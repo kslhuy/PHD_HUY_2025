@@ -21,27 +21,70 @@ connected vehicle}
 \jurymember{6}{Prenom \textsc{Nom 6}}{DR Affiliation}{Directeur de thèse}
 % \jurymember{7}{Prénom NOM}{Titre, établissement}{Directeur de thèse}
 
-% entre 1700 et 4000 signes ? 
+% % entre 1700 et 4000 signes ? 
+% \frabstract{
+% La fiabilité et la sécurité des véhicules connectés et autonomes (VCA) dépendent de manière critique de la disponibilité en temps réel d'informations précises sur l'état dynamique. 
+% Cependant, les contraintes économiques limitent souvent l'utilisation de capteurs haut de gamme. 
+% De plus, les VCA sont vulnérables aux défauts de capteurs et aux cyberattaques ciblant les communications inter-véhicules (V2V/V2I). 
+% Pour relever ces défis, cette thèse propose un cadre de « capteur logiciel » résilient basé sur la redondance analytique.
+
+% Cette recherche développe une méthodologie de modélisation hybride intégrant des équations physiques et des réseaux de neurones neuro-adaptatifs. 
+% Cette approche est spécifiquement conçue pour estimer les forces inconnues et les dynamiques non modélisées complexes, résolvant ainsi des problèmes d'estimation délicats tels que ceux rencontrés dans la prévention du renversement ou la dynamique latérale. Des algorithmes d'estimation non linéaires avancés observateurs à entrées inconnues (UIO) et observateurs neuro-adaptatifs sont développés pour garantir la résilience du système.
+
+% L'efficacité des stratégies proposées est démontrée à travers deux axes principaux :
+% \begin{itemize}
+%     \item \textbf{CACC Cyber-sécurisé :} Des architectures d'observateurs sont conçues pour détecter et atténuer une large gamme de cybermenaces, incluant l'injection de fausses données (FDI), le déni de service (DoS), ainsi que les retards et pertes de paquets. Ces observateurs permettent la reconstruction des signaux d'attaque, assurant un contrôle longitudinal robuste.
+%     \item \textbf{Peloton et Suivi de Véhicules :} Un cadre d'estimation distribué est proposé pour gérer des modèles dynamiques non linéaires dépendant de forces inconnues. Couplé à un mécanisme de gestion de la confiance, il assure la cohésion du peloton lors de manœuvres complexes.
+% \end{itemize}
+
+% Enfin, les contributions théoriques sont validées par le développement d'un prototype de carte électronique embarquée, démontrant une solution rentable et évolutive pour améliorer l'autonomie et la sécurité des véhicules de nouvelle génération.
+% }
+
+% \enabstract{
+% The reliability and safety of Connected and Autonomous Vehicles (CAVs) critically depend on the real-time availability of precise dynamic state information. However, economic constraints often limit the use of high-end sensors. Furthermore, CAVs are vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I). To address these challenges, this thesis proposes a resilient ``soft sensor'' framework based on analytical redundancy.
+
+% This research develops a hybrid modeling methodology integrating physical equations with neuro-adaptive neural networks. This approach is specifically designed to estimate unknown forces and complex unmodeled dynamics, addressing challenging estimation problems such as those found in rollover prevention or lateral dynamics. Advanced nonlinear estimation algorithms Unknown Input Observers (UIO) and neuro-adaptive observers are developed to ensure system resilience.
+
+% The effectiveness of the proposed strategies is demonstrated through two main axes:
+% \begin{itemize}
+%     \item \textbf{Cyber-Secure CACC:} Observer architectures are designed to detect and mitigate a wide range of cyber-threats, including False Data Injection (FDI), Denial of Service (DoS), as well as delays and packet losses. These observers enable the reconstruction of attack signals, ensuring robust longitudinal control.
+%     \item \textbf{Platooning and Vehicle Tracking:} A distributed estimation framework is proposed to handle nonlinear dynamic models dependent on unknown forces. Coupled with a trust management mechanism, it ensures platoon cohesion during complex maneuvers.
+% \end{itemize}
+
+% Finally, the theoretical contributions are validated through the development of a prototype embedded electronic board, demonstrating a cost-effective and scalable solution for enhancing the autonomy and security of next-generation vehicles.
+% }
 \frabstract{
-% \lipsum[10-11]
+La fiabilité et la sécurité des véhicules connectés et autonomes (VCA) dépendent de manière critique de la disponibilité en temps réel d'informations précises sur l'état dynamique. Cependant, les contraintes économiques limitent souvent l'utilisation de capteurs haut de gamme. De plus, les VCA sont vulnérables aux défauts de capteurs et aux cyberattaques ciblant les communications inter-véhicules (V2V/V2I). Pour relever ces défis, cette thèse propose un cadre de « capteur logiciel » résilient basé sur la redondance analytique.
+
+Cette recherche développe une méthodologie de modélisation hybride intégrant des équations physiques et des réseaux de neurones neuro-adaptatifs. Cette approche permet une représentation précise des paramètres complexes et variables dans le temps ainsi que des dynamiques non modélisées. S'appuyant sur ces modèles, des algorithmes d'estimation non linéaires avancés observateurs à entrées inconnues (UIO) et observateurs neuro-adaptatifs sont développés pour garantir la résilience du système.
+
+L'efficacité des stratégies proposées est démontrée à travers trois axes principaux :
+\begin{itemize}
+    \item \textbf{CACC Cyber-sécurisé :} Des architectures d'observateurs sont conçues pour détecter et atténuer une large gamme de cybermenaces, incluant l'injection de fausses données (FDI), le déni de service (DoS), ainsi que les retards et pertes de paquets. Ces observateurs permettent la reconstruction des signaux d'attaque, assurant un contrôle longitudinal robuste.
+    \item \textbf{Peloton et Suivi de Véhicules :} Un cadre d'estimation distribué est proposé pour gérer des modèles dynamiques non linéaires. Couplé à un mécanisme de gestion de la confiance, il permet de filtrer les données non fiables et d'assurer la cohésion du peloton lors de manœuvres complexes.
+    \item \textbf{Estimation des Forces et Dynamique du Véhicule :} L'application des observateurs hybrides neuronaux est étendue à l'estimation de forces inconnues et de dynamiques complexes, adressant des problèmes critiques tels que le risque de renversement, où la connaissance précise des forces externes est essentielle pour la sécurité.
+\end{itemize}
+
+% Enfin, les contributions théoriques sont validées par le développement d'un prototype de carte électronique embarquée, démontrant une solution rentable et évolutive pour améliorer l'autonomie et la sécurité des véhicules de nouvelle génération.
 }
 
 \enabstract{
-The reliability and safety of Connected and Autonomous Vehicles (CAVs) critically depend on the real-time availability of precise dynamic state information. However, equipping vehicles with comprehensive high-end sensor suites is often limited by economic and physical constraints. Furthermore, CAVs are increasingly vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I), which pose significant risks to system integrity. To address these challenges without incurring the prohibitive costs of hardware redundancy, this thesis proposes a resilient ``soft sensor'' framework based on analytical redundancy.
+The reliability and safety of Connected and Autonomous Vehicles (CAVs) critically depend on the real-time availability of precise dynamic state information. However, economic constraints often limit the use of high-end sensors. Furthermore, CAVs are vulnerable to sensor faults and cyber-attacks targeting inter-vehicle communications (V2V/V2I). To address these challenges, this thesis proposes a resilient ``soft sensor'' framework based on analytical redundancy.
 
-This research adopts a hybrid modeling methodology that integrates physical differential equations with online learning-based neuro-adaptive neural networks. This approach enables the accurate representation of complex, time-varying parameters and unmodeled dynamics. Building on these models, advanced nonlinear estimation algorithms—specifically discrete-time Unknown Input Observers (UIO) and neuro-adaptive observers—are developed to reconstruct unmeasured states and ensure system resilience against data loss and malicious signal injection.
+This research develops a hybrid modeling methodology integrating physical equations with neuro-adaptive neural networks. This approach enables the accurate representation of complex, time-varying parameters and unmodeled dynamics. Building on these models, advanced nonlinear estimation algorithms: Unknown Input Observers (UIO) and neuro-adaptive observers are developed to ensure system resilience.
 
-The effectiveness of the proposed strategies is demonstrated in two primary control scenarios:
+The effectiveness of the proposed strategies is demonstrated through three main axes:
 \begin{itemize}
-    \item \textbf{Cyber-Secure Cooperative Adaptive Cruise Control (CACC):} Novel observer architectures are designed to detect and mitigate cyber-threats, such as Denial of Service (DoS) and False Data Injection (FDI). These fast-converging discrete-time observers enable the reconstruction of attack signals, ensuring robust longitudinal control.
-    \item \textbf{Resilient Platooning and Vehicle Tracking:} A distributed estimation framework, enhanced by a trust management mechanism, is proposed to handle nonlinear dynamics and filter out unreliable data, thereby maintaining platoon cohesion during complex maneuvers like lane changes.
+    \item \textbf{Cyber-Secure CACC:} Observer architectures are designed to detect and mitigate a wide range of cyber-threats, including False Data Injection (FDI), Denial of Service (DoS), as well as delays and packet losses. These observers enable the reconstruction of attack signals, ensuring robust longitudinal control.
+    \item \textbf{Platooning and Vehicle Tracking:} A distributed estimation framework is proposed to handle nonlinear dynamic models. Coupled with a trust management mechanism, it allows filtering out unreliable data and ensuring platoon cohesion during complex maneuvers.
+    \item \textbf{Vehicle Dynamics and Force Estimation:} The application of hybrid neural observers is extended to the estimation of unknown forces and complex dynamics, addressing critical issues such as rollover risk, where precise knowledge of external forces is essential for safety.
 \end{itemize}
 
-Finally, the theoretical contributions are validated through the development of a prototype embedded electronic board. This hardware platform demonstrates a cost-effective and scalable solution for enhancing the autonomy, security, and fault tolerance of next-generation vehicles.
+% Finally, the theoretical contributions are validated through the development of a prototype embedded electronic board, demonstrating a cost-effective and scalable solution for enhancing the autonomy and security of next-generation vehicles.
 }
 
-\frkeywords{Estimation, mot clé 2, mot clé 3, mot clé 4}
-\enkeywords{State Estimation, keyword 2, keyword 3, keyword 4}
+\frkeywords{Estimation distribuée, observateur neuronal, Cyberattaque, Gestion de la confiance}
+\enkeywords{State Estimation, Neural Observer, Cyber-attack, Trust management,}
 
 
 %%%%%%% Paramètres PDF

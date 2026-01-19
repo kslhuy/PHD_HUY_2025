@@ -26,6 +26,11 @@ Although the results obtained in this thesis represent a significant step toward
 
 A first perspective concerns large-scale experimental validation. While the proposed algorithms were tested in realistic simulation environments and prepared for embedded implementation, full-scale experiments on real vehicles in diverse traffic conditions would provide valuable insights into their real-world performance. Such experiments could include highway platooning, urban driving, and interaction with non-cooperative road users.
 
+A complementary perspective is the \textbf{full onboard implementation} of the proposed resilient estimation and trust mechanisms on an embedded platform.
+In particular, the custom electronic board introduced in Chapter~6 was designed as a future hosting target for the observers developed in the thesis (unknown-input observers, neuro-adaptive observers, and trust-aware distributed observers).
+Future work will consist in porting the estimation stack to the embedded RTOS environment (task scheduling at $100\,\mathrm{Hz}$, timestamped V2V messaging, and robust I/O handling), and validating the resulting closed-loop performance on the QCar2 platform and, ultimately, on full-scale vehicles.
+This step will enable a rigorous assessment of real-time constraints (latency, packet losses, sensor noise), computational load, and energy consumption, while providing a practical path from simulation-grade validation to deployable automotive-grade solutions.
+
 A second perspective involves extending the estimation framework to cooperative perception systems. Future autonomous vehicles will increasingly rely on shared perception data, such as camera images, LiDAR point clouds, and radar detections exchanged through V2V and V2I communications. Integrating resilient estimation algorithms with cooperative perception would enable robust fusion of heterogeneous data sources while mitigating the impact of corrupted or delayed information.
 
 Another important direction concerns the interaction between estimation, control, and decision-making layers. In this thesis, the focus was placed on state estimation and its role in ensuring reliable control. 

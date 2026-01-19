@@ -1,29 +1,544 @@
-\chapter[Titre court du 2nd chapitre pour sommaire]{Le titre long du second chapitre du manuscrit de thèse}\label{chp6_chap}
-\chaptermark{Titre chp 2 pour en tete de page}
+\chapter[Vehicle experiments and Board electronic]{Vehicle experiments and Board electronic}\label{chp6_chap}
+\chaptermark{Vehicle experiments and Board electronic}
 
-\objectif{Objectif rapide du chapitre 2.}
+\objectif{This chapter reports the experimental validation workflow and the implementation results obtained on the Quanser QCar2/QLabs platform.
+It first presents the virtual-to-real experimental methodology, the platform architecture (sensing, perception, V2V communication, software stack), and the longitudinal/lateral control loops used to reproduce cooperative driving.
+Then, it details the observer and trust-aware distributed estimation pipeline, and summarizes the main results under nominal conditions and under representative cyber/communication attack scenarios.
+Finally, this chapter introduces the custom embedded electronic board designed to host the proposed estimation and trust mechanisms on a real vehicle, and discusses the firmware validation and the integration roadmap.
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}
+\section{Vehicle Experiments }\label{chp6_sec_vehicle_experiments}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Paragraphe avec une figure}
+\subsection{Experimental methodology: from virtual validation to real trials}\label{chp6_subsec_methodology}
+The experimental validation strategy follows a modular pipeline centered on (i) platoon modeling, (ii) cooperative control, (iii) distributed observation, and (iv) incremental validation on a realistic platform.
+In practice, the workflow is decomposed into five phases:
+\begin{itemize}
+	\item \textbf{Phase 1 -- Environment setup:} configuration of the virtual environment under Ubuntu and deployment of the Quanser Virtual Environment container to connect QLabs and QCar2.
+	\item \textbf{Phase 2 -- V2V communication and software architecture:} implementation of inter-vehicle communication via UDP and development of a modular Python architecture.
+	\item \textbf{Phase 3 -- Longitudinal and lateral control:} two complementary control loops are implemented:
+	(i) longitudinal control to regulate speed and inter-vehicle distance, and
+	(ii) lateral control to track the road/trajectory.
+	\item \textbf{Phase 4 -- Observer and trust system:} development of a distributed observer to estimate the fleet states even in presence of delays and information losses; integration of a trust system that weights the reliability of received data and dynamically adapts the fusion mechanism.
+	\item \textbf{Phase 5 -- Full integration and real-time validation:} complete integration and real-time testing in QLabs; the transfer to physical scenarios on real QCar2 is prepared as a next step.
+\end{itemize}
 
-\lipsum[50]
-\begin{figure}[H]\centering
-\includegraphics[width=.5\linewidth]{ch2/fig/Saturation_voxel_size.png}
-\caption{Une description avec la légende associée et sa référence.}
-\label{fig2_example}
+\begin{figure}[!ht]
+	\centering
+	% \fbox{\parbox{0.9\linewidth}{\vspace{1.6cm}\centering Placeholder for the virtual-to-real experimental workflow ("Figure 3" in the provided report).\vspace{1.6cm}}}
+	\includegraphics[width=0.9\linewidth]{ch6/fig/Modular_Experimental_Phases.png}
+    \caption{Modular Experimental Phases.}
+	\label{fig:ch6_modular_Experimental_Phases}
 \end{figure}
 
-\subsection{Résultats avec un tableau}
-\lipsum[51]
+The objective of the real-trial preparation is to design an \emph{embedded intelligent soft sensor} able to estimate non-measured quantities and detect disturbances related to cyberattacks and/or sensor faults.
+This embedded soft sensor associates perception measurements to surrounding vehicles, reconstructs critical variables, and distinguishes physical anomalies from malicious perturbations.
 
-\begin{table}[H]\centering
-\begin{tabular}{lcc}
-                                 & \textit{In silico} & \textit{In vitro} \\ \hline
-Number of half cycles            & 2        & 4                    \\ \hline
-Duty cycle                       & \SI{33}{\%}     & \SI{45}{\%}                 \\ \hline
-\end{tabular}
-\caption{Un exemple de tableau}\label{tab2_num1}
+
+\begin{figure}[!ht]
+	\centering
+	% \fbox{\parbox{0.9\linewidth}{\vspace{1.6cm}\centering Placeholder for the virtual-to-real experimental workflow ("Figure 3" in the provided report).\vspace{1.6cm}}}
+	\includegraphics[width=0.9\linewidth]{ch6/fig/experimental_workflow.png}
+    \caption{Experimental workflow for the virtual validation on QLabs/QCar2 and preparation of real trials.}
+	\label{fig:ch6_workflow}
+\end{figure}
+Beyond the modular phases described above, 
+the experiments rely on a coordinated workflow that links code development, 
+simulation, and real-world testing. 
+A containerized development environment is used to write and package the Python control and estimation code. 
+Once a new controller or observer is ready, the container sends the code to a Graphical Ground Station. 
+This application acts as the central hub for the experiments: it runs the cooperative control and planning algorithms, visualizes trajectories and state estimates in real time, 
+and forwards commands to the test platform. 
+When working with the QLabs simulator, the ground station interfaces with the QLabs Virtual Environment, which is a digital twin of the physical QCar platform. 
+The virtual QCar behaves the same way as the real hardware and exposes the same sensors and actuators, so control software can be measured and tested in simulation before deployment.
+
+During a simulation trial, the ground station sends high‑level control commands (e.g., desired speed and spacing) to the virtual environment and receives simulated sensor data and vehicle states. 
+This allows the researcher to verify the platoon behaviour, tune the cooperative adaptive cruise control and look‑ahead steering loops, and adjust observer parameters. 
+Because the digital twin mirrors the physical self‑driving car studio, the same code can then be executed on the real QCar with minimal changes. 
+In physical tests, the ground station sends visual plots and user commands to the vehicle while logging the on‑board measurements, estimated distances and trust indicators. 
+The logs collected during real trials are sent back to the containerized development environment, where they are analysed to refine the models and software. This feedback loop—code development → ground‑station execution → virtual trials → physical trials → log analysis—enables safe, incremental validation: controllers and observers are first validated in a realistic digital twin, then applied to the real vehicle. Bridging and blending code between the virtual and physical platforms allows researchers to explore new scenarios and behaviours while ensuring that the resulting algorithms are robust when transferred to hardware.
+
+\section{Quanser QCar2/QLabs experimental platform}\label{chp6_sec_platform}
+
+\subsection{Virtual environment and scenario definition}\label{chp6_subsec_virtual_env}
+The QLabs environment is configured with two connected vehicles: a \emph{leader} vehicle tracking a predefined closed-loop trajectory and a \emph{follower} vehicle reproducing cooperative platoon behavior.
+The leader trajectory is defined via a set of waypoints that form a closed loop.
+In the reported experiments, a desired speed of $0.3\,\mathrm{m/s}$ is selected to generate a smooth and repeatable reference motion for the follower.
+The scenario includes typical road elements (ground, walls, pedestrian crossing), making it closer to real driving conditions.
+
+\begin{figure}[!ht]
+	\centering
+	\fbox{\parbox{0.9\linewidth}{\vspace{1.6cm}\centering Placeholder for the QLabs environment configuration and the selected waypoints ("Figures 5--6" in the provided report).\vspace{1.6cm}}}
+	\caption{QLabs scenario and example of selected waypoints for the leader vehicle.}
+	\label{fig:ch6_qlabs_waypoints}
+\end{figure}
+
+\subsection{Measurements and perception pipeline}\label{chp6_subsec_measurements}
+Designing trust-aware distributed estimation requires a clear definition of the measurements and metadata available on the QCar2 platform.
+In this work, the data sources include: onboard sensors, perception modules (LiDAR-camera fusion), and V2V exchanged states.
+Table~\ref{tab:ch6_qcar_measurements} summarizes the measurements used in the reported experiments.
+
+\begin{table}[!ht]
+	\centering
+	\caption{Summary of measurements and metadata available on QCar2/QLabs used for control, estimation, and trust evaluation.}
+	\label{tab:ch6_qcar_measurements}
+	\renewcommand{\arraystretch}{1.15}
+	\begin{tabular}{p{0.21\linewidth} p{0.26\linewidth} p{0.24\linewidth} p{0.25\linewidth}}
+		\hline
+			\textbf{Category} & \textbf{Measurement / Metadata} & \textbf{Source} & \textbf{Usage} \\
+		\hline
+		Onboard sensors (raw) & Position $(x,y)$ and timestamp & QLabs virtual GPS (GPSSync API) & Time alignment and trajectory registration \\
+		Onboard sensors (raw) & Acceleration and angular rate & IMU (accelerometers, gyros) & Instantaneous vehicle dynamics \\
+		Onboard sensors (raw) & 2D point cloud & LiDAR (RPLiDAR A2, $12\,\mathrm{m}$ range) & 360$^\circ$ obstacle sensing \\
+		Onboard sensors (raw) & RGB / depth images & Cameras (Intel RealSense D435 and CSI 360$^\circ$) & Visual perception \\
+		Onboard sensors (raw) & Wheel speed and steering angle & Motor encoder and steering servo & Inputs for longitudinal/lateral control \\
+		Derived kinematics & Position, orientation $(\psi)$ & QLabs global state & Absolute vehicle state in the map \\
+		Derived kinematics & Longitudinal speed $(v)$ & Encoder + Kalman filter & Smoothed speed estimate \\
+		Derived kinematics & Longitudinal acceleration $(a)$ & Derivative of $v$ (Kalman) or IMU & Longitudinal acceleration estimate \\
+		Cooperative variables & Inter-vehicle distance $(d)$ & LiDAR-camera fusion pipeline & Reliable distance for cooperative control \\
+		Cooperative variables & Relative speed $(\Delta v)$ & Temporal derivative of $d$ & Rate of change of inter-vehicle gap \\
+		V2V metadata & Neighbor states $(p,v,a)$ & Periodic V2V messages & Cooperation / distributed estimation \\
+		V2V metadata & Link quality & Packet loss rate, delays & Communication reliability for trust \\
+		\hline
+	\end{tabular}
 \end{table}
+
+Two critical quantities for cooperative control and trust assessment are the inter-vehicle distance $d$ and the relative speed $\Delta v$.
+They are obtained via a LiDAR-camera fusion pipeline, which can be summarized as follows:
+\begin{itemize}
+	\item Image segmentation: YOLOv8-seg is used to extract object masks (vehicles, pedestrians).
+	\item Post-processing: mask erosion reduces false positives.
+	\item LiDAR projection: 3D LiDAR points are projected into the image plane using intrinsic/extrinsic calibration matrices.
+	\item Data association: projected points are associated to segmented objects, yielding a 2D-3D coupling.
+	\item Spatial clustering: DBSCAN filters and groups fused points.
+	\item 3D estimation: PCA computes 3D bounding boxes and relative positions.
+	\item Final quantities: distance $d$ is deduced from relative position; relative speed is obtained from time-derivative of $d$.
+\end{itemize}
+
+% \begin{figure}[!ht]
+% 	\centering
+% 	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for LiDAR bird-eye view and camera fusion view ("Figures 7--8" in the provided report).\vspace{1.7cm}}}
+% 	\caption{Illustration of LiDAR-camera fusion for inter-vehicle distance estimation.}
+% 	\label{fig:ch6_lidar_camera_fusion}
+% \end{figure}
+
+% In the reported example, the estimated distances displayed in real time include values such as $d \approx 8\,\mathrm{m}$ and $d \approx 22\,\mathrm{m}$.
+% These results show that the cooperative variables $(d,\Delta v)$ do not come from raw sensors only, but from a multimodal perception chain that combines vision and LiDAR.
+
+\subsection{V2V communication and modular software architecture and Attack design}\label{chp6_subsec_v2v}
+\subsubsection{Design of V2V communication}\label{chp6_subsubsec_v2v_design}
+Beyond control and estimation algorithms, the overall system requires a robust communication layer.
+The V2V stack is organized into three functional layers, as illustrated in Figure~\ref{fig:ch6_v2v_stack}:
+\begin{enumerate}
+	\item \textbf{Application layer}: high-level cooperative functions (platoon controller, distributed observer, trust manager) consume and produce vehicle state messages.
+	\item \textbf{Session layer}: handles message reliability through acknowledgments (ACK/NACK), periodic heartbeats for neighbor-presence detection, and a virtual-GPS-based time synchronization service that timestamps every packet.
+	\item \textbf{Transport layer}: UDP sockets transmit and receive datagrams at a fixed period (typically $T_s = 100\,\mathrm{ms}$). Separate threads handle transmission and reception to avoid blocking.
+\end{enumerate}
+
+At each communication period, a vehicle broadcasts a state packet containing:
+\begin{itemize}
+	\item vehicle identifier ($id$);
+	\item position $(x,y)$ and heading $\psi$;
+	\item longitudinal speed $v$ and acceleration $a$;
+	\item synchronized timestamp $t$.
+\end{itemize}
+When a packet is received, an ACK is returned to the sender; if no ACK arrives within a timeout, the message is flagged as lost.
+In parallel, a heartbeat mechanism periodically checks for missing neighbors: if no message (nor heartbeat) is received from a neighbor for a configurable interval, that neighbor is marked as unavailable and excluded from the cooperative estimation until communication resumes.
+These mechanisms ensure temporal consistency and data integrity, which are prerequisites for the distributed observer and trust framework.
+
+% ============================================================
+% DIAGRAM SPECIFICATION FOR FIGURE ch6_v2v_stack
+% ------------------------------------------------------------
+% Create a vertical block diagram with three stacked layers:
+%
+%   ┌─────────────────────────────────────────────────────┐
+%   │              APPLICATION LAYER                      │
+%   │  ┌──────────┐  ┌──────────────┐  ┌──────────────┐   │
+%   │  │ Platoon  │  │ Distributed  │  │    Trust     │   │
+%   │  │Controller│  │  Observer    │  │   Manager    │   │
+%   │  └────┬─────┘  └──────┬───────┘  └──────┬───────┘   │
+%   └───────┼───────────────┼─────────────────┼───────────┘
+%           │  state msgs   │                 │
+%           ▼               ▼                 ▼
+%   ┌─────────────────────────────────────────────────────┐
+%   │               SESSION LAYER                         │
+%   │  ┌──────────┐  ┌──────────────┐  ┌──────────────┐   │
+%   │  │ ACK/NACK │  │  Heartbeat   │  │ GPS Time     │   │
+%   │  │ Handler  │  │   Manager    │  │   Sync       │   │
+%   │  └────┬─────┘  └──────┬───────┘  └──────┬───────┘   │
+%   └───────┼───────────────┼─────────────────┼───────────┘
+%           │  UDP pkts     │                 │
+%           ▼               ▼                 ▼
+%   ┌─────────────────────────────────────────────────────┐
+%   │              TRANSPORT LAYER (UDP)                  │
+%   │         ┌───────────┐    ┌───────────┐              │
+%   │         │  TX Thread│    │  RX Thread│              │
+%   │         └─────┬─────┘    └─────┬─────┘              │
+%   └───────────────┼────────────────┼────────────────────┘
+%                   │                │
+%                   ▼                ▼
+%              ══════════════════════════
+%                  Wireless Channel
+%              ══════════════════════════
+% ============================================================
+
+\begin{figure}[!ht]
+	\centering
+	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for V2V communication stack diagram (see LaTeX comments above for specification).\vspace{1.7cm}}}
+	\includegraphics[width=0.7\linewidth]{ch6/fig/V2V_achi.png}
+	\caption{Layered architecture of the V2V communication stack used in the QLabs experiments.}
+	\label{fig:ch6_v2v_stack}
+\end{figure}
+
+\subsubsection{Attack injection mechanism}\label{chap6_subsubsec_attack_insert}
+To evaluate the robustness of the distributed observer and trust framework under adversarial conditions, a configurable \emph{attack injector} is integrated into the communication layer.
+The injector intercepts outgoing or incoming V2V packets and applies one of several perturbation models before the data reach the application layer.
+Figure~\ref{fig:ch6_attack_injector} illustrates the injection pipeline.
+
+\paragraph{Injection modes.}
+Three attack families are supported:
+\begin{enumerate}
+	\item \textbf{Bias injection}: a constant offset $\delta$ is added to one or more state variables (e.g., $\tilde{v} = v + \delta_v$).
+	\item \textbf{Random fault}: with probability $p$, the transmitted value is replaced by a random sample drawn from a uniform distribution of configurable intensity.
+	\item \textbf{Data drop (DoS)}: with probability $p_{drop}$, the packet is discarded entirely, simulating a denial-of-service or severe packet-loss scenario.
+\end{enumerate}
+
+\paragraph{Injection parameters.}
+Each attack scenario is defined by:
+\begin{itemize}
+	\item \emph{attacker ID}: the vehicle whose outgoing messages are corrupted;
+	\item \emph{target variables}: which state components are affected (position, velocity, acceleration, or all);
+	\item \emph{attack window}: the time interval $[t_{start}, t_{end}]$ during which the attack is active;
+	\item \emph{attack parameters}: bias magnitude $\delta$, fault intensity, or drop probability $p_{drop}$.
+\end{itemize}
+The injector can operate transparently (victim vehicles are unaware) or be logged for post-experiment analysis.
+This flexibility enables systematic benchmarking of the trust-aware estimation framework across a wide range of adversarial conditions (see Table~\ref{tab:ch6_attack_scenarios} for the specific scenarios used in this work).
+
+% ============================================================
+% DIAGRAM SPECIFICATION FOR FIGURE ch6_attack_injector
+% ------------------------------------------------------------
+% Create a horizontal flow diagram showing the attack injection point:
+%
+%   ┌────────────┐      ┌──────────────────────────────┐      ┌────────────┐
+%   │  Sensor /  │      │       ATTACK INJECTOR        │      │ Application│
+%   │  Estimator ├─────►│  ┌─────────────────────────┐ ├─────►│   Layer    │
+%   │  (Sender)  │      │  │ Mode selector:          │ │      │ (Receiver) │
+%   └────────────┘      │  │  • Bias injection       │ │      └────────────┘
+%                       │  │  • Random fault         │ │
+%        outgoing       │  │  • Packet drop (DoS)    │ │        corrupted /
+%        V2V packet     │  └─────────────────────────┘ │        clean packet
+%                       │                              │
+%                       │  Parameters:                 │
+%                       │   - attacker ID              │
+%                       │   - target variables         │
+%                       │   - time window [t_s, t_e]   │
+%                       │   - δ, intensity, p_drop     │
+%                       └──────────────────────────────┘
+%
+% Use color coding:
+%   • Green arrow = clean packet path (bypass)
+%   • Red arrow   = corrupted packet path
+% ============================================================
+
+\begin{figure}[!ht]
+	\centering
+	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for attack injector pipeline diagram (see LaTeX comments above for specification).\vspace{1.7cm}}}
+	\includegraphics[width=0.9\linewidth]{ch6/fig/attack_injector.png}
+	\caption{Attack injection mechanism integrated into the V2V communication layer.}
+	\label{fig:ch6_attack_injector}
+\end{figure}
+
+\section{Control architecture}\label{chp6_sec_control}
+
+\subsection{Longitudinal control: cooperative cruise control}\label{chp6_subsec_longitudinal}
+The longitudinal control loop is based on cooperative adaptive cruise control (CACC) to regulate both velocity and inter-vehicle spacing.
+The control input combines locally measured quantities (e.g., speed/acceleration) with cooperative information received via V2V (e.g., predecessor acceleration), and relies on the perception-derived distance $d$ and relative speed $\Delta v$.
+This chapter focuses on the experimental integration and validation aspects; the detailed CACC modeling and resilient observer-based compensation are developed in earlier chapters.
+
+\subsection{Lateral control: extended look-ahead to reduce corner cutting}\label{chp6_subsec_lateral}
+In curves, follower vehicles tend to exhibit \emph{corner cutting} (reduced turning radius compared to the leader), which can induce lateral offsets and affect the effective inter-vehicle spacing.
+To mitigate this effect, an Extended Look-Ahead Controller (ELC) is implemented.
+The idea is to define a virtual pursuit point $P^*$ located ahead of the preceding vehicle by a look-ahead distance $d_{LA}$ and laterally shifted by $d_{lat}$.
+The follower then computes its steering command using this virtual target rather than the preceding vehicle's center of gravity.
+This improves curve tracking and helps maintain the spacing policy (e.g., constant time-gap) in both straight and curved roads.
+
+\begin{figure}[!ht]
+	\centering
+	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for corner-cutting comparison without/with look-ahead control ("Figures 10--11" in the provided report).\vspace{1.7cm}}}
+	\caption{Effect of extended look-ahead on corner cutting in curves.}
+	\label{fig:ch6_corner_cutting}
+\end{figure}
+
+% \section{Observer-based estimation and trust-aware distributed fusion}\label{chp6_sec_observers_trust}
+
+% \subsection{Two-layer observation architecture}\label{chp6_subsec_observer_arch}
+% Estimation is used to reconstruct states that are not directly measured with sufficient accuracy and to maintain robustness under noisy or missing data.
+% Two complementary observation layers are implemented:
+% \begin{itemize}
+% 	\item \textbf{Local observer} (per-vehicle): estimates the vehicle state $x_i(t)$ from local measurements $y_i(t)$.
+% 	\item \textbf{Distributed observer} (cooperative): each vehicle $i$ reconstructs states of other vehicles $j$ by combining its local observer outputs with V2V information from neighbors $\mathcal{N}_i$.
+% \end{itemize}
+% Under graph connectivity and appropriate gain choices, the distributed estimation converges to the true fleet state (as reported in the provided experimental document).
+
+% \begin{figure}[!ht]
+% 	\centering
+% 	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for the two-layer observation/communication architecture ("Figure 12" in the provided report).\vspace{1.7cm}}}
+% 	\caption{Two-layer estimation architecture: local observers and V2V-based distributed fusion.}
+% 	\label{fig:ch6_two_layer_arch}
+% \end{figure}
+
+% \subsection{Nominal results (no attack)}\label{chp6_subsec_nominal_results}
+% In nominal conditions, the local observer estimates are consistent with the GPS reference trajectories.
+% The reported comparisons show that positions $(x,y)$, heading $\psi$, and longitudinal speed $v$ are accurately reconstructed despite encoder noise.
+% Moreover, distributed observers enable each vehicle to reconstruct the full fleet state (trajectories and speed profiles) from V2V exchanges.
+% These nominal results provide a baseline reference before introducing faulty or adversarial scenarios.
+
+% \begin{figure}[!ht]
+% 	\centering
+% 	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholders for local-observer vs GPS plots and distributed fleet estimates ("Figures 13--18" in the provided report).\vspace{1.7cm}}}
+% 	\caption{Nominal estimation results: local observer tracking of GPS and distributed reconstruction of fleet states.}
+% 	\label{fig:ch6_nominal_estimation}
+% \end{figure}
+
+% \subsection{Trust framework integration}\label{chp6_subsec_trust}
+% To increase resilience against compromised neighbors and communication faults, a trust framework is integrated into the distributed observer.
+% Trust is computed from both local kinematic consistency and global consistency of distributed estimates:
+% \begin{itemize}
+% 	\item \textbf{Local evaluation functions:}
+% 	\begin{itemize}
+% 		\item \texttt{evaluate\_velocity()}: checks consistency between reported speed and observed displacement.
+% 		\item \texttt{evaluate\_distance()}: compares reported position with locally measured inter-vehicle distance.
+% 		\item \texttt{evaluate\_acceleration()}: evaluates whether speed variations are dynamically plausible.
+% 	\end{itemize}
+% 	\item \textbf{Global evaluation functions:}
+% 	\begin{itemize}
+% 		\item \texttt{gamma\_cross()}: measures coherence between a vehicle's global fleet estimates and observed data.
+% 		\item \texttt{gamma\_local()}: checks if neighbors' local estimates match the ego vehicle perception.
+% 	\end{itemize}
+% \end{itemize}
+
+% The \emph{local trust} is computed as a product of local consistency terms:
+% \[
+% 	LT = (\text{velocity})\times(\text{distance})\times(\text{acceleration}).
+% \]
+% The \emph{global trust} evaluates the reliability of the information a vehicle shares about the rest of the fleet:
+% \[
+% 	DT = \gamma_{cross}\times\gamma_{local}.
+% \]
+% The final combined trust score for vehicle $j$ is defined as
+% \[
+% 	O_j = DT\times LT.
+% \]
+% Based on this score, the set of trusted neighbors is updated online according to a simple thresholding rule:
+% \[
+% 	\mathcal{N}_i(t) = \{ j\in\mathcal{N}_i: O_j>0.5\}.
+% \]
+% Communication weights are then dynamically adapted as a function of the number of trusted neighbors.
+% In particular, a normalized weight is maintained even when only a few neighbors are trusted, using a lower bound $\kappa$ to preserve connectivity.
+
+% \begin{figure}[!ht]
+% 	\centering
+% 	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholders for trust impact heatmap and trust score evolution during DoS ("Figures 19--20" in the provided report).\vspace{1.7cm}}}
+% 	\caption{Trust framework results: normalized impact scores and trust score evolution under DoS.}
+% 	\label{fig:ch6_trust_results}
+% \end{figure}
+
+\subsection{Attack scenarios and quantitative summary}\label{chp6_subsec_attack_scenarios}
+In the reported virtual experiments, the leader vehicle (ID 1) behaves as the attacker between $t=5\,\mathrm{s}$ and $t=10\,\mathrm{s}$.
+Several scenarios are considered, including bias injection, random faults, and DoS-like packet drops on position/velocity/acceleration.
+
+\begin{table}[!ht]
+	\centering
+	\caption{Attack scenarios used to evaluate the trust-aware estimation framework (leader ID 1 attacks other vehicles during $t\in[5,10]\,\mathrm{s}$).}
+	\label{tab:ch6_attack_scenarios}
+	\renewcommand{\arraystretch}{1.15}
+	\begin{tabular}{c p{0.26\linewidth} p{0.26\linewidth} p{0.28\linewidth}}
+		\hline
+            \textbf{Case} & \textbf{Attack method} & \textbf{Parameter(s)} & \textbf{Target (data)} \\
+		\hline
+		1 & Bias & $-5\,\mathrm{m}$ & Position \\
+		2 & Random fault & intensity $=10$, $p=0.3$ & Position \\
+		3 & Bias & $-2\,\mathrm{m/s}$ & Velocity \\
+		4 & Random fault & intensity $=2.5$, $p=0.3$ & Velocity \\
+		5 & Random fault & intensity $=1.0$, $p=0.3$ & Acceleration \\
+		6 & Data drop (DoS) & $p_{drop}=0.5$ & Position, velocity, acceleration \\
+		\hline
+	\end{tabular}
+\end{table}
+
+Two indicators are used to quantify the effects of the attacks: (i) a combined raw error capturing deviations on distance, speed, and acceleration estimates; and (ii) a normalized impact score obtained by dividing the combined error by the maximum error observed across scenarios.
+Among the considered scenarios, the DoS attack (Case~6) yields the highest normalized impact score ($0.872$), confirming it as the most severe perturbation.
+Conversely, the velocity bias attack (Case~3, bias $=-2\,\mathrm{m/s}$) yields the lowest reported impact score ($0.240$), indicating a limited effect on the overall platoon stability.
+In terms of vehicle sensitivity, the reported results show that vehicle $V4$ is the most affected (max impact $0.872$), whereas vehicle $V2$ is the most resilient with the lowest average impact score ($0.362$).
+Finally, the trust score evolution under DoS shows a clear drop below the $0.5$ threshold during the perturbation interval, followed by progressive recovery after the attack ends.
+
+\section{Custom embedded electronic board for future onboard deployment}\label{chp6_sec_board}
+
+\subsection{Motivation and design objectives}\label{chp6_subsec_board_motivation}
+To move from simulation-based validation / small-scale experiments to real trials, the project includes the design of a dedicated embedded electronic board.
+The objective is not only to ``run the code on hardware'', but to provide an integration-ready platform where sensing, communication, timing, and basic cyber-resilience can be validated under realistic constraints.
+In this thesis, the board is envisioned as an embedded \emph{intelligent soft sensor}: it reconstructs non-measured variables, monitors the consistency of cooperative data, and exports reliable state and trust indicators to higher-level decision and control.
+
+From a system engineering viewpoint, the design targets four key objectives:
+\begin{itemize}
+	\item \textbf{Real-time execution:} guarantee deterministic execution of periodic estimation and control-related computations (e.g., $\approx 100\,\mathrm{Hz}$ loops as used in the experimental software stack), with bounded jitter.
+	\item \textbf{Multi-interface sensing and synchronization:} acquire heterogeneous data streams (inertial, positioning/time reference, and auxiliary sensors) and ensure time alignment through timestamping.
+	\item \textbf{V2V-ready communication:} support low-latency exchange of compact state messages and metadata (packet loss, delay indicators) required by the distributed observer and trust evaluation.
+	\item \textbf{Robustness and diagnosability:} provide a hardware and firmware structure that supports fault detection, health monitoring, and graceful degradation when sensors or communications are unavailable.
+\end{itemize}
+
+Compared with a purely PC-based ground-station deployment, the embedded approach also addresses practical constraints that become critical on a vehicle: compactness and wiring reduction, controlled power distribution, electromagnetic compatibility (EMC), and reliable boot/execution behavior.
+The overall role of the board is therefore to acquire onboard sensing data, exchange information with neighboring vehicles, fuse local and remote information, and publish consolidated variables (including trust indicators) to the vehicle-level decision and control system.
+
+\subsection{Architecture and PCB design}\label{chp6_subsec_board_hw}
+The development process is structured into four phases: (i) functional needs analysis and block-architecture definition, (ii) electronic CAD design, (iii) prototyping and embedded programming, and (iv) experimental verification with rigorous test protocols.
+The design identifies the required sensors, the target microcontroller family, and the relevant communication protocols, including \textbf{SPI}, \textbf{I$^2$C}, \textbf{UART}, and \textbf{Wi-Fi 6}.
+The electronic design is implemented in KiCad and routed on a \textbf{4-layer PCB}, which offers two main benefits: (i) dedicated reference planes to control return paths and reduce EMI, and (ii) improved power distribution and decoupling compared with 2-layer prototypes.
+
+\paragraph{Functional blocks.}
+At a high level, the board architecture (Figure~\ref{fig:ch6_board_design}) can be described as a composition of:
+\begin{itemize}
+	\item a \textbf{real-time processing unit} (microcontroller + memory resources) responsible for scheduling tasks, running the embedded observer/trust logic, and managing peripherals;
+	\item a \textbf{communication subsystem} supporting short-range V2V exchange (Wi-Fi) and wired diagnostic/telemetry links (UART);
+	\item a \textbf{sensing and timing subsystem} interfacing inertial and positioning/time-reference signals through SPI/I$^2$C/UART, and providing timestamping for data consistency;
+	\item a \textbf{power subsystem} that converts the vehicle supply to regulated rails for digital logic and RF modules, with attention to inrush current, ripple, and protection.
+\end{itemize}
+
+\paragraph{Electrical and layout considerations.}
+Beyond functional connectivity, the PCB is designed to be compatible with an onboard environment where noisy actuators, switching regulators, and RF emissions may coexist.
+The main layout guidelines are summarized below:
+\begin{itemize}
+	\item \textbf{Power integrity:} short decoupling loops close to IC supply pins, separation of noisy switching nodes from sensitive analog/RF areas, and adequate bulk capacitance for transient loads.
+	\item \textbf{Grounding and return paths:} continuous ground reference planes and stitching vias to reduce loop areas, ensuring that high-frequency return currents follow controlled paths.
+	\item \textbf{High-speed / RF routing:} controlled-impedance routing and keep-out zones for the Wi-Fi/RF section, plus careful placement of the GNSS/RF components to minimize coupling.
+	\item \textbf{Robust I/O:} ESD-aware connector placement and protection where needed (especially for external cables), as well as clear separation between internal buses (SPI/I$^2$C) and external-facing ports.
+\end{itemize}
+Particular care is therefore devoted to power integrity, impedance constraints, electromagnetic compatibility, and high-frequency signal management (Wi-Fi and GNSS).
+
+\begin{table}[!ht]
+	\centering
+	\caption{Embedded board design targets for thesis-to-vehicle transfer (high-level, implementation-dependent).}
+	\label{tab:ch6_board_targets}
+	\renewcommand{\arraystretch}{1.15}
+	\begin{tabular}{p{0.30\linewidth} p{0.64\linewidth}}
+		\hline
+			extbf{Design aspect} & \textbf{Target / rationale} \\
+		\hline
+		Real-time behavior & Deterministic scheduling for periodic estimation tasks (e.g., $\sim 100\,\mathrm{Hz}$) and bounded latency for event-driven message handling. \\
+		Interfaces & Support SPI/I$^2$C/UART for sensors and debugging; support Wi-Fi for V2V exchange of compact state packets and link-quality metadata. \\
+		Time consistency & Timestamping and time-reference handling to align sensor samples and received packets before fusion and trust evaluation. \\
+		Robustness & Health monitoring (watchdog, peripheral status), logging/telemetry hooks, and safe fallback behavior when links or sensors degrade. \\
+		PCB constraints & 4-layer stack-up to improve grounding and EMC; separation of RF/power/sensitive areas; routing practices compatible with onboard EMI constraints. \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{figure}[!ht]
+	\centering
+	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholders for board block diagram, PCB routing, and 3D model ("Figures 21--23" in the provided report).\vspace{1.7cm}}}
+    \begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/achitec_carte.png}
+		% \caption{block architecture.}
+		\label{fig:ch6_block_architecture}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/Kidcad_elec.png}
+		% \caption{KiCad PCB electrical plan.}
+		\label{fig:ch6_KiCad_PCB}
+	\end{subfigure}
+    
+    
+    \caption{Embedded board design: block architecture and KiCad PCB implementation.}
+	\label{fig:ch6_board_design}
+\end{figure}
+
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/proto1.png}
+		\caption{Prototype validation using development kits (firmware bring-up and I/O tests).}
+		\label{fig:ch6_proto_devkit}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/cart_true.jpg}
+		\caption{Manufactured embedded board intended for onboard deployment.}
+		\label{fig:ch6_proto_board}
+	\end{subfigure}
+
+	\caption{Prototype validation and manufactured embedded board.}
+	\label{fig:ch6_board_prototype}
+\end{figure}
+
+\subsection{Firmware structure and first validation tests}\label{chp6_subsec_board_fw}
+In order to validate the hardware early and de-risk the integration, initial firmware developments are performed using development modules before deployment on the final board.
+The embedded software is prepared using STM32CubeMX and STM32CubeIDE, and integrates a real-time operating system (RTOS).
+The firmware is designed as a modular set of drivers and tasks that mirrors the software decomposition used in the QLabs experiments (sensing, communication, estimation, and trust update), while respecting embedded constraints (bounded memory, fixed timing, and robust I/O).
+
+\paragraph{RTOS organization.}
+From a scheduling point of view, two categories of tasks are distinguished:
+\begin{itemize}
+    \item \textbf{Periodic tasks} (time-triggered), responsible for sensor acquisition, filtering, and state propagation at a fixed rate.
+    \item \textbf{Event-driven tasks} (message-triggered), responsible for reception/transmission handling and for updating distributed estimates when new V2V data arrive.
+\end{itemize}
+This separation is aligned with the needs of the trust-aware distributed observer: local estimation must remain stable even when communication becomes intermittent, while V2V updates can be processed opportunistically and explicitly timestamped.
+
+\paragraph{Data flow and software services.}
+At a functional level, the firmware implements the following services:
+\begin{itemize}
+	\item acquire environment data from onboard sensors;
+	\item structure data in a dynamic list adapted to real-time processing;
+	\item communicate with neighbor vehicles to exchange environmental and state data;
+	\item fuse received information with local measurements for a coherent view;
+	\item transmit consolidated variables to the vehicle system for decision making.
+\end{itemize}
+The sensing layer provides unified data structures that include both numerical values and metadata (timestamps, validity flags, and optional quality indicators).
+The communication layer provides packet framing, serialization/deserialization, and hooks for monitoring link quality (e.g., packet counters, estimated loss, and delay statistics).
+At the application level, the embedded ``observer/soft-sensor'' logic consumes these time-stamped inputs and outputs a consistent state estimate together with trust-related indicators that can be logged or transmitted to the vehicle control stack.
+
+\paragraph{Verification philosophy.}
+The first firmware iterations focus on hardware bring-up and repeatable tests that validate each subsystem independently before enabling closed-loop operation.
+This staged validation reduces integration risk: peripherals are tested with controlled stimuli, and each interface is instrumented with debug traces before moving to multi-task real-time execution.
+First validation tests reported in the provided document confirm:
+\begin{itemize}
+	\item sensor data readout and transmission via UART;
+	\item stable RTOS scheduler operation at $100\,\mathrm{Hz}$;
+	\item correct interrupt and asynchronous task handling;
+	\item compatibility between configured peripherals and the target hardware.
+\end{itemize}
+In practice, these checks provide evidence that the embedded platform can sustain the required sampling and communication rates, and that timing-critical sections (interrupt handlers, DMA transfers if used, and inter-task synchronization) behave reliably under continuous operation.
+
+\subsection{Integration roadmap with thesis algorithms}\label{chp6_subsec_board_roadmap}
+The embedded platform is designed to support a progressive transfer of the estimation and resilience mechanisms developed throughout the thesis:
+\begin{itemize}
+	\item implementing the local observer as a periodic real-time task (sensor acquisition, filtering, state update);
+	\item implementing the distributed observer and trust update as event-driven tasks synchronized with V2V message reception;
+	\item maintaining time consistency via timestamping (synchronized clock) and heartbeat/ACK mechanisms;
+	\item ensuring safe degradation modes under detected faults/attacks by down-weighting or isolating untrusted neighbors.
+\end{itemize}
+The proposed integration is intentionally incremental.
+First, the embedded platform is used as a data concentrator and logger to validate sensing and timestamping on the vehicle.
+Second, the local observer is activated onboard, producing filtered kinematic estimates and residuals for fault detection.
+Third, V2V exchange is enabled and the distributed observer is executed, initially in a monitoring mode (estimating and logging without affecting control), then progressively coupled to the decision/control layer once stability and robustness are confirmed.
+
+Two practical aspects are key to a successful transfer:
+\begin{itemize}
+    \item \textbf{Computational budgeting:} profiling of task execution times and memory usage to ensure that worst-case execution times remain compatible with the selected sampling periods.
+    \item \textbf{Numerical robustness:} careful management of numeric scaling, saturation, and data validation (outlier rejection, missing-data handling) to avoid observer divergence when inputs are corrupted or delayed.
+\end{itemize}
+At the hardware level, the reported design identifies future optimization axes, including RF matching network tuning, via-loss reduction, improved high-frequency routing, and more refined power management.
+From an experimental perspective, these optimizations will be coupled with extended stress tests (continuous operation, communication congestion, and perturbation injection) to verify that the embedded implementation preserves the key properties demonstrated in simulation: stable local estimation, timely trust degradation under attacks, and recovery once the perturbation ends.
+
+\section{Conclusion}\label{chp6_sec_conclusion}
+This chapter presented the experimental workflow and results obtained on the Quanser QCar2/QLabs platform.
+The full software stack (communication, perception, control, estimation) was integrated and validated in real time.
+Nominal experiments confirm accurate local state reconstruction and coherent distributed estimation of the whole fleet.
+Under representative attack scenarios (biases, random faults, and DoS drops), the trust-aware fusion mechanism detects inconsistencies and mitigates their impact, with the DoS case being the most severe according to the reported normalized impact score.
+Finally, a custom embedded electronic board was designed and prototyped as a hardware foundation for future real-vehicle deployment of the proposed observers and cyber-resilience mechanisms.
+
