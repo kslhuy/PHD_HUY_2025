@@ -14,25 +14,74 @@
 % Serif text close to the reference cover (fallback if missing).
 \IfFileExists{newtxtext.sty}{\RequirePackage{newtxtext}}{}
 
-% --- VARIABLES ---
-\newcommand*{\institute}[1]{\gdef\@institute{#1}}
-\newcommand*{\degree}[1]{\gdef\@degree{#1}}
-\newcommand*{\mention}[1]{\gdef\@mention{#1}}
-\newcommand*{\coverdate}[1]{\gdef\@coverdate{#1}}
-\newcommand*{\directors}[1]{\gdef\@directors{#1}}
-\newcommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
-\newcommand*{\footerlinea}[1]{\gdef\@footerlinea{#1}}
-\newcommand*{\footerlineb}[1]{\gdef\@footerlineb{#1}}
+% --- UL BRANDING COLORS ---
+\definecolor{ulcolor}{RGB}{0, 0, 0}
+\definecolor{ulaccent}{RGB}{255, 205, 0}
 
-% Default values
-\newcommand*{\@institute}{}
-\newcommand*{\@degree}{}
-\newcommand*{\@mention}{}
-\newcommand*{\@coverdate}{}
-\newcommand*{\@directors}{}
-\newcommand*{\@thesistype}{Th\`ese}
-\newcommand*{\@footerlinea}{}
-\newcommand*{\@footerlineb}{}
+% --- FONTS ---
+% Handles font selection safely for LuaTeX, XeTeX, or PDFTeX
+\ifLuaTeX
+  \newfontfamily\ulfont{Arial}
+  \newenvironment{ulfontenv}{\ulfont}{\par}
+\else
+  \ifXeTeX
+    \newfontfamily\ulfont{Arial}
+    \newenvironment{ulfontenv}{\ulfont}{\par}
+  \else
+    \newenvironment{ulfontenv}{\fontfamily{phv}\selectfont}{\par}
+  \fi
+\fi
+
+% --- VARIABLES ---
+\def\@institute{}
+\def\@degree{}
+\def\@mention{}
+\def\@coverdate{}
+\def\@directors{}
+\def\@thesistype{Th\`ese}
+\def\@footerlinea{}
+\def\@footerlineb{}
+\def\@doctoralschoolname{}
+\def\@doctoralschoolnumber{}
+\def\@specialty{}
+\def\@laboratory{}
+
+% --- SETTERS ---
+\providecommand*{\institute}[1]{\gdef\@institute{#1}}
+\providecommand*{\degree}[1]{\gdef\@degree{#1}}
+\providecommand*{\mention}[1]{\gdef\@mention{#1}}
+\renewcommand*{\date}[1]{\gdef\@coverdate{#1}}
+\providecommand*{\thesistype}[1]{\gdef\@thesistype{#1}}
+\providecommand*{\footerlinea}[1]{\gdef\@footerlinea{#1}}
+\providecommand*{\footerlineb}[1]{\gdef\@footerlineb{#1}}
+
+% Fallback for macros potentially defined elsewhere
+\providecommand*{\sujet}[1]{\gdef\@title{#1}}
+\providecommand*{\encadrant}[1]{\gdef\@directors{#1}}
+
+\providecommand*{\doctoralschool}[2]{\gdef\@doctoralschoolname{#1}\gdef\@doctoralschoolnumber{#2}}
+\providecommand*{\specialty}[1]{\gdef\@specialty{#1}}
+\providecommand*{\laboratory}[1]{\gdef\@laboratory{#1}}
+
+% Asset path
+\newcommand*{\@ulassetspath}{.}
+\providecommand*{\ulassetspath}[1]{\gdef\@ulassetspath{#1}}
+
+% Abstracts and keywords
+\newcommand{\frabstract}[1]{\long\gdef\@frabstract{#1}}
+\newcommand*{\@frabstract}{}
+\newcommand{\enabstract}[1]{\long\gdef\@enabstract{#1}}
+\newcommand*{\@enabstract}{}
+\newcommand*{\frkeywords}[1]{\gdef\@frkeywords{#1}}
+\newcommand*{\@frkeywords}{\par}
+\newcommand*{\enkeywords}[1]{\gdef\@enkeywords{#1}}
+\newcommand*{\@enkeywords}{\par}
+
+% Public accessors
+\providecommand{\getfrabstract}{\@frabstract}
+\providecommand{\getenabstract}{\@enabstract}
+\providecommand{\getfrkeywords}{\@frkeywords}
+\providecommand{\getenkeywords}{\@enkeywords}
 
 % --- LOGOS ---
 \newcommand*{\@logoApath}{}
@@ -49,11 +98,13 @@
   \gdef\@logoBpath{#2}%
 }
 
-% Top row logos (horizontal)
+% Top row logos
 \newcommand*{\@logoTopApath}{}
 \newcommand*{\@logoTopBpath}{}
+\newcommand*{\@logoTopCenterpath}{}
 \newcommand*{\@logoTopAwidth}{2.2cm}
 \newcommand*{\@logoTopBwidth}{2.2cm}
+\newcommand*{\@logoTopCenterwidth}{2.2cm}
 
 \newcommand*{\logoTopA}[2][]{%
   \ifstrempty{#1}{}{\gdef\@logoTopAwidth{#1}}%
@@ -63,62 +114,123 @@
   \ifstrempty{#1}{}{\gdef\@logoTopBwidth{#1}}%
   \gdef\@logoTopBpath{#2}%
 }
+\newcommand*{\logoTopCenter}[2][]{%
+  \ifstrempty{#1}{}{\gdef\@logoTopCenterwidth{#1}}%
+  \gdef\@logoTopCenterpath{#2}%
+}
 
-% --- JURY MANAGEMENT ---
-\newcommand*{\@jurylist}{}
-\newcommand{\jurymember}[3]{%
-  \g@addto@macro\@jurylist{%
-    \textit{#1} & \textbf{#2} \\[-0.2em]
-    & #3 \\[0.6em]
+% --- JURY MANAGEMENT (MATCHING ul-cover.sty logic) ---
+\newcommand{\jurymember}[4]{
+  \ifnum#1=1 \gdef\@jiname{#2}\gdef\@jitt{#3}\gdef\@jirole{#4}\fi
+  \ifnum#1=2 \gdef\@jiiname{#2}\gdef\@jiitt{#3}\gdef\@jiirole{#4}\fi
+  \ifnum#1=3 \gdef\@jiiiname{#2}\gdef\@jiiitt{#3}\gdef\@jiiirole{#4}\fi
+  \ifnum#1=4 \gdef\@jivname{#2}\gdef\@jivtt{#3}\gdef\@jivrole{#4}\fi
+  \ifnum#1=5 \gdef\@jvname{#2}\gdef\@jvtt{#3}\gdef\@jvrole{#4}\fi
+  \ifnum#1=6 \gdef\@jviname{#2}\gdef\@jvitt{#3}\gdef\@jvirole{#4}\fi
+  \ifnum#1=7 \gdef\@jviiname{#2}\gdef\@jviitt{#3}\gdef\@jviirole{#4}\fi
+  \ifnum#1=8 \gdef\@jviiiname{#2}\gdef\@jviiitt{#3}\gdef\@jviiirole{#4}\fi
+  \ifnum#1=9 \gdef\@jixname{#2}\gdef\@jixtt{#3}\gdef\@jixrole{#4}\fi
+  \ifnum#1=10 \gdef\@jxname{#2}\gdef\@jxtt{#3}\gdef\@jxrole{#4}\fi
+  \ifnum#1=11 \gdef\@jxiname{#2}\gdef\@jxitt{#3}\gdef\@jxirole{#4}\fi
+  \ifnum#1=12 \gdef\@jxiiname{#2}\gdef\@jxiitt{#3}\gdef\@jxiirole{#4}\fi
+}
+
+%% Initialize empty jury variables
+\newcommand*{\@jiname}{} \newcommand*{\@jitt}{} \newcommand*{\@jirole}{}
+\newcommand*{\@jiiname}{} \newcommand*{\@jiitt}{} \newcommand*{\@jiirole}{}
+\newcommand*{\@jiiiname}{} \newcommand*{\@jiiitt}{} \newcommand*{\@jiiirole}{}
+\newcommand*{\@jivname}{} \newcommand*{\@jivtt}{} \newcommand*{\@jivrole}{}
+\newcommand*{\@jvname}{} \newcommand*{\@jvtt}{} \newcommand*{\@jvrole}{}
+\newcommand*{\@jviname}{} \newcommand*{\@jvitt}{} \newcommand*{\@jvirole}{}
+\newcommand*{\@jviiname}{} \newcommand*{\@jviitt}{} \newcommand*{\@jviirole}{}
+\newcommand*{\@jviiiname}{} \newcommand*{\@jviiitt}{} \newcommand*{\@jviiirole}{}
+\newcommand*{\@jixname}{} \newcommand*{\@jixtt}{} \newcommand*{\@jixrole}{}
+\newcommand*{\@jxname}{} \newcommand*{\@jxtt}{} \newcommand*{\@jxrole}{}
+\newcommand*{\@jxiname}{} \newcommand*{\@jxitt}{} \newcommand*{\@jxirole}{}
+\newcommand*{\@jxiiname}{} \newcommand*{\@jxiitt}{} \newcommand*{\@jxiirole}{}
+
+% Helper for Hasni layout (NO extra column separator logic if affiliation contains one, but we assume user provides affiliation safely or we handle the row break)
+% The failing case was "Affiliation & Role" passed as arg 3.
+% We need a style that mimics: 
+% Name & Role \\
+% Affiliation \\
+\newcommand{\hasnijurystyle}[3]{%
+  \ifdefempty{#1}{}{%
+    \fontsize{10}{12}\selectfont #1 & \emph{#3}\\
+    \multicolumn{2}{@{}p{\textwidth}@{}}{#2} \\[1mm]
   }%
 }
 
-% --- MAIN COMMANDS ---
+% --- FRONT COVER ---
 \newcommand*{\ulfrontcover}{%
+  % If \encadrant is used, sync it to \@directors
+  \ifx\@directors\empty
+    \ifdefined\encadrant
+      \let\tmp\encadrant
+      \gdef\@directors{\tmp}
+    \fi
+  \fi
+  %
   \thispagestyle{empty}
   \begin{tikzpicture}[overlay, remember picture]
     \coordinate (nw) at (current page.north west);
     \coordinate (ne) at (current page.north east);
     \ifdefempty{\@logoTopApath}{}{%
-      \node[anchor=north west, xshift=12mm, yshift=-10mm] at (nw) {%
+      \node[anchor=north west, xshift=30mm, yshift=-10mm] at (nw) {%
         \includegraphics[width=\@logoTopAwidth]{\@logoTopApath}%
       };
     }
     \ifdefempty{\@logoTopBpath}{}{%
-      \node[anchor=north east, xshift=-12mm, yshift=-10mm] at (ne) {%
+      \node[anchor=north east, xshift=-30mm, yshift=-10mm] at (ne) {%
         \includegraphics[width=\@logoTopBwidth]{\@logoTopBpath}%
+      };
+    }
+    \ifdefempty{\@logoTopCenterpath}{}{%
+      \node[anchor=north, yshift=-10mm] at (current page.north) {%
+        \includegraphics[width=\@logoTopCenterwidth]{\@logoTopCenterpath}%
       };
     }
   \end{tikzpicture}
   \begin{center}
-    \vspace*{8mm}
+    \vspace*{4mm}
     {\Large\bfseries \@title\par}
-    \vspace{6mm}
+    \vspace{3mm}
     {\large \@thesistype\par}
-    \vspace{4mm}
-    {\small Pr\'esent\'ee et soutenue publiquement le \@coverdate\ pour l'obtention du titre de\par}
     \vspace{2mm}
+    {\small Pr\'esent\'ee et soutenue publiquement le \@coverdate\ pour l'obtention du titre de\par}
+    \vspace{1mm}
     {\small\scshape \@degree\par}
     \ifdefempty{\@mention}{}{%
-      \vspace{1mm}
+      \vspace{0.5mm}
       {\small (\@mention)\par}
     }
-    \vspace{4mm}
+    \vspace{2mm}
     {\small par\par}
-    \vspace{2mm}
+    \vspace{1mm}
     {\large \@author\par}
-    \vspace{4mm}
-    {\small Sous la direction de\par}
     \vspace{2mm}
+    {\small Sous la direction de\par}
+    \vspace{1mm}
     {\small \@directors\par}
   \end{center}
 
-  \vspace{6mm}
+  \vspace{4mm}
   {\noindent\small\textbf{Composition du jury}\par}
-  \vspace{2mm}
+  \vspace{1mm}
   {\small
-  \begin{tabularx}{\textwidth}{p{0.23\textwidth}X}
-    \@jurylist
+  \begin{tabularx}{\textwidth}{p{0.35\textwidth}X}
+    \hasnijurystyle{\@jiname}{\@jitt}{\@jirole}
+    \hasnijurystyle{\@jiiname}{\@jiitt}{\@jiirole}
+    \hasnijurystyle{\@jiiiname}{\@jiiitt}{\@jiiirole}
+    \hasnijurystyle{\@jivname}{\@jivtt}{\@jivrole}
+    \hasnijurystyle{\@jvname}{\@jvtt}{\@jvrole}
+    \hasnijurystyle{\@jviname}{\@jvitt}{\@jvirole}
+    \hasnijurystyle{\@jviiname}{\@jviitt}{\@jviirole}
+    \hasnijurystyle{\@jviiiname}{\@jviiitt}{\@jviiirole}
+    \hasnijurystyle{\@jixname}{\@jixtt}{\@jixrole}
+    \hasnijurystyle{\@jxname}{\@jxtt}{\@jxrole}
+    \hasnijurystyle{\@jxiname}{\@jxitt}{\@jxirole}
+    \hasnijurystyle{\@jxiiname}{\@jxiitt}{\@jxiirole}
   \end{tabularx}
   }
 
@@ -147,6 +259,70 @@
   \end{tikzpicture}
 }
 
-\renewcommand*{\maketitle}{\ulfrontcover}
+% --- BACK COVER ---
+\newcommand*{\ulbackcover}{
+  \pagestyle{empty}
+  \cleardoublepage{}
+  \ifodd\value{page}\hbox{}\newpage\fi
+  \begin{ulfontenv}
+    \begin{tikzpicture}[overlay, remember picture, text centered, align=center]
+
+      \coordinate (o) at (current page.center);
+
+      \coordinate[xshift=0mm, yshift=0mm] (bottomline) at (current page.south);
+      \fill[ulaccent] (current page.south west) rectangle ([yshift=10mm]current page.south east);
+
+      \fontsize{11}{13}\selectfont
+      
+      % Keywords / Abstracts
+      \node[yshift=0mm, above] (frKeywords) at (o) {
+        \ulbacknode{MOTS CL\'{E}S}{\@frkeywords{}}{10}{12}
+      };
+      \node[yshift=2mm, above] at (frKeywords.north) {
+        \ulbacknode{R\'{E}SUM\'{E}}{\@frabstract{}}{9}{11}
+      };
+      \node[yshift=-6mm, below] (enAbstract) at (o) { 
+        \ulbacknode{ABSTRACT}{\@enabstract{}}{9}{11}
+      };
+      \node[yshift=-2mm, below] at (enAbstract.south) {
+        \ulbacknode{KEYWORDS}{\@enkeywords{}}{10}{12}
+      };
+
+      % Add Logo
+      \node[yshift=-20mm] at (current page.north) {
+         \includegraphics[width=4cm]{\@ulassetspath/logo-Lorraine.png}
+      };
+
+    \end{tikzpicture}
+  \end{ulfontenv}
+}
+
+\newcommand{\ulbacknode}[4]{
+  \begin{minipage}[h]{.8\paperwidth}
+    {\color{ulcolor}\fontsize{12}{15}\selectfont #1}\unskip\strut\par
+    \vspace{-2.5mm}
+    \tikz{\draw[ulcolor, line width=.5mm] (0, 0) -- (16.8, 0);}
+    \vspace{1mm} 
+    {\color{black}\fontsize{#3}{#4}\selectfont #2}\unskip\strut\par
+  \end{minipage}
+}
+
+% --- MAIN INTERFACE ---
+\newcommand*{\ulcover}{
+  \ulfrontcover
+  \AtEndDocument{\ulbackcover}
+}
+
+% --- OPTIONS ---
+\newif\if@nomaketitle\@nomaketitlefalse
+\DeclareOption{nomaketitle}{ \@nomaketitletrue }
+\newif\if@cotutelle\@cotutellefalse
+\DeclareOption{cotutelle}{ \@cotutelletrue }
+\ProcessOptions{}\relax{}
+
+\if@nomaketitle
+\else
+\renewcommand*{\maketitle}{\ulcover}
+\fi
 
 \endinput

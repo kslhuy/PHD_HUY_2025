@@ -3,12 +3,12 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[english,french]{babel}
+\usepackage[english]{babel}
 \usepackage{textgreek}
 
 % Keep proof headings in English even when French is the active babel language.
 % (babel's French captions set \proofname to "Démonstration" by default.)
-\addto\extrasfrench{\renewcommand{\proofname}{Proof}}
+%\addto\extrasfrench{\renewcommand{\proofname}{Proof}}
 
 \setcounter{tocdepth}{3} % Pour que les subsubsections n'apparaissent pas dans la TOC
 \setcounter{secnumdepth}{3} % Pour que les subsubsections ne soient pas numérotées
@@ -41,7 +41,7 @@
 \DeclareMathOperator{\sinc}{sinc}
 \DeclareMathOperator{\e}{e}
 
-\usepackage[locale = FR]{siunitx} % Pour gérer les unités
+\usepackage[locale = US]{siunitx} % Pour gérer les unités
 \sisetup{inter-unit-product=\ensuremath{{}\cdot{}}} % pour mettre des points médians entre les unités quand il y en a plusieurs
 \sisetup{separate-uncertainty=true,multi-part-units=single} % pour faire des incertitudes en écrivant \SI{valeur(incertitude)}{unité}
 \DeclareSIUnit\vitesse{\meter\per\second}
@@ -120,7 +120,7 @@ decorations.pathreplacing}
 \renewcommand{\thesection}{\arabic{section}}
 
 % Pour la table des matières
-\usepackage[francais,nohints,tight]{minitoc}		% Mini table des matières, en français
+\usepackage[english,nohints,tight]{minitoc}		% Mini table des matières, en français
 \setcounter{minitocdepth}{2} % Mini-toc détaillées (sections/sous-sections)
 \setlength{\mtcindent}{-1em} % décalage des minitoc à gauche
 \dominitoc
@@ -150,7 +150,7 @@ decorations.pathreplacing}
 %%%%%%%%%%% Links ref  %%%%%%%%%%% 
 \usepackage{bookmark}
 \usepackage{acronym}
-\usepackage[nameinlink,french]{cleveref} % noabbrev
+\usepackage[nameinlink,english]{cleveref} % noabbrev
 \Crefname{figure}{Fig.}{Figs.} % traduction des références aux figures/tables/équations
 \crefname{figure}{fig.}{figs.}
 \Crefname{equation}{Eq.}{Eqs.}

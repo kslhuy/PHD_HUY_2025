@@ -51,7 +51,7 @@ The CACC scenario working on a platoon can be illustrated as in Figure~\ref{fig_
  %===
  \begin{figure}[h!]
     \centering
-    \includegraphics[width=8cm]{ch3/img/fig_11.png}
+    \includegraphics[width=10cm]{ch3/img/SACC.png}
     \caption{Illustration of CACC working on a vehicle platoon.}
     \label{fig_pre_fol}
 \end{figure} 
@@ -126,10 +126,10 @@ It follows that the spacing error can be written as:
 where ${L}$ is the minimum safety distance and $h$ is the time-gap.
 Then, the controller $u_{\text{i}}$ is given by~\cite{rajamani2002semi}:
 
-\begin{multline}\label{controller}
-        u_{\text{i}} = -k_{1}{a}_{i-1}+(k_{1}+h k_{1}k_{2}){a}_{i}\\
+\begin{equation}\label{controller}
+        u_{\text{i}} = -k_{1}{a}_{i-1}+(k_{1}+h k_{1}k_{2}){a}_{i}
         -\frac{1}{h}(1-h k_{1}k_{2})\dot{\varepsilon}_{i} -\frac{k_{2}}{h}\varepsilon_{i}-k_{2} {v}_{i}
-\end{multline}
+\end{equation}
 where ${a}_{i-1}$ is the acceleration of the preceding vehicle obtained by using inter-vehicle communication.
 The scalar gains $k_1$ and $k_2$ are the controller design parameters to be designed according to the detailed procedure introduced in~\cite{rajamani2002semi}. 
 %It has been shown in~\cite{rajamani2002semi} that if the gain $k_1$ is chosen such as to satisfy the constraint $-k_{1}h >\tau$, then the CACC controller \eqref{controller} is string stable, independently from the value of $h$. 
@@ -171,10 +171,10 @@ where $a_{i-1}(t)$ is the true acceleration and $f^c(t)$ is the additive cyberat
 %%\end{remark}
 
 Under a cyberattack, the following vehicle receives $\mu$ and will utilize it in its controller. Then, instead of~\eqref{controller}, the controller $u_{\text{i}}$ will be implemented as follows:
-\begin{align}\label{control_uc}
-        u_{\text{i}}&=-k_{1} \mu(t) + (k_{1}+h k_{1}k_{2}){a}_{i} \notag\\
-        &\quad-\frac{1}{h}(1-h k_{1}k_{2})\dot{\varepsilon}_{i} -\frac{k_{2}}{h}\varepsilon_{i}-k_{2} {v}_{i}.
-\end{align}
+\begin{equation}\label{control_uc}
+        u_{\text{i}}=-k_{1} \mu(t) + (k_{1}+h k_{1}k_{2}){a}_{i} 
+        -\frac{1}{h}(1-h k_{1}k_{2})\dot{\varepsilon}_{i} -\frac{k_{2}}{h}\varepsilon_{i}-k_{2} {v}_{i}.
+\end{equation}
 %
 %% \begin{align} \label{control_uc}
 %%         u_{s y n}&=\left(h k_1 k_2\right) \mu-\left(k_1+h k_1 k_2\right) f^c-k_2 \dot{x}_i  \notag\\
@@ -447,10 +447,12 @@ Assume there exist two symmetric and positive definite matrices $\mathcal{P}$ an
 \end{equation}
 Then the estimation error $\tilde{\xi}_{k}$, with $K = \mathcal{P}^{-1} \mathcal{Z}^{\top}$, satisfies the following exponential Input-to-State Stable~(ISS) bound:
 %\begin{multline}\label{ali_eISS} % \mathcal{P} \mathcal{A}_z - \mathcal{Z}^{\top} C_\xi
-\begin{empheq}[box = \widebox]{multline}\label{ali_eISS}
+
+\begin{empheq}[box = \widebox]{gather}\label{ali_eISS}
 \left\| \tilde{\xi}_{t}\right\| \leq \sqrt{\frac{\lambda_{\max}(\mathcal{P})}{\lambda_{\min}(\mathcal{P})}} \left\| \tilde{\xi}_{0}\right\| \displaystyle\alpha^{\frac{t}{2}} 
 + \sqrt{\frac{\lambda_{\max}(\mathcal{S})}{(1-\alpha) \lambda_{\min}(\mathcal{P})}} \max_{0\leq k\leq t}\left\| \bar{\omega}_{k}\right\|.
 \end{empheq}
+
 %\end{multline}
 %}
 \end{theorem}
@@ -582,33 +584,26 @@ cyberattack~\eqref{attack1} are presented in Figure~\ref{fig:case1} and Figure~\
 The observer demonstrates similar good performance in accurately reconstructing a random cyberattack and packet-loss, as depicted in~Figure~\ref{fig:case1_fc}. As we can see, the estimated delay attack is exactly 2 steps.
 
 \color{black}
-\begin{figure}
+\begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.9]{ch3/img/matlab_error_case_2.eps}
+    \includegraphics[scale=1]{ch3/img/matlab_error_case_2.eps}
     \caption{State estimation case 1.}%under the attack~\eqref{attack1}} 
     \label{fig:case1}
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.7]{ch3/img/matlab_fc_2.eps}
+    \includegraphics[scale=0.8]{ch3/img/matlab_fc_2.eps}
     \caption{Attack estimation using UIO case 1.}
     \label{fig:case1_fc}
 \end{figure}
 
-
-%  (since the plot of the results for this scenario
-% is almost the same as Fig. 8, it is omitted to avoid repetition)
-%{\color{blue}
-
-
 For the second case of time-varying and bounded attack signal~\eqref{attack2}, it can be observed from the Figure~\ref{fig:case2_fc} that the cyberattack signal is accurately estimated, and the estimation error is bound.
 
-
-\begin{figure}
+\begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.8]{ch3/img/matlab_fc_1.eps}
+    \includegraphics[scale=0.9]{ch3/img/matlab_fc_1.eps}
     \caption{Attack estimation and the errors case 2.}
     \label{fig:case2_fc}
 \end{figure}
@@ -652,19 +647,19 @@ To evaluate the system under more realistic conditions, we conducted simulations
  %~\cite{CarlaSimulator}
  \begin{figure}[h!]
      \centering    
-     \includegraphics[width=0.4\textwidth,height = 3.5cm]{ch3/img/carla_d.png}
+     \includegraphics[width=0.6\textwidth,height = 3.5cm]{ch3/img/carla_d.png}
     \caption{Carla Simulator platform~(\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}).}
      \label{fig:carla_img}
  \end{figure}
 
 \begin{figure}[h!]
     \centering    
-    \includegraphics[scale=0.9]{ch3/img/state_carla_new.eps}
+    \includegraphics[scale=1]{ch3/img/state_carla_new.eps}
     \caption{State estimation using CARLA under attack case 2.}
     \label{fig:carla_state}
 \end{figure}
 \begin{figure}[h!]
-    \centering    \includegraphics[scale=0.8]{ch3/img/fc_carla_new.eps}
+    \centering    \includegraphics[scale=0.9]{ch3/img/fc_carla_new.eps}
     \caption{Cyberattack signal and inter-vehicle communication case 2.}
     \label{fig:carla_fc}
 \end{figure}
@@ -696,7 +691,7 @@ Figure~\ref{fig_dis_UIO} illustrates the structure of the proposed observer-base
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=7cm]{ch3/img/probleme_2.png}
+\includegraphics[width=10cm]{ch3/img/probleme_2.png}
 \caption{Discrete-time model-based UIO}
 \label{fig_dis_UIO}
 \end{figure}
@@ -745,14 +740,21 @@ Since $C_d W_d \neq 0$, the rank condition $\rank(C_d W_d) = \rank(W_d) = 1$ is 
 To demonstrate the effectiveness of the exact discretization method and the proposed observer, we conducted simulations using MATLAB and CARLA, following the procedures outlined in~\cite{nguyen2020cyberattack}. This section presents the results obtained with our method and compares them with those from~\cite{nguyen2020cyberattack}.
 
 We solve the LMI conditions for the observer gain using the YALMIP Toolbox with the exponential stability parameter $\alpha=0.5$. The resulting observer gain $K$ is:
-\[
-K = \begin{pmatrix}
-0.5 & -0.005 \\
--0.001 & 0.7 \\
--0.2 & -68.0 \\
-2.2 & 1004.2 
-\end{pmatrix}
-\]
+% \[
+% K = \begin{pmatrix}
+% 0.5 & -0.005 \\
+% -0.001 & 0.7 \\
+% -0.2 & -68.0 \\
+% 2.2 & 1004.2 
+% \end{pmatrix}
+% \]
+
+\begin{equation*}
+    K =\begin{bmatrix}
+        0.5000 & -0.001 & -0.2 & 2.2 \\
+        -0.005 & 0.7 & -68.0 & 1004.2 
+      \end{bmatrix}^{\top}.
+\end{equation*} 
 
 \begin{figure}[h!]
     \centering 

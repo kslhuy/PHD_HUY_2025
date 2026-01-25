@@ -919,7 +919,179 @@ where $C_f$ and $C_r$ are the nominal cornering stiffnesses. The tire slip angle
     \alpha_r = - \frac{v_y - l_r r}{v_x}.
 \end{equation}
 
-Defining the state vector $x = [v_x, v_y, \psi, r]^\top$ and assuming small steering angles ($\cos(\delta) \approx 1, \sin(\delta) \approx \delta$), the system can be written in the following quasi-LPV form with additive unknown tire-force nonlinearities.
+
+
+\section*{0) Augmented state, input, unknown}
+
+\textbf{State order (8D):}
+\[
+x_8 = \begin{bmatrix} v_x & v_y & \psi & r & X & Y & a_x & a_y \end{bmatrix}
+\]
+
+\textbf{Input:}
+\[
+u = \begin{bmatrix} \delta & a \end{bmatrix}
+\]
+
+\textbf{Unknown residual (your NN/UIO output):}
+\[
+w = \begin{bmatrix} w_1 \\ w_2 \end{bmatrix} =
+\begin{bmatrix} f_r(\alpha_r) \\ f_f(\alpha_f) \end{bmatrix}
+\]
+
+\textbf{Slip angles (same as you):}
+\[
+\alpha_f = \delta - \frac{v_y}{v_x} - \frac{l_f r}{v_x}, \qquad
+\alpha_r = -\frac{v_y}{v_x} + \frac{l_r r}{v_x}
+\]
+
+\textbf{Scheduling (qLPV) example:}
+\[
+\rho = \left[ \frac{1}{v_x},\ \sin\delta,\ \cos\delta,\ v_x,\ v_y,\ \sin\psi,\ \cos\psi \right]
+\quad (v_x > 0)
+\]
+
+\section*{1) The key ``clean IMU'' definition (why this is best for $w$)}
+
+Use \textbf{body acceleration} identities:
+\[
+a_x^{\text{body}} = \dot{v}_x - r v_y, \qquad a_y^{\text{body}} = \dot{v}_y + r v_x
+\]
+With your bicycle model, the $(rv)$ terms cancel, giving \textbf{direct force equations}:
+\[
+a_x^{\text{body}} = a - \frac{\sin\delta}{m}\big(C_f\alpha_f + w_2\big) - \mu g
+\]
+\[
+a_y^{\text{body}} = \frac{1}{m}\big(C_r\alpha_r + w_1\big) + \frac{\cos\delta}{m}\big(C_f\alpha_f + w_2\big)
+\]
+
+Now we make the \textbf{augmented states} $(a_x, a_y)$ track these with a small time constant:
+\[
+\dot{a}_x = \frac{1}{\tau_x}\big(a_x^{\text{body}} - a_x\big), \qquad
+\dot{a}_y = \frac{1}{\tau_y}\big(a_y^{\text{body}} - a_y\big)
+\]
+($\tau_x, \tau_y$ small, e.g.\ $0.05$--$0.2$\,s)
+
+This is what makes the measurement \textbf{constant ($C$)} and makes $w$ show up strongly (especially in $a_y$).
+
+\section*{2) Continuous-time qLPV form}
+
+\[
+\boxed{\dot{x}_8 = A_8(\rho)x_8 + B_8(\rho)u + b_8 + E_8(\rho)w}
+\]
+
+\subsection*{2.1 The full $A_8(\rho)$ ($8 \times 8$)}
+
+Let $s = \sin\delta,\ c = \cos\delta$. Then:
+\[
+A_8(\rho) =
+\begin{bmatrix}
+0 & \frac{C_f s}{m v_x} & 0 & \frac{C_f l_f s}{m v_x}+v_y & 0 & 0 & 0 & 0 \\[6pt]
+0 & -\frac{C_f c+C_r}{m v_x} & 0 & -v_x+\frac{l_r C_r-l_f C_f c}{m v_x} & 0 & 0 & 0 & 0 \\[6pt]
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\[6pt]
+0 & -\frac{l_f C_f c-l_r C_r}{I_z v_x} & 0 & -\frac{l_f^2 C_f c+l_r^2 C_r}{I_z v_x} & 0 & 0 & 0 & 0 \\[6pt]
+\cos\psi & -\sin\psi & 0 & 0 & 0 & 0 & 0 & 0 \\[6pt]
+\sin\psi & \cos\psi & 0 & 0 & 0 & 0 & 0 & 0 \\[8pt]
+0 & \frac{1}{\tau_x}\frac{C_f s}{m v_x} & 0 & \frac{1}{\tau_x}\frac{C_f l_f s}{m v_x} & 0 & 0 & -\frac{1}{\tau_x} & 0 \\[10pt]
+0 & -\frac{1}{\tau_y}\frac{C_f c+C_r}{m v_x} & 0 & \frac{1}{\tau_y}\frac{l_r C_r-l_f C_f c}{m v_x} & 0 & 0 & 0 & -\frac{1}{\tau_y}
+\end{bmatrix}
+\]
+
+\noindent \textbf{Notes:}
+\begin{itemize}
+    \item The \textbf{top 6$\times$6} is your qLPV bicycle (with $-\mu g$ kept in $b_8$ below).
+    \item The \textbf{last two rows} are the IMU acceleration tracking dynamics using the \textbf{body-accel} formula (best for $w$).
+\end{itemize}
+
+\subsection*{2.2 The full $B_8(\rho)$ ($8 \times 2$)}
+
+\[
+B_8(\rho) =
+\begin{bmatrix}
+-\frac{C_f s}{m} & 1 \\[6pt]
+\frac{C_f c}{m} & 0 \\[6pt]
+0 & 0 \\[6pt]
+\frac{l_f C_f c}{I_z} & 0 \\[6pt]
+0 & 0 \\[6pt]
+0 & 0 \\[10pt]
+-\frac{1}{\tau_x}\frac{C_f s}{m} & \frac{1}{\tau_x} \\[10pt]
+\frac{1}{\tau_y}\frac{C_f c}{m} & 0
+\end{bmatrix}
+\]
+This is \textbf{exact} given your modeling choice $F_{yf} = C_f\alpha_f + w_2$ (so the $\delta$ term creates the $\delta\sin\delta$ and $\delta\cos\delta$ effects via scheduling).
+
+\subsection*{2.3 The full $E_8(\rho)$ ($8 \times 2$)}
+
+Remember $w = [w_1 \ w_2] = [f_r(\alpha_r) \ f_f(\alpha_f)]$. Then:
+\[
+E_8(\rho) =
+\begin{bmatrix}
+0 & -\frac{s}{m} \\[6pt]
+\frac{1}{m} & \frac{c}{m} \\[6pt]
+0 & 0 \\[6pt]
+-\frac{l_r}{I_z} & \frac{l_f c}{I_z} \\[6pt]
+0 & 0 \\[6pt]
+0 & 0 \\[10pt]
+0 & -\frac{1}{\tau_x}\frac{s}{m} \\[10pt]
+\frac{1}{\tau_y}\frac{1}{m} & \frac{1}{\tau_y}\frac{c}{m}
+\end{bmatrix}
+\]
+Key benefit: $w$ now affects \textbf{both the dynamics} and also \textbf{directly the acceleration channels}, which helps estimation a lot.
+
+\subsection*{2.4 Constant affine term ($b_8$)}
+
+\[
+b_8 =
+\begin{bmatrix}
+-\mu g & 0 & 0 & 0 & 0 & 0 & -\frac{1}{\tau_x}\mu g & 0
+\end{bmatrix}
+\]
+\begin{itemize}
+    \item That $-\mu g$ is your longitudinal rolling/friction bias term (not ``IMU gravity''; it’s your model’s constant decel).
+\end{itemize}
+If you want, you can also add IMU biases as extra states later, but you didn’t ask for that here.
+
+\section*{3) Constant measurement matrix $C$ (two modes)}
+
+\subsection*{Mode A: GPS + IMU + gyro (recommended)}
+If you measure $y = [v_x,\ \psi,\ r,\ X,\ Y,\ a_x,\ a_y]$:
+\[
+y = C_{\text{GPS}} x_8, \qquad
+C_{\text{GPS}} =
+\begin{bmatrix}
+1&0&0&0&0&0&0&0\\
+0&0&1&0&0&0&0&0\\
+0&0&0&1&0&0&0&0\\
+0&0&0&0&1&0&0&0\\
+0&0&0&0&0&1&0&0\\
+0&0&0&0&0&0&1&0\\
+0&0&0&0&0&0&0&1
+\end{bmatrix}
+\]
+
+\subsection*{Mode B: no GPS (still constant $C$)}
+If you measure $y = [v_x,\ r,\ a_x,\ a_y]$:
+\[
+C_{\text{noGPS}} =
+\begin{bmatrix}
+1&0&0&0&0&0&0&0\\
+0&0&0&1&0&0&0&0\\
+0&0&0&0&0&0&1&0\\
+0&0&0&0&0&0&0&1
+\end{bmatrix}
+\]
+
+\section*{4) Observer-ready Luenberger form (still constant $C$)}
+
+\[
+\boxed{
+\dot{\hat{x}}_8 = A_8(\hat\rho)\hat{x}_8 + B_8(\hat\rho)u + b_8 + E_8(\hat\rho)\hat{w}
++ L(\hat\rho)\big(y - C\hat{x}_8\big)
+}
+\]
+Where $\hat\rho = \rho(\hat{x}_8, u)$ (or use measured $v_x, \psi, \delta$ directly when available).
+
+% Defining the state vector $x = [v_x, v_y, \psi, r]^\top$ and assuming small steering angles ($\cos(\delta) \approx 1, \sin(\delta) \approx \delta$), the system can be written in the following quasi-LPV form with additive unknown tire-force nonlinearities.
 
 In particular, we make the standard assumptions:
 \begin{enumerate}

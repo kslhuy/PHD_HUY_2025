@@ -24,24 +24,25 @@
 \ulcover{} % création des couvertures, avec résumé/abstract
 
 \frontmatter
-\include{others/remerciements}
+\include{others/remerciements}\adjustmtc
 \AddResumeAbstract % macro pour résumé et abstract
 
 \begin{singlespace} % réduction de l'interligne pour condenser
 % Utiliser \adjustmtc si un décalage apparaît dans les petites tables des matières
-\phantomsection \addcontentsline{toc}{chapter}{Table des matières}\adjustmtc
+\phantomsection \addcontentsline{toc}{chapter}{Table of Contents}
+\renewcommand{\contentsname}{Table of Contents}
 \tableofcontents\newpage
-\renewcommand{\listfigurename}{Liste des figures}
-\phantomsection\listoffigures\adjustmtc % Liste des figures
-\phantomsection\listoftables\adjustmtc % Liste des tableaux
-{\printglossary[type=\acronymtype,title=Acronymes et anglicismes]}\adjustmtc
+\renewcommand{\listfigurename}{List of Figures}
+\phantomsection\listoffigures % Liste des figures
+\renewcommand{\listtablename}{List of Tables}
+\phantomsection\listoftables % Liste des tableaux
+{\printglossary[type=\acronymtype,title=List of Acronyms]}
 \end{singlespace}
 
 %%%%%%%%%%%%%%%% CHAPITRES %%%%%%%%%%%%%%%%%%
 \mainmatter
 \setcounter{page}{1}
 \include{ch1/ch1_main}
-% \include{ch2/ch2_main}
 \include{ch3/ch3_main}
 \include{ch4/ch4_main}
 \include{ch5/ch5_main}
@@ -57,7 +58,7 @@
 
 \begin{singlespace}
 \setlength\labelalphawidth{0em}
-\small\printbibliography[heading=bibintoc,title=Bibliographie]
+\small\printbibliography[heading=bibintoc,title=Bibliography]
 \end{singlespace}
 
 \end{document}
