@@ -51,14 +51,15 @@ The CACC scenario working on a platoon can be illustrated as in Figure~\ref{fig_
  %===
  \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm]{ch3/img/SACC.png}
+    \includegraphics[width=1\textwidth]{ch3/img/SACC.png}
     \caption{Illustration of CACC working on a vehicle platoon.}
     \label{fig_pre_fol}
 \end{figure} 
  %=====
-In Figure~\ref{fig_pre_fol}, $a_{i-1}$ represents the acceleration of the preceding vehicle transmitted through a wireless communication channel to the following vehicle; $\delta_{i}$ denotes the distance between the rear of the preceding vehicle and the bumper of the following vehicle; $l_{i}$ is the length of the following vehicle; $p_{i}$ and $p_{i-1}$ correspond to the positions of the following and preceding vehicles, respectively.
+The acceleration of preceding vehicle $a_{i-1}$ transmitted through a wireless communication channel to the following vehicle; $\delta_{i}$ denotes the distance between the rear of the preceding vehicle and the bumper of the following vehicle; $l_{i}$ is the length of the following vehicle; $p_{i}$ and $p_{i-1}$ correspond to the positions of the following and preceding vehicles, respectively.
 
-The CACC control system of a vehicle comprises two controllers: an upper-level controller and a lower-level controller. The lower-level controller is responsible for utilizing throttle and/or brake control inputs to achieve the desired acceleration tracking. On the other hand, the upper-level controller is tasked with calculating the desired acceleration to maintain the desired spacing with respect to a preceding vehicle. In line with the approach discussed in~\cite{rajamani2002semi}, this paper focuses exclusively on the investigation of the upper-level controller, operating under the assumption that a suitable lower-level controller is already in place.
+Following the logic of ~\cite{rajamani2002semi}, The CACC control system focuses only on the upper-level controller for acceleration input. It assumes the lower-level execution of throttle and brake control is already functional and optimized
+% The CACC control system of a vehicle comprises two controllers: an upper-level controller and a lower-level controller. The lower-level controller is responsible for utilizing throttle and/or brake control inputs to achieve the desired acceleration tracking. On the other hand, the upper-level controller is tasked with calculating the desired acceleration to maintain the desired spacing with respect to a preceding vehicle. In line with the approach discussed in~\cite{rajamani2002semi}, this paper focuses exclusively on the investigation of the upper-level controller, operating under the assumption that a suitable lower-level controller is already in place.
  
 
 % \section{Design of Resilient Observers}
@@ -290,7 +291,7 @@ There are numerical differentiators in the literature allowing the online calcul
 %===== Figure ================================================
  \begin{figure}[h!]
      \centering    
-        \includegraphics[width=0.4\textwidth]{ch3/img/fig_discrete-time.png}
+        \includegraphics[width=1\textwidth]{ch3/img/fig_discrete-time.png}
  \caption{Discrete-time model-based UIO.}
      \label{fig_discrete}
       \end{figure}
@@ -489,7 +490,7 @@ with the condition $h > 2\tau $ and $\lambda > 0$ in order to ensure the string 
 %============
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.4\textwidth]{ch3/img/bla_bla.png}
+    \includegraphics[width=1\textwidth]{ch3/img/bla_bla.png}
     \caption{Resilient control for CACC system.}
     \label{figobser_control}
 \end{figure}
@@ -594,7 +595,7 @@ The observer demonstrates similar good performance in accurately reconstructing 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.8]{ch3/img/matlab_fc_2.eps}
+    \includegraphics[scale=1]{ch3/img/matlab_fc_2.eps}
     \caption{Attack estimation using UIO case 1.}
     \label{fig:case1_fc}
 \end{figure}
@@ -603,76 +604,42 @@ For the second case of time-varying and bounded attack signal~\eqref{attack2}, i
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.9]{ch3/img/matlab_fc_1.eps}
+    \includegraphics[scale=1]{ch3/img/matlab_fc_1.eps}
     \caption{Attack estimation and the errors case 2.}
     \label{fig:case2_fc}
 \end{figure}
 
-We can see that the proposed observer can estimate the the full state with good accuracy, while the unknown input is reconstructed with a fixed delay of two units based on the available output measurements. 
-
-%}
-
-%\begin{comment}
-%
-%\begin{figure}[h!]
-%    \centering
-%    \includegraphics[width=0.4\textwidth, height=5cm]{img/case2.eps}
-%    \caption{UIO state estimation case 2 }%under the attack~\eqref{attack2}}
-%    \label{fig:case2}
-%\end{figure}
-%\begin{figure}
-%    \centering
-%    \includegraphics[width=0.4\textwidth,height = 5cm]{img/case2_fc.eps}
-%    \caption{Attack estimation by UIO, case 2}
-%    \label{fig:case2_fc}
-%\end{figure}
-%\end{comment}
-%
-%\begin{comment}
-%    
-%\pagebreak 
-%\begin{remark}
-%If the disturbance $\omega_{t}$ affects the second part of the state vector, $\dot{\delta}_i$, in either the system or measurement, it will impact the system's accuracy in estimating the attack $f^c$. Therefore, detecting attacks is only possible if the measurement of relative velocity remains untainted.
-%\end{remark}
-%
-%\end{comment}
-
-% \vspace*{-0.3cm}
-\subsection{Simulation result using Carla}
-%----
-{
-\color{black}
-
-To evaluate the system under more realistic conditions, we conducted simulations within the CARLA simulator. Specifically, we simulated a scenario where a leading vehicle utilized a PID controller for cruise control, aiming to maintain a velocity of $10m/s$. We kept the parameters consistent with those listed in Table~\ref{tab:simple} and adopted a time step of $t_s = 0.04$. We also implemented a deterministic attack signal that varies over time and is defined by equation~\eqref{attack2}. As depicted in Fig~\ref{fig:carla_state}, the error state vectors for relative position and relative velocity exhibit good tracking, but the third vector $\tilde{\xi}_{a}$ falls short of perfection. This is because the acceleration of the preceding vehicle in Fig~\ref{fig:carla_fc} sent to the network is inconsistent, which affects the attack estimation performance. Fig~\ref{fig:carla_fc} illustrates the observer taking at least 5 seconds to converge to the actual state, and the estimated value being influenced by noise and imperfection of the model. However, the leading vehicle retains its ability to detect the cyberattack signal, ensuring a safe distance effectively}. A video showcasing the simulation scenario is provided in~\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}. Fig.~\ref{fig:carla_img} displays a thumbnail from the video.
- %~\cite{CarlaSimulator}
- \begin{figure}[h!]
-     \centering    
-     \includegraphics[width=0.6\textwidth,height = 3.5cm]{ch3/img/carla_d.png}
-    \caption{Carla Simulator platform~(\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}).}
-     \label{fig:carla_img}
- \end{figure}
-
-\begin{figure}[h!]
-    \centering    
-    \includegraphics[scale=1]{ch3/img/state_carla_new.eps}
-    \caption{State estimation using CARLA under attack case 2.}
-    \label{fig:carla_state}
-\end{figure}
-\begin{figure}[h!]
-    \centering    \includegraphics[scale=0.9]{ch3/img/fc_carla_new.eps}
-    \caption{Cyberattack signal and inter-vehicle communication case 2.}
-    \label{fig:carla_fc}
-\end{figure}
-%[GitHub repository](https://github.com/kslhuy/CACC_UIO_simulink).
-
-% \pagebreak 
+We can see that the proposed observer can estimate the full state with good accuracy, while the unknown input is reconstructed with a fixed delay of two units based on the available output measurements. 
 
 
 
+% % \vspace*{-0.3cm}
+% \subsection{Simulation result using Carla}
+% %----
+% {
+% \color{black}
 
+% To evaluate the system under more realistic conditions, we conducted simulations within the CARLA simulator. Specifically, we simulated a scenario where a leading vehicle utilized a PID controller for cruise control, aiming to maintain a velocity of $10m/s$. We kept the parameters consistent with those listed in Table~\ref{tab:simple} and adopted a time step of $t_s = 0.04$. We also implemented a deterministic attack signal that varies over time and is defined by equation~\eqref{attack2}. As depicted in Fig~\ref{fig:carla_state}, the error state vectors for relative position and relative velocity exhibit good tracking, but the third vector $\tilde{\xi}_{a}$ falls short of perfection. This is because the acceleration of the preceding vehicle in Fig~\ref{fig:carla_fc} sent to the network is inconsistent, which affects the attack estimation performance. Fig~\ref{fig:carla_fc} illustrates the observer taking at least 5 seconds to converge to the actual state, and the estimated value being influenced by noise and imperfection of the model. However, the leading vehicle retains its ability to detect the cyberattack signal, ensuring a safe distance effectively}. A video showcasing the simulation scenario is provided in~\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}. Fig.~\ref{fig:carla_img} displays a thumbnail from the video.
+%  %~\cite{CarlaSimulator}
+%  \begin{figure}[h!]
+%      \centering    
+%      \includegraphics[width=0.6\textwidth,height = 3.5cm]{ch3/img/carla_d.png}
+%     \caption{Carla Simulator platform~(\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}).}
+%      \label{fig:carla_img}
+%  \end{figure}
 
-
-
+% \begin{figure}[h!]
+%     \centering    
+%     \includegraphics[scale=1]{ch3/img/state_carla_new.eps}
+%     \caption{State estimation using CARLA under attack case 2.}
+%     \label{fig:carla_state}
+% \end{figure}
+% \begin{figure}[h!]
+%     \centering    \includegraphics[scale=0.9]{ch3/img/fc_carla_new.eps}
+%     \caption{Cyberattack signal and inter-vehicle communication case 2.}
+%     \label{fig:carla_fc}
+% \end{figure}
+% %[GitHub repository](https://github.com/kslhuy/CACC_UIO_simulink).
 
 
 
@@ -681,17 +648,15 @@ To evaluate the system under more realistic conditions, we conducted simulations
 \section{Exact Discretization Approach}\label{sec_Exact discretization}
 %---
 
-The observer design developed in the previous sections relies on a discrete-time model obtained via Euler discretization. This choice is deliberate, as it preserves the structure of the continuous-time system and allows direct application of well-established UIO existence and stability theorems. However, this discretization introduces a structural limitation, namely the violation of the rank condition, which necessitates the use of delayed outputs. The delay introduced in the previous sections is a discretization artifact, not a physical requirement.
-{\color{blue}
-In this section, we show that the delay requirement is not intrinsic to the continuous-time dynamics of the CACC system, but rather induced by the Euler discretization method. Physically, an input force affects acceleration instantly, which in turn influences velocity and position over any time interval $\Delta t$. 
-The Euler method ($p_{k+1} = p_k + \Delta t \cdot v_k$) effectively ignores the direct influence of acceleration on position within the sampling step, severing the algebraic link required for the rank condition. 
-By adopting an exact discretization based on the matrix exponential~\cite{M.Zhang}, the discrete-time model captures the complete evolution of the state trajectories between samples. This integration naturally couples the input with the position and velocity states through the matrix exponential, effectively preserving higher-order dynamics (such as $\frac{1}{2} a \Delta t^2$). This restores the structural coupling between the unknown input and the measured output, allowing the construction of a delay-free UIO. This approach offers significant advantages, including improved responsiveness and a simplified observer structure.
-}
-Figure~\ref{fig_dis_UIO} illustrates the structure of the proposed observer-based cyberattack estimation framework using the exact discretization model.
+The observer design developed in the previous sections relies on a discrete-time model obtained via forward Euler discretization. This choice is convenient because it preserves the continuous-time structure and enables the direct use of classical UIO existence and stability results. However, forward Euler may destroy the algebraic coupling between the unknown input and the measured output, which can lead to a violation of the rank condition and, consequently, to the use of delayed outputs. Importantly, this delay is not a physical requirement of the CACC dynamics; it is a numerical artifact induced by the discretization method.
+
+The key intuition is simple: a force (or acceleration) affects the vehicle motion \emph{within} each sampling interval. In particular, acceleration influences velocity and position through higher-order terms (e.g., $\tfrac{1}{2}aT_s^2$). By contrast, the Euler update $p_{k+1}=p_k+T_s v_k$ neglects this intra-sample coupling, which can sever the direct link needed by the rank condition. To preserve these higher-order effects, we adopt an exact (ZOH) discretization based on the matrix exponential~\cite{M.Zhang}. The resulting discrete-time model captures the full state evolution between samples and restores the structural coupling required for a delay-free UIO.
+
+Figure~\ref{fig_dis_UIO} illustrates the observer-based cyberattack estimation framework using the exact discretization model.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=10cm]{ch3/img/probleme_2.png}
+\includegraphics[width=1\textwidth]{ch3/img/probleme_2.png}
 \caption{Discrete-time model-based UIO}
 \label{fig_dis_UIO}
 \end{figure}
@@ -709,22 +674,23 @@ where the system matrices are computed as:
     A_d &= e^{A T_s}, \quad B_d =\int_{0}^{T_s} e^{A \eta} B d\eta, \quad C_d = C, \\
     F_d &= \int_{0}^{T_s} e^{A \eta} F d\eta, \quad W_d = \int_{0}^{T_s} e^{A \eta} W d\eta, \quad \hat{\Delta} = \int_{0}^{T_s} e^{A \eta} \Delta d\eta,
 \end{align*}
-with $T_s$ denoting the sampling period.
+with $T_s$ denoting the sampling period (under a zero-order hold assumption over $[kT_s,(k+1)T_s)$).
 
 We now verify the rank condition for the discretized system~\eqref{CACC_discrete_2}. Using the system parameters given in Table~\ref{tab:simple}, we obtain:
 \[
-C_d W_d = \begin{pmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0
-\end{pmatrix} 
+C_d W_d = 
+% \begin{pmatrix}
+% 1 & 0 & 0 \\
+% 0 & 1 & 0
+% \end{pmatrix} 
+% \begin{pmatrix}
+% 0.0000\\
+% 0.0002\\
+% 0.00483
+% \end{pmatrix} 
 \begin{pmatrix}
-1.14\times 10^{-6}\\
-3.41\times 10^{-4}\\
-6.75\times 10^{-2}
-\end{pmatrix} 
-= \begin{pmatrix}
-    1.14\times 10^{-6}\\
-    3.41\times 10^{-4}
+    0.0008\times 10^{-3}\\
+    0.2442\times 10^{-3}
 \end{pmatrix} \neq 0.
 \]
 Since $C_d W_d \neq 0$, the rank condition $\rank(C_d W_d) = \rank(W_d) = 1$ is satisfied. This confirms that the unknown input $f^c_k$ can be estimated directly from the output $y_k$ without requiring any delay.
@@ -737,97 +703,95 @@ Since $C_d W_d \neq 0$, the rank condition $\rank(C_d W_d) = \rank(W_d) = 1$ is 
 %============
 \subsection{Simulation Results and Comparison}\label{sec4}
 %--
-To demonstrate the effectiveness of the exact discretization method and the proposed observer, we conducted simulations using MATLAB and CARLA, following the procedures outlined in~\cite{nguyen2020cyberattack}. This section presents the results obtained with our method and compares them with those from~\cite{nguyen2020cyberattack}.
+To evaluate the impact of the discretization method, we compare two discrete-time designs built from the same continuous-time model: (i) the Euler-discretized (delayed-output) observer presented in the previous sections and (ii) the proposed delay-free observer based on exact (ZOH) discretization. We conduct CARLA simulations following the general procedures described in~\cite{nguyen2020cyberattack}.
 
-We solve the LMI conditions for the observer gain using the YALMIP Toolbox with the exponential stability parameter $\alpha=0.5$. The resulting observer gain $K$ is:
-% \[
-% K = \begin{pmatrix}
-% 0.5 & -0.005 \\
-% -0.001 & 0.7 \\
-% -0.2 & -68.0 \\
-% 2.2 & 1004.2 
-% \end{pmatrix}
-% \]
+We solve the LMI conditions for the observer gains using the CVX Toolbox with the exponential stability parameter $\alpha=0.5$. The resulting gains are:
+
+ %~\cite{CarlaSimulator}
+ \begin{figure}[h!]
+     \centering    
+     \includegraphics[width=0.6\textwidth,height = 3.5cm]{ch3/img/carla_d.png}
+    \caption{Carla Simulator platform~(\href{https://github.com/kslhuy/CACC_UIO_simulink}{GitHub repository}).}
+     \label{fig:carla_img}
+ \end{figure}
 
 \begin{equation*}
-    K =\begin{bmatrix}
-        0.5000 & -0.001 & -0.2 & 2.2 \\
-        -0.005 & 0.7 & -68.0 & 1004.2 
+    K_{euler} =\begin{bmatrix}
+        0.2500 & -0.0025 & 0.2500 & -11.1139 \\
+        -0.0050 & 1.0000 & -99.9950 & 2157.0714 
+      \end{bmatrix}^{\top}.
+\end{equation*} 
+
+\begin{equation*}
+    K_{exact} =\begin{bmatrix}
+        0.2500 & 0.0012 &  -0.3080 & 6.6744 \\
+        -5.3\times10^{-5} & 0.4461 & -46.1776 & 1216.7071 
       \end{bmatrix}^{\top}.
 \end{equation*} 
 
 \begin{figure}[h!]
     \centering 
-    \includegraphics[scale=0.45]{ch3/img/error_state_mat.png}
-    \caption{State estimation error using the proposed exact discretization method.}
+    \includegraphics[width=1\linewidth]{ch3/img/vehicle_trajectoies.eps}
+    \caption{Vehicle trajectories of preceding-following vehicle.}
+    \label{vehicle_trajectories_fig}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering 
+    \includegraphics[width=1\linewidth]{ch3/img/control_input.eps}
+    \caption{Control input of preceding-following vehicle.}
+    \label{control_input_fig}
+\end{figure}
+
+Figure~\ref{control_input_fig} indicates that the discretization method also impacts the control effort. In particular, the exact discretization leads to a less aggressive input. Table~\ref{tab:ch3_control_input_metrics} confirms this trend by showing reductions in both RMS and peak values of $u_{\text{sync}}$ after the warm-up period.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Euler} & \textbf{Exact (ZOH)} \\ \hline
+RMS (after warm-up)  & 4.609962 & 3.633092 \\ \hline
+Peak (after warm-up) & 13.487141 & 9.389372 \\ \hline
+\end{tabular}
+\caption{Control input metrics $u_{\text{sync}}$ for Euler and exact (ZOH) discretization (CARLA simulation).}
+\label{tab:ch3_control_input_metrics}
+\end{table}
+
+
+\begin{figure}[h!]
+    \centering 
+    \includegraphics[width=1\linewidth]{ch3/img/eror_state_estimation.eps}
+    \caption{State estimation error of 2 discretization method.}
     \label{est_error_sel_fig}
-    
-    \vspace{0.5cm}
-    
-    \centering 
-    \includegraphics[scale=0.3]{ch3/img/erreur.png}
-    \caption{State estimation error from~\cite{nguyen2020cyberattack}.}
-    \label{est_error_sel_fig_huy}
 \end{figure}
 
-Figures~\ref{est_error_sel_fig} and~\ref{est_error_sel_fig_huy} illustrate the estimation errors for the system states (position, velocity, and acceleration). Figure~\ref{est_error_sel_fig_huy} shows the results from~\cite{nguyen2020cyberattack}, where the estimation errors exhibit significant initial oscillations lasting about 5 seconds before stabilizing. Furthermore, the noise amplitude is substantial, indicating reduced accuracy under cyberattacks.
+Figure~\ref{est_error_sel_fig} compares the state estimation errors for position, velocity, and acceleration under Euler and exact discretization. Overall, the exact discretization approach yields a faster transient response and visibly reduces oscillations and noise, with the most pronounced improvement observed for the acceleration estimate.
 
-In contrast, Figure~\ref{est_error_sel_fig} shows the results obtained with our exact discretization method. The initial oscillations are less pronounced, and the system stabilizes more rapidly (within approximately 3 seconds). Moreover, the noise amplitude in both position and velocity errors is significantly reduced. This demonstrates the superior accuracy and robustness of the proposed method. Notably, the velocity estimation error is much smaller compared to the method in~\cite{nguyen2020cyberattack}.
+To quantify this observation, Table~\ref{tab:ch3_state_estimation_errors} reports the RMS and MSE values for both discretization methods. While the position error is similar in both cases, the exact discretization reduces the velocity RMS by about $4.5\%$ and the acceleration RMS by about $40\%$. A similar trend is observed in MSE, where the acceleration MSE decreases by more than $60\%$. These results support the claim that preserving the exact inter-sample dynamics improves both accuracy and robustness.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Position} & \textbf{Velocity} & \textbf{Acceleration} \\ \hline
+RMS (Euler)  & 0.035637 & 0.020425 & 1.508381 \\ \hline
+RMS (Exact)  & 0.035600 & 0.019503 & 0.912209 \\ \hline
+MSE (Euler)  & 0.001270 & 0.000417 & 2.275214 \\ \hline
+MSE (Exact)  & 0.001267 & 0.000380 & 0.832126 \\ \hline
+\end{tabular}
+\caption{State estimation error metrics for Euler and exact discretization (CARLA simulation).}
+\label{tab:ch3_state_estimation_errors}
+\end{table}
 
 \begin{figure}[h!]
     \centering 
-    \includegraphics[scale=0.4]{ch3/img/photo1.png}
-    \caption{Cyberattack estimation and error using the proposed method.}
+    \includegraphics[width=1\linewidth]{ch3/img/compare_est_f_c.eps}
+    \caption{Comparison of cyberattack estimation and error.}
     \label{fig:attack_est}
-
-    \vspace{0.5cm}
-
-    \centering 
-    \includegraphics[scale=0.4]{ch3/img/cyberattack.png}
-    \caption{Cyberattack estimation and error from~\cite{nguyen2020cyberattack}.}
-    \label{fig:attack_est_huy}
 \end{figure}
 
-Figures~\ref{fig:attack_est} and~\ref{fig:attack_est_huy} depict the actual cyberattack signal (blue) and its estimate (green), along with the estimation error. Both methods detect the attack, but our method (Figure~\ref{fig:attack_est}) exhibits superior performance. The estimated signal shows fewer fluctuations and greater stability compared to~\cite{nguyen2020cyberattack} (Figure~\ref{fig:attack_est_huy}).
+Figure~\ref{fig:attack_est} shows the true cyberattack signal and its reconstruction, along with the estimation error. Both discretization strategies enable attack detection; however, the exact discretization yields a smoother reconstruction and a smaller estimation error, which is consistent with the improved state estimates reported above.
 
-The estimation error in our method is centered around zero with minimal fluctuations (amplitude $\approx 0.6$), whereas the method from~\cite{nguyen2020cyberattack} shows errors with an amplitude of around 2. This higher noise level in the previous method could compromise reliability in safety-critical scenarios.
-
-\subsubsection{CARLA Simulator Results}
-To validate the proposed method under more realistic conditions, we conducted tests using the CARLA simulator. We implemented the same scenario as in~\cite{nguyen2020cyberattack}, involving a lead vehicle and a following vehicle. The lead vehicle maintains a reference speed of 10 m/s using a PID controller. The simulation parameters match those used in the MATLAB simulation, with a time step of 0.04 seconds.
-
-\begin{figure}[h!]
-    \centering 
-    \includegraphics[scale=0.32]{ch3/img/err_moi.png}
-    \caption{State estimation error in CARLA using the proposed method.}
-    \label{fig:carla_error_moi}
-    
-    \vspace{0.5cm}
-    
-    \centering 
-    \includegraphics[scale=0.45]{ch3/img/carla erreur.png}
-    \caption{State estimation error in CARLA from~\cite{nguyen2020cyberattack}.}
-    \label{fig:carla_error_huy}
-\end{figure}
-
-Figures~\ref{fig:carla_error_moi} and~\ref{fig:carla_error_huy} compare the state estimation errors in the CARLA environment. With our method (Figure~\ref{fig:carla_error_moi}), the position and velocity errors converge to zero more rapidly than in~\cite{nguyen2020cyberattack} (Figure~\ref{fig:carla_error_huy}). The acceleration estimation takes about 5 seconds to stabilize, which is comparable to the reference method.
-
-\begin{figure}[h!]
-    \centering 
-    \includegraphics[scale=0.52]{ch3/img/fc_moi.png}
-    \caption{Cyberattack estimation in CARLA using the proposed method.}
-    \label{fig:carla_attack_moi}
-    
-    \vspace{0.5cm}
-    
-    \centering 
-    \includegraphics[scale=0.47]{ch3/img/fc_huy.png}
-    \caption{Cyberattack estimation in CARLA from~\cite{nguyen2020cyberattack}.}
-    \label{fig:carla_attack_huy}
-\end{figure}
-
-Figures~\ref{fig:carla_attack_moi} and~\ref{fig:carla_attack_huy} present the cyberattack estimation results. Our method (Figure~\ref{fig:carla_attack_moi}) demonstrates better initial error management with smaller fluctuations compared to the significant transient instability observed in~\cite{nguyen2020cyberattack} (Figure~\ref{fig:carla_attack_huy}).
-
-Furthermore, our method achieves faster convergence, accurately estimating the cyberattack within 3 seconds, whereas the reference method requires more than 5 seconds. In terms of long-term accuracy, our method tracks the actual cyberattack signal $f^c$ more closely, providing a more precise estimation than the method in~\cite{nguyen2020cyberattack}.
 
 \section{Conclusion}
 This chapter addressed the problem of resilient state estimation and cyberattack reconstruction for Connected Autonomous Vehicles (CAVs) operating in a Cooperative Adaptive Cruise Control (CACC) platoon. The primary challenge identified was the violation of the rank condition required for standard Unknown Input Observer (UIO) design when using classical Euler discretization.
@@ -840,4 +804,3 @@ Comparative simulations in both MATLAB and the high-fidelity CARLA simulator val
 
 Future work will focus on extending these resilient estimation strategies to multi-vehicle platoons with heterogeneous dynamics and investigating the impact of model parameter uncertainties. Additionally, we aim to integrate this observer-based detection with active fault-tolerant control strategies to further enhance the safety and resilience of autonomous transportation systems.
 % \section{Conclusion}
-

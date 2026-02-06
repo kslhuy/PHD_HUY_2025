@@ -135,7 +135,7 @@
       \node[xshift=-86mm, yshift=75mm, anchor=north west] at (o) {
         \begin{minipage}[h]{.55\paperwidth}
           \color{ulcolor}
-          \fontsize{14}{17}\selectfont
+          \fontsize{16}{20}\selectfont
           Pr\'{e}par\'{e}e \`{a} \@institute{}\unskip\strut\par
           \if@cotutelle
           Dans le cadre d'une cotutelle avec \@otherinstitute{}\unskip\strut\par
@@ -159,7 +159,7 @@
       \node[yshift=31mm] at (o2) {
         \begin{minipage}[h]{.85\paperwidth}
           \centering
-          \fontsize{18}{22}\selectfont
+          \fontsize{22}{26}\selectfont
           \textbf{\@title{}}\unskip\strut\par
         \end{minipage}
       };
@@ -172,9 +172,9 @@
         \begin{minipage}[h]{.3\paperwidth}
           \ulbluelabel{Soutenue par}\unskip\strut\par
           \vspace{1mm}
-          {\fontsize{16}{19}\selectfont\textbf{\@author{}}}\unskip\strut\par
+          {\fontsize{18}{22}\selectfont\textbf{\@author{}}}\unskip\strut\par
           \vspace{1mm}
-          {\fontsize{12}{15}\selectfont Le \@date{}}\unskip\strut\par
+          {\fontsize{14}{17}\selectfont Le \@date{}}\unskip\strut\par
         \end{minipage}
       };
 
@@ -185,7 +185,7 @@
           \unskip\strut\par
             \vspace{1mm}
             \begin{flushleft} \unskip
-            {\fontsize{14}{17}\selectfont\textbf{\@doctoralschoolname{}}}
+            {\fontsize{16}{19}\selectfont\textbf{\@doctoralschoolname{}}}
             \end{flushleft} 
         \end{minipage}
       };
@@ -196,7 +196,7 @@
           \ulbluelabel{Sp\'{e}cialit\'{e}}
           \unskip\strut\par
           \vspace{1mm}
-          {\fontsize{14}{17}\selectfont\textbf{\@specialty{}}}
+          {\fontsize{16}{19}\selectfont\textbf{\@specialty{}}}
         \end{minipage}
       };
 
@@ -207,20 +207,20 @@
             \unskip\strut\par
             \vspace{1mm}
             \begin{flushleft} \unskip
-            {\fontsize{12}{15}\selectfont \@laboratory{}}
+            {\fontsize{14}{17}\selectfont \@laboratory{}}
             \end{flushleft} 
         \end{minipage}
       };
 
       % 8. Jury
-      \node[fill=lightgray!10, xshift=-15mm, yshift=-6.5mm, anchor=north west] (compo) at (o3) {
-        \begin{minipage}[h]{100mm}
-          \vspace{2mm}
-          {\hspace{1mm}\color{ulcolor}\fontsize{12}{15}\selectfont Composition du jury :}
-          \vspace{5mm}
-          \hspace{-2mm}
-          \fontsize{9}{11}\selectfont
-          \begin{tabularx}{100mm}{p{70mm}p{30mm}}
+      \node[fill=lightgray!10, xshift=-5mm, yshift=-6.5mm, anchor=north west] (compo) at (o3) {
+        \begin{minipage}[h]{130mm}
+          \vspace{3mm}
+          {\hspace{2mm}\color{ulcolor}\fontsize{14}{17}\selectfont Composition du jury :}
+          \vspace{6mm}
+          \hspace{0mm}
+          \fontsize{11}{13}\selectfont
+          \begin{tabularx}{130mm}{p{30mm}p{50mm}p{48mm}}
             \uljurystylepresident{\@jiname}{\@jitt}
             \uljurystyle{\@jiiname}{\@jiitt}{\@jiirole}
             \uljurystyle{\@jiiiname}{\@jiiitt}{\@jiiirole}
@@ -234,7 +234,7 @@
             \uljurystyle{\@jxiname}{\@jxitt}{\@jxirole}
             \uljurystyle{\@jxiiname}{\@jxiitt}{\@jxiirole}
           \end{tabularx}
-          \vspace{0mm}
+          \vspace{2mm}
         \end{minipage}
       };
 
@@ -301,19 +301,17 @@
 }
 
 %% --- STYLING HELPERS ---
-\newcommand{\ulbluelabel}[1]{{\color{ulcolor}\fontsize{12}{15}\selectfont #1}}
+\newcommand{\ulbluelabel}[1]{{\color{ulcolor}\fontsize{14}{17}\selectfont #1}}
 
 \newcommand{\uljurystyle}[3]{
   \ifdefempty{#1}{}{
-    \fontsize{10}{12}\selectfont #1 & \emph{#3}\\
-    #2 &  \\[3mm]
+    \emph{#3} & \fontsize{11}{13}\selectfont \textbf{#1} & \fontsize{10}{12}\selectfont #2 \\[4mm]
   }
 }
 
 \newcommand{\uljurystylepresident}[2]{
   \ifdefempty{#1}{}{
-    \fontsize{10}{12}\selectfont #1 & \emph{Président du jury}\\
-    #2 \\[3mm]
+    \emph{Président du jury} & \fontsize{11}{13}\selectfont \textbf{#1} & \fontsize{10}{12}\selectfont #2 \\[4mm]
   }
 }
 

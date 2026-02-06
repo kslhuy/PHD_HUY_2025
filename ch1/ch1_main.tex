@@ -27,6 +27,13 @@ From an industrial standpoint, resilience against cyber-attacks is increasingly 
 
 Finally, it is important to mention the role of high-fidelity simulation and real-world testing platforms in bridging theory to practice. Researchers and engineers increasingly use platforms like CARLA (an open-source vehicle simulator) and industry tools like dSPACE/Simulink for validation of estimation algorithms in realistic scenarios. For example, in Chapter 2 of this thesis, a resilient observer for a CACC platoon under attack was tested in the CARLA simulator. The scenario involved a lead vehicle broadcasting false acceleration data to its followers; using CARLA allowed the inclusion of realistic vehicle dynamics and sensor noise. Results showed that the proposed observer could still detect and estimate the attack, though with a convergence delay of a few seconds and some noise-induced estimation error. Such studies underscore practical issues (estimator convergence time, noise sensitivity, model discrepancies) that might not be evident in pure theory. By incorporating realistic benchmarks and case studies, the development of observers can be guided to address the gaps between an idealized design and a deployable solution. In summary, while advanced estimation algorithms hold great promise for improving autonomy and safety, their industrial adoption hinges on meeting strict requirements for real-time performance, reliability, and certifiability in the unpredictable conditions of the real world.
 
+% \begin{figure}[!t]
+%     \centering
+%     \includegraphics[width=0.9\linewidth]{ch1/fig/observer_evolution.png}
+%     \caption{Evolution of observer design from classical to hybrid resilient estimation.}
+%     \label{fig:observer_evolution}
+% \end{figure}
+
 \section{Literature Review Summary}
 Before proceeding to the detailed contributions in Chapters 2–4, we summarize here the key themes from the literature that underpin this thesis. A comprehensive review was conducted on state-of-the-art observers and estimation methods relevant to resilient autonomous vehicles, spanning both classical techniques and emerging hybrid approaches.
 
@@ -82,29 +89,27 @@ Three methodological challenges motivate the developments in this manuscript.
 
 The remainder of the thesis proposes observer designs addressing these points in a unified resilient estimation viewpoint.
 
+
 \section{Approach overview}
 
 The thesis follows a consistent workflow: (i) formulate vehicle/communication models with disturbances and attacks as unknown inputs, (ii) design observers with explicit robustness properties, (iii) enrich the estimators with learning or trust layers when needed, and (iv) validate by simulation on representative scenarios.
 
-\begin{figure}
+Figure~\ref{fig:hybrid_model} provides an overview of the hybrid resilient estimation viewpoint adopted throughout the manuscript.
+
+\begin{figure}[!t]
     \centering
     \includegraphics[width=0.9\linewidth]{ch1/fig/hybrid_model_2.png}
-    \caption{Hybrid resilient estimation framework for connected vehicles}
+    \caption{Hybrid resilient estimation framework for connected vehicles.}
     \label{fig:hybrid_model}
 \end{figure}
 
-\begin{figure}
+In addition, the cyber-physical threat model considered in this thesis is exemplified by a CACC platoon subject to corrupted V2V information, as illustrated in Figure~\ref{fig:under_attack}.
+
+\begin{figure}[!t]
     \centering
     \includegraphics[width=0.9\linewidth]{ch1/fig/under_attack.png}
-    \caption{CACC under cyber-attack scenario}
+    \caption{CACC under cyber-attack scenario.}
     \label{fig:under_attack}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\linewidth]{ch1/fig/Structure_these_2.png}
-    \caption{Organization of the thesis}
-    \label{fig:structure_these}
 \end{figure}
 
 \section{Main contributions}
@@ -121,9 +126,18 @@ Overall, the thesis contributes observer designs that combine robustness, adapti
 \section{Organization of the manuscript}
 
 The manuscript is organized as follows.
+Figure~\ref{fig:structure_these} summarizes the overall structure and chapter dependencies.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=1\linewidth]{ch1/fig/Structure_these_2.png}
+    \caption{Organization of the thesis.}
+    \label{fig:structure_these}
+\end{figure}
+
 \begin{itemize}
     \item Chapter~\ref{chp3_chap} studies resilient state estimation and cyber-attack reconstruction for connected autonomous vehicles in a CACC setting.
-    \item Chapter~\ref{chp4_chap} introduces a learning-based unknown input observer framework for robust nonlinear estimation, combining a generalized UIO with a neural adaptive observer.
+    \item Chapter~\ref{chp4_chap} introduces a two-layer, physics-informed learning framework for vehicle state estimation, where a tire-residual teacher observer supervises a neural residual student to compensate remaining modeling errors.
     \item Chapter~\ref{chp5_chap} proposes a resilient trust-aware distributed observer design for connected vehicle platoons under adversarial conditions.
     \item The conclusion summarizes the main results and outlines perspectives for future work.
 \end{itemize}

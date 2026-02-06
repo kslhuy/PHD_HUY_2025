@@ -149,15 +149,11 @@
 \newcommand*{\@jxiname}{} \newcommand*{\@jxitt}{} \newcommand*{\@jxirole}{}
 \newcommand*{\@jxiiname}{} \newcommand*{\@jxiitt}{} \newcommand*{\@jxiirole}{}
 
-% Helper for Hasni layout (NO extra column separator logic if affiliation contains one, but we assume user provides affiliation safely or we handle the row break)
-% The failing case was "Affiliation & Role" passed as arg 3.
-% We need a style that mimics: 
-% Name & Role \\
-% Affiliation \\
+% Helper for Hasni layout with 3-column structure:
+% Column 1: Role, Column 2: Name, Column 3: Affiliation
 \newcommand{\hasnijurystyle}[3]{%
   \ifdefempty{#1}{}{%
-    \fontsize{10}{12}\selectfont #1 & \emph{#3}\\
-    \multicolumn{2}{@{}p{\textwidth}@{}}{#2} \\[1mm]
+    \emph{#3} & \fontsize{11}{13}\selectfont\textbf{#1} & \fontsize{10}{12}\selectfont#2 \\[3mm]
   }%
 }
 
@@ -193,32 +189,32 @@
   \end{tikzpicture}
   \begin{center}
     \vspace*{4mm}
-    {\Large\bfseries \@title\par}
+    {\fontsize{20}{24}\selectfont\bfseries \@title\par}
     \vspace{3mm}
-    {\large \@thesistype\par}
+    {\fontsize{16}{20}\selectfont \@thesistype\par}
     \vspace{2mm}
-    {\small Pr\'esent\'ee et soutenue publiquement le \@coverdate\ pour l'obtention du titre de\par}
+    {\fontsize{12}{15}\selectfont Presented and publicly defended on \@coverdate\ for obtaining the title of\par}
     \vspace{1mm}
-    {\small\scshape \@degree\par}
+    {\fontsize{12}{15}\selectfont\scshape \@degree\par}
     \ifdefempty{\@mention}{}{%
       \vspace{0.5mm}
-      {\small (\@mention)\par}
+      {\fontsize{12}{15}\selectfont (\@mention)\par}
     }
     \vspace{2mm}
-    {\small par\par}
+    {\fontsize{12}{15}\selectfont by\par}
     \vspace{1mm}
-    {\large \@author\par}
+    {\fontsize{16}{20}\selectfont \@author\par}
     \vspace{2mm}
-    {\small Sous la direction de\par}
+    {\fontsize{12}{15}\selectfont Under the supervision of\par}
     \vspace{1mm}
-    {\small \@directors\par}
+    {\fontsize{12}{15}\selectfont \@directors\par}
   \end{center}
 
   \vspace{4mm}
-  {\noindent\small\textbf{Composition du jury}\par}
-  \vspace{1mm}
-  {\small
-  \begin{tabularx}{\textwidth}{p{0.35\textwidth}X}
+  {\noindent\fontsize{14}{17}\selectfont\textbf{Jury Composition}\par}
+  \vspace{2mm}
+  {\fontsize{11}{13}\selectfont
+  \begin{tabularx}{\textwidth}{p{0.25\textwidth}p{0.4\textwidth}X}
     \hasnijurystyle{\@jiname}{\@jitt}{\@jirole}
     \hasnijurystyle{\@jiiname}{\@jiitt}{\@jiirole}
     \hasnijurystyle{\@jiiiname}{\@jiiitt}{\@jiiirole}
@@ -231,6 +227,11 @@
     \hasnijurystyle{\@jxname}{\@jxtt}{\@jxrole}
     \hasnijurystyle{\@jxiname}{\@jxitt}{\@jxirole}
     \hasnijurystyle{\@jxiiname}{\@jxiitt}{\@jxiirole}
+    \hline
+    % \multicolumn{3}{l}{\fontsize{12}{14}\selectfont\textbf{Supervision}} \\[2mm]
+    \emph{PhD Director} & \fontsize{11}{13}\selectfont\textbf{Ali ZEMOUCHE} & \fontsize{10}{12}\selectfont Professor, Université de Lorraine \\[3mm]
+    \emph{Co-supervisor} & \fontsize{11}{13}\selectfont\textbf{Hugues RAFRALAHY} & \fontsize{10}{12}\selectfont Associate Professor, Université de Lorraine \\[3mm]
+    \emph{Industrial Supervisor} & \fontsize{11}{13}\selectfont\textbf{Madjid HADDAD} & \fontsize{10}{12}\selectfont Research Director, SEGULA Technologies \\[3mm]
   \end{tabularx}
   }
 

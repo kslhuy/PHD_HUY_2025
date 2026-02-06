@@ -180,23 +180,23 @@ decorations.pathreplacing}
 			minbibnames=6, % nb min authors in biblio
 			maxbibnames=6, % nb max authors in biblio
 			maxcitenames=1,mincitenames=1, % nb min authors as textual
-			maxalphanames=1, %nb author ref
-			style=alphabetic,%authoryear, numeric ,  alphabetic
+			% maxalphanames=1, %nb author ref
+			style=numeric,%authoryear, numeric ,  alphabetic
 			sorting=nyt]{biblatex}
 \renewcommand*{\bibfont}{\footnotesize}
 \setlength\bibitemsep{\itemsep}
 \renewbibmacro{in:}{} % remove In 
 
-\renewcommand*{\labelalphaothers}{}
-\DeclareLabelalphaTemplate{
-  \labelelement{
-    \field[final]{shorthand}
-    \field{labelname}
-    \field{label}
-  }
-  \labelelement{\literal{,\addhighpenspace}}
-  \labelelement{\field{year}}
-}
+% \renewcommand*{\labelalphaothers}{}
+% \DeclareLabelalphaTemplate{
+%   \labelelement{
+%     \field[final]{shorthand}
+%     \field{labelname}
+%     \field{label}
+%   }
+%   \labelelement{\literal{,\addhighpenspace}}
+%   \labelelement{\field{year}}
+% }
 
 \AtEveryBibitem{%
     \clearfield{note} % Remove note

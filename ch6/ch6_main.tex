@@ -1,9 +1,13 @@
 \chapter[Vehicle experiments and Board electronic]{Vehicle experiments and Board electronic}\label{chp6_chap}
 \chaptermark{Vehicle experiments and Board electronic}
 
+% \objectif{This chapter reports the experimental validation workflow and the implementation results obtained on the Quanser QCar2/QLabs platform.
+% It first presents the virtual-to-real experimental methodology, the platform architecture (sensing, perception, V2V communication, software stack), and the longitudinal/lateral control loops used to reproduce cooperative driving.
+% Then, it details the observer and trust-aware distributed estimation pipeline, and summarizes the main results under nominal conditions and under representative cyber/communication attack scenarios.
+% Finally, this chapter introduces the custom embedded electronic board designed to host the proposed estimation and trust mechanisms on a real vehicle, and discusses the firmware validation and the integration roadmap.
+% }
 \objectif{This chapter reports the experimental validation workflow and the implementation results obtained on the Quanser QCar2/QLabs platform.
 It first presents the virtual-to-real experimental methodology, the platform architecture (sensing, perception, V2V communication, software stack), and the longitudinal/lateral control loops used to reproduce cooperative driving.
-Then, it details the observer and trust-aware distributed estimation pipeline, and summarizes the main results under nominal conditions and under representative cyber/communication attack scenarios.
 Finally, this chapter introduces the custom embedded electronic board designed to host the proposed estimation and trust mechanisms on a real vehicle, and discusses the firmware validation and the integration roadmap.
 }
 
@@ -64,14 +68,32 @@ The logs collected during real trials are sent back to the containerized develop
 \subsection{Virtual environment and scenario definition}\label{chp6_subsec_virtual_env}
 The QLabs environment is configured with two connected vehicles: a \emph{leader} vehicle tracking a predefined closed-loop trajectory and a \emph{follower} vehicle reproducing cooperative platoon behavior.
 The leader trajectory is defined via a set of waypoints that form a closed loop.
-In the reported experiments, a desired speed of $0.3\,\mathrm{m/s}$ is selected to generate a smooth and repeatable reference motion for the follower.
+In the reported experiments, a desired speed of $0.5\,\mathrm{m/s}$ is selected to generate a smooth and repeatable reference motion for the follower.
 The scenario includes typical road elements (ground, walls, pedestrian crossing), making it closer to real driving conditions.
+
+% \begin{figure}[!ht]
+% 	\centering
+% 	\includegraphics[width=0.9\linewidth]{ch6/fig/Figure_1.png}
+% 	\caption{QLabs scenario and example of selected waypoints for the leader vehicle.}
+% 	\label{fig:ch6_qlabs_waypoints}
+% \end{figure}
 
 \begin{figure}[!ht]
 	\centering
-	\fbox{\parbox{0.9\linewidth}{\vspace{1.6cm}\centering Placeholder for the QLabs environment configuration and the selected waypoints ("Figures 5--6" in the provided report).\vspace{1.6cm}}}
-	\caption{QLabs scenario and example of selected waypoints for the leader vehicle.}
-	\label{fig:ch6_qlabs_waypoints}
+	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholders for board block diagram, PCB routing, and 3D model ("Figures 21--23" in the provided report).\vspace{1.7cm}}}
+    \begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/Figure_1.png}
+		% \caption{block architecture.}
+		% \label{fig:ch6_block_architecture}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{ch6/fig/map_real.jpg}
+		% \caption{KiCad PCB electrical plan.}
+		\label{fig:ch6_qlabs_waypoints}
+	\end{subfigure}
 \end{figure}
 
 \subsection{Measurements and perception pipeline}\label{chp6_subsec_measurements}
@@ -79,7 +101,7 @@ Designing trust-aware distributed estimation requires a clear definition of the 
 In this work, the data sources include: onboard sensors, perception modules (LiDAR-camera fusion), and V2V exchanged states.
 Table~\ref{tab:ch6_qcar_measurements} summarizes the measurements used in the reported experiments.
 
-\begin{table}[!ht]
+\begin{table}[ht!]
 	\centering
 	\caption{Summary of measurements and metadata available on QCar2/QLabs used for control, estimation, and trust evaluation.}
 	\label{tab:ch6_qcar_measurements}
@@ -270,6 +292,12 @@ This improves curve tracking and helps maintain the spacing policy (e.g., consta
 	\label{fig:ch6_corner_cutting}
 \end{figure}
 
+\subsection{MPC for following path}\label{chp6_subsec_MPC}
+The MPC for path following is designed to track a reference trajectory defined by the leader's waypoints while respecting the vehicle's kinematic constraints and ensuring smooth control actions.
+That also suupport the lateral control loop by providing a reference heading and curvature that the look-ahead controller can use to compute steering commands.
+The MPC optimization problem is solved at each control step, using the current state estimate and the reference
+
+
 % \section{Observer-based estimation and trust-aware distributed fusion}\label{chp6_sec_observers_trust}
 
 % \subsection{Two-layer observation architecture}\label{chp6_subsec_observer_arch}
@@ -344,49 +372,69 @@ This improves curve tracking and helps maintain the spacing policy (e.g., consta
 % 	\label{fig:ch6_trust_results}
 % \end{figure}
 
-\subsection{Attack scenarios and quantitative summary}\label{chp6_subsec_attack_scenarios}
-In the reported virtual experiments, the leader vehicle (ID 1) behaves as the attacker between $t=5\,\mathrm{s}$ and $t=10\,\mathrm{s}$.
-Several scenarios are considered, including bias injection, random faults, and DoS-like packet drops on position/velocity/acceleration.
+% \subsection{Attack scenarios and quantitative summary}\label{chp6_subsec_attack_scenarios}
+% In the reported virtual experiments, the leader vehicle (ID 1) behaves as the attacker between $t=5\,\mathrm{s}$ and $t=10\,\mathrm{s}$.
+% Several scenarios are considered, including bias injection, random faults, and DoS-like packet drops on position/velocity/acceleration.
 
-\begin{table}[!ht]
-	\centering
-	\caption{Attack scenarios used to evaluate the trust-aware estimation framework (leader ID 1 attacks other vehicles during $t\in[5,10]\,\mathrm{s}$).}
-	\label{tab:ch6_attack_scenarios}
-	\renewcommand{\arraystretch}{1.15}
-	\begin{tabular}{c p{0.26\linewidth} p{0.26\linewidth} p{0.28\linewidth}}
-		\hline
-            \textbf{Case} & \textbf{Attack method} & \textbf{Parameter(s)} & \textbf{Target (data)} \\
-		\hline
-		1 & Bias & $-5\,\mathrm{m}$ & Position \\
-		2 & Random fault & intensity $=10$, $p=0.3$ & Position \\
-		3 & Bias & $-2\,\mathrm{m/s}$ & Velocity \\
-		4 & Random fault & intensity $=2.5$, $p=0.3$ & Velocity \\
-		5 & Random fault & intensity $=1.0$, $p=0.3$ & Acceleration \\
-		6 & Data drop (DoS) & $p_{drop}=0.5$ & Position, velocity, acceleration \\
-		\hline
-	\end{tabular}
-\end{table}
+% \begin{table}[!ht]
+% 	\centering
+% 	\caption{Attack scenarios used to evaluate the trust-aware estimation framework (leader ID 1 attacks other vehicles during $t\in[5,10]\,\mathrm{s}$).}
+% 	\label{tab:ch6_attack_scenarios}
+% 	\renewcommand{\arraystretch}{1.15}
+% 	\begin{tabular}{c p{0.26\linewidth} p{0.26\linewidth} p{0.28\linewidth}}
+% 		\hline
+%             \textbf{Case} & \textbf{Attack method} & \textbf{Parameter(s)} & \textbf{Target (data)} \\
+% 		\hline
+% 		1 & Bias & $-5\,\mathrm{m}$ & Position \\
+% 		2 & Random fault & intensity $=10$, $p=0.3$ & Position \\
+% 		3 & Bias & $-2\,\mathrm{m/s}$ & Velocity \\
+% 		4 & Random fault & intensity $=2.5$, $p=0.3$ & Velocity \\
+% 		5 & Random fault & intensity $=1.0$, $p=0.3$ & Acceleration \\
+% 		6 & Data drop (DoS) & $p_{drop}=0.5$ & Position, velocity, acceleration \\
+% 		\hline
+% 	\end{tabular}
+% \end{table} 
 
-Two indicators are used to quantify the effects of the attacks: (i) a combined raw error capturing deviations on distance, speed, and acceleration estimates; and (ii) a normalized impact score obtained by dividing the combined error by the maximum error observed across scenarios.
-Among the considered scenarios, the DoS attack (Case~6) yields the highest normalized impact score ($0.872$), confirming it as the most severe perturbation.
-Conversely, the velocity bias attack (Case~3, bias $=-2\,\mathrm{m/s}$) yields the lowest reported impact score ($0.240$), indicating a limited effect on the overall platoon stability.
-In terms of vehicle sensitivity, the reported results show that vehicle $V4$ is the most affected (max impact $0.872$), whereas vehicle $V2$ is the most resilient with the lowest average impact score ($0.362$).
-Finally, the trust score evolution under DoS shows a clear drop below the $0.5$ threshold during the perturbation interval, followed by progressive recovery after the attack ends.
+% Two indicators are used to quantify the effects of the attacks: (i) a combined raw error capturing deviations on distance, speed, and acceleration estimates; and (ii) a normalized impact score obtained by dividing the combined error by the maximum error observed across scenarios.
+% Among the considered scenarios, the DoS attack (Case~6) yields the highest normalized impact score ($0.872$), confirming it as the most severe perturbation.
+% Conversely, the velocity bias attack (Case~3, bias $=-2\,\mathrm{m/s}$) yields the lowest reported impact score ($0.240$), indicating a limited effect on the overall platoon stability.
+% In terms of vehicle sensitivity, the reported results show that vehicle $V4$ is the most affected (max impact $0.872$), whereas vehicle $V2$ is the most resilient with the lowest average impact score ($0.362$).
+% Finally, the trust score evolution under DoS shows a clear drop below the $0.5$ threshold during the perturbation interval, followed by progressive recovery after the attack ends.
 
 \section{Custom embedded electronic board for future onboard deployment}\label{chp6_sec_board}
 
 \subsection{Motivation and design objectives}\label{chp6_subsec_board_motivation}
-To move from simulation-based validation / small-scale experiments to real trials, the project includes the design of a dedicated embedded electronic board.
-The objective is not only to ``run the code on hardware'', but to provide an integration-ready platform where sensing, communication, timing, and basic cyber-resilience can be validated under realistic constraints.
-In this thesis, the board is envisioned as an embedded \emph{intelligent soft sensor}: it reconstructs non-measured variables, monitors the consistency of cooperative data, and exports reliable state and trust indicators to higher-level decision and control.
+Transitioning from simulation-based validation and small-scale experiments to real vehicle trials requires an onboard implementation of the proposed estimation and trust mechanisms.
+Although deploying software directly on a vehicle computer may be acceptable for a single dedicated platform, this approach becomes impractical when scaling up to test multiple vehicles or when working across different testbeds: the software environment is strongly vehicle-dependent, access to low-level signals and time bases can be constrained, and modifications to each onboard stack increase integration time, maintenance effort, and safety risk.
+The proposed embedded electronic board addresses these issues by acting as a self-contained module that can be integrated as an add-on to different platforms without deeply modifying the vehicle control architecture.
 
-From a system engineering viewpoint, the design targets four key objectives:
+In addition, the board is designed as a \emph{portable ecosystem}: it provides a stable hardware/software baseline (drivers, timestamping, message formats, diagnostics, logging) so that the same implementation can be reused across multiple testbeds (scaled vehicles such as QCar, experimental prototypes, and future full-scale platforms).
+This portability reduces the cost of transferring algorithms between platforms, improves experiment repeatability, and supports progressive deployment (monitoring-only mode first, then tighter coupling with control once validated).
+
+In this thesis, the board is therefore envisioned as an embedded \emph{intelligent soft sensor}: it reconstructs non-measured variables, monitors the consistency of cooperative data, and exports reliable state and trust indicators to higher-level decision and control.
+This rationale is also driven by practical deployment constraints: in connected and autonomous vehicles, simultaneously measuring all the variables required by cooperative control and diagnosis (distances, relative velocities/accelerations, attitude/heading, road adhesion proxies, etc.) is often costly, and some quantities remain inaccessible with the available instrumentation.
+Model-based observers can compensate for missing measurements by reconstructing critical states online, but their effectiveness depends on deterministic timing, consistent timestamping, and reliable access to both local sensor data and cooperative messages.
+The VEHALSECU R\&D effort therefore targets a compact onboard module able to perform state estimation and cyberattack-aware consistency monitoring even under reduced sensing and intermittent/corrupted V2V communication~\cite{chaix2026vehalsecu}.
+
+From a system engineering viewpoint, the board design addresses three main challenges: (i) ensuring deterministic real-time behavior for observer and control tasks (e.g., $\approx 100\,\mathrm{Hz}$ loops with bounded jitter), (ii) integrating multiple sensor modalities and communication interfaces while maintaining time consistency across all data streams, and (iii) supporting deployment across different vehicle platforms through standardized interfaces and a portable software baseline.
+
+\paragraph{Functional requirements.}
+To meet these objectives, the needs analysis identifies the following embedded capabilities required for onboard deployment:
 \begin{itemize}
-	\item \textbf{Real-time execution:} guarantee deterministic execution of periodic estimation and control-related computations (e.g., $\approx 100\,\mathrm{Hz}$ loops as used in the experimental software stack), with bounded jitter.
-	\item \textbf{Multi-interface sensing and synchronization:} acquire heterogeneous data streams (inertial, positioning/time reference, and auxiliary sensors) and ensure time alignment through timestamping.
-	\item \textbf{V2V-ready communication:} support low-latency exchange of compact state messages and metadata (packet loss, delay indicators) required by the distributed observer and trust evaluation.
-	\item \textbf{Robustness and diagnosability:} provide a hardware and firmware structure that supports fault detection, health monitoring, and graceful degradation when sensors or communications are unavailable.
+	\item \textbf{Inertial sensing:} an Inertial Measurement Unit (IMU) combined with a magnetometer to measure acceleration, angular rates, and heading;
+	\item \textbf{Positioning and time reference:} a Global Navigation Satellite System (GNSS) receiver to provide absolute position and a synchronized time base;
+	\item \textbf{Data logging:} removable storage (e.g., microSD card) to record sensor data, received messages, and estimation outputs for offline analysis;
+	\item \textbf{Wired diagnostics interface:} Universal Serial Bus (USB) and Universal Asynchronous Receiver-Transmitter (UART) connections for firmware programming, debugging, and telemetry;
+	\item \textbf{Wireless communication:} a short-range wireless interface (Wi-Fi) to support Vehicle-to-Vehicle (V2V) data exchange;
+	\item \textbf{Power management:} a regulated power stage capable of converting the nominal vehicle supply voltage ($12\,\mathrm{V}$) into stable rails for digital and RF components.
 \end{itemize}
+This modular architecture ensures that the board can operate independently while interfacing with different vehicle platforms~\cite{chaix2026vehalsecu}.
+
+From a vehicle-integration perspective, this embedded demonstrator must also remain robust to typical onboard constraints, including supply transients, Electrostatic Discharge (ESD) events on external cabling, mechanical vibration, and Electromagnetic Interference (EMI) generated by actuators and switching power stages.
+These constraints directly influence the PCB stack-up and placement (return-path control and RF keep-outs), connector and protection choices, and firmware safety mechanisms such as watchdog supervision and brown-out handling.
+
+Finally, the move to embedded hardware opens the door to security-by-design evaluations that are difficult to emulate in a PC-only setup (device identity, secure storage, authenticated firmware updates, and message authentication).
+While the present prototype focuses on functionality and timing, the architecture is intended to remain compatible with later upgrades toward authenticated communication and secure boot.
 
 Compared with a purely PC-based ground-station deployment, the embedded approach also addresses practical constraints that become critical on a vehicle: compactness and wiring reduction, controlled power distribution, electromagnetic compatibility (EMC), and reliable boot/execution behavior.
 The overall role of the board is therefore to acquire onboard sensing data, exchange information with neighboring vehicles, fuse local and remote information, and publish consolidated variables (including trust indicators) to the vehicle-level decision and control system.
@@ -394,7 +442,16 @@ The overall role of the board is therefore to acquire onboard sensing data, exch
 \subsection{Architecture and PCB design}\label{chp6_subsec_board_hw}
 The development process is structured into four phases: (i) functional needs analysis and block-architecture definition, (ii) electronic CAD design, (iii) prototyping and embedded programming, and (iv) experimental verification with rigorous test protocols.
 The design identifies the required sensors, the target microcontroller family, and the relevant communication protocols, including \textbf{SPI}, \textbf{I$^2$C}, \textbf{UART}, and \textbf{Wi-Fi 6}.
+\paragraph{Sizing and interface selection.}
+To keep the embedded implementation compatible with the thesis algorithms, the architecture definition includes a first-order sizing step: expected sensor sampling rates and message rates are translated into data throughput and storage requirements, which then guide the selection of memory resources and logging mechanisms~\cite{chaix2026vehalsecu}.
+In practice, this motivates (i) separating time-critical sensor acquisition from less deterministic communication bursts and (ii) providing an onboard storage path to retain raw measurements and intermediate signals for offline analysis.
+
+\paragraph{Communication choice for the first prototype.}
+Several V2V candidates were considered (DSRC / ITS-G5, C-V2X, and Wi-Fi-based solutions).
+For the first experimental prototype deployed on a scaled test platform, Wi-Fi~6 was retained because it is comparatively accessible to implement while still providing sufficient performance for short-range V2V exchanges; this choice also simplifies integration and experimentation before migrating to more automotive-oriented stacks if required~\cite{chaix2026vehalsecu}.
 The electronic design is implemented in KiCad and routed on a \textbf{4-layer PCB}, which offers two main benefits: (i) dedicated reference planes to control return paths and reduce EMI, and (ii) improved power distribution and decoupling compared with 2-layer prototypes.
+Following the layout strategy reported in~\cite{chaix2026vehalsecu}, inner layers are used as continuous planes (ground and the main $3.3\,\mathrm{V}$ distribution) to stabilize return paths and supply impedance while freeing outer layers for routing and component placement.
+This 4-layer choice also reflects a compromise between routability/EMC and manufacturing cost: while additional layers can further ease routing and improve isolation, they were not retained for the first prototype iteration~\cite{chaix2026vehalsecu}.
 
 \paragraph{Functional blocks.}
 At a high level, the board architecture (Figure~\ref{fig:ch6_board_design}) can be described as a composition of:
@@ -423,7 +480,7 @@ Particular care is therefore devoted to power integrity, impedance constraints, 
 	\renewcommand{\arraystretch}{1.15}
 	\begin{tabular}{p{0.30\linewidth} p{0.64\linewidth}}
 		\hline
-			extbf{Design aspect} & \textbf{Target / rationale} \\
+			\textbf{Design aspect} & \textbf{Target / rationale} \\
 		\hline
 		Real-time behavior & Deterministic scheduling for periodic estimation tasks (e.g., $\sim 100\,\mathrm{Hz}$) and bounded latency for event-driven message handling. \\
 		Interfaces & Support SPI/I$^2$C/UART for sensors and debugging; support Wi-Fi for V2V exchange of compact state packets and link-quality metadata. \\
@@ -434,14 +491,21 @@ Particular care is therefore devoted to power integrity, impedance constraints, 
 	\end{tabular}
 \end{table}
 
+
+\begin{figure}[t]
+	\includegraphics[width=1\linewidth]{ch6/fig/achitec_carte.png}
+	\caption{Block architecture.}
+	\label{fig:ch6_block_architecture}
+\end{figure}
+
 \begin{figure}[!ht]
 	\centering
 	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholders for board block diagram, PCB routing, and 3D model ("Figures 21--23" in the provided report).\vspace{1.7cm}}}
     \begin{subfigure}[t]{0.49\linewidth}
 		\centering
-		\includegraphics[width=1\linewidth]{ch6/fig/achitec_carte.png}
+		\includegraphics[width=1\linewidth]{ch6/fig/shecmatic_Kidcad.png}
 		% \caption{block architecture.}
-		\label{fig:ch6_block_architecture}
+		\label{fig:ch6_KiCad_PCB_3D}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.49\linewidth}
@@ -452,7 +516,7 @@ Particular care is therefore devoted to power integrity, impedance constraints, 
 	\end{subfigure}
     
     
-    \caption{Embedded board design: block architecture and KiCad PCB implementation.}
+    \caption{Embedded board design: KiCad PCB implementation.}
 	\label{fig:ch6_board_design}
 \end{figure}
 
@@ -481,6 +545,10 @@ In order to validate the hardware early and de-risk the integration, initial fir
 The embedded software is prepared using STM32CubeMX and STM32CubeIDE, and integrates a real-time operating system (RTOS).
 The firmware is designed as a modular set of drivers and tasks that mirrors the software decomposition used in the QLabs experiments (sensing, communication, estimation, and trust update), while respecting embedded constraints (bounded memory, fixed timing, and robust I/O).
 
+\paragraph{Traceability and experiment reproducibility.}
+Because the goal is to transition from simulation to real-world deployment, a key practical requirement is the ability to \emph{trace} what happened during a run: raw sensor samples, timestamps, received packets, link-quality indicators, intermediate observer quantities, and final state/trust outputs.
+This motivates onboard logging (e.g., SD storage) and lightweight telemetry channels so that the observer behavior can be audited offline and compared against simulation baselines~\cite{chaix2026vehalsecu}.
+
 \paragraph{RTOS organization.}
 From a scheduling point of view, two categories of tasks are distinguished:
 \begin{itemize}
@@ -505,7 +573,7 @@ At the application level, the embedded ``observer/soft-sensor'' logic consumes t
 \paragraph{Verification philosophy.}
 The first firmware iterations focus on hardware bring-up and repeatable tests that validate each subsystem independently before enabling closed-loop operation.
 This staged validation reduces integration risk: peripherals are tested with controlled stimuli, and each interface is instrumented with debug traces before moving to multi-task real-time execution.
-First validation tests reported in the provided document confirm:
+The initial validation protocols described in~\cite{chaix2026vehalsecu} confirm:
 \begin{itemize}
 	\item sensor data readout and transmission via UART;
 	\item stable RTOS scheduler operation at $100\,\mathrm{Hz}$;
@@ -513,6 +581,14 @@ First validation tests reported in the provided document confirm:
 	\item compatibility between configured peripherals and the target hardware.
 \end{itemize}
 In practice, these checks provide evidence that the embedded platform can sustain the required sampling and communication rates, and that timing-critical sections (interrupt handlers, DMA transfers if used, and inter-task synchronization) behave reliably under continuous operation.
+
+\paragraph{Bring-up and interface test protocol.}
+The verification procedure follows a hierarchical approach.
+First, power integrity is validated through visual inspection and continuity checks, then by a progressive power-up with current limiting; regulated rails are verified under no-load conditions and their ripple is measured with an oscilloscope to detect unstable regulators or layout-related issues.
+Second, the communication interfaces are validated with simple, repeatable transactions: UART loopback/telemetry, I$^2$C bus scan and register reads, SPI transfers to a known peripheral (or a synthetic test pattern), and finally GNSS acquisition and Wi-Fi association followed by basic data transfer tests (IP assignment, ping, packet sending)~\cite{chaix2026vehalsecu}.
+
+In addition to software-level checks, bench bring-up measurements provide quantitative confidence in the electrical design.
+Reported results include a regulated $3.3\,\mathrm{V}$ rail close to nominal with limited ripple, stable bidirectional UART communication (e.g., $115200$\,baud), GNSS fix acquisition within tens of seconds with meter-level horizontal accuracy, and a functional Wi-Fi~6 link with measured throughput on the order of tens of Mbit/s in a test setup~\cite{chaix2026vehalsecu}.
 
 \subsection{Integration roadmap with thesis algorithms}\label{chp6_subsec_board_roadmap}
 The embedded platform is designed to support a progressive transfer of the estimation and resilience mechanisms developed throughout the thesis:
@@ -541,4 +617,3 @@ The full software stack (communication, perception, control, estimation) was int
 Nominal experiments confirm accurate local state reconstruction and coherent distributed estimation of the whole fleet.
 Under representative attack scenarios (biases, random faults, and DoS drops), the trust-aware fusion mechanism detects inconsistencies and mitigates their impact, with the DoS case being the most severe according to the reported normalized impact score.
 Finally, a custom embedded electronic board was designed and prototyped as a hardware foundation for future real-vehicle deployment of the proposed observers and cyber-resilience mechanisms.
-
