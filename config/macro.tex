@@ -40,9 +40,9 @@
 \newcommand{\addchapnonumber}[1]{
 \phantomsection
 \addtocounter{chapter}{1}
-\mtcaddchapter[#1] % Properly register with minitoc
+\mtcaddchapter[#1] % Properly register with minitoc AND adds to TOC
 \chapter*{#1}
-\addcontentsline{toc}{chapter}{#1}
+% \addcontentsline{toc}{chapter}{#1} % Removed: \mtcaddchapter already adds to TOC
 \markboth{#1}{#1}
 \setcounter{section}{0}
 }
