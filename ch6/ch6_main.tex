@@ -62,7 +62,7 @@ This allows the researcher to verify the platoon behaviour, tune the cooperative
 Because the digital twin mirrors the physical self‑driving car studio, the same code can then be executed on the real QCar with minimal changes. 
 In physical tests, the ground station sends visual plots and user commands to the vehicle while logging the on‑board measurements, estimated distances and trust indicators. 
 The logs collected during real trials are sent back to the containerized development environment, where they are analysed to refine the models and software. This feedback loop—code development → ground‑station execution → virtual trials → physical trials → log analysis—enables safe, incremental validation: controllers and observers are first validated in a realistic digital twin, then applied to the real vehicle. Bridging and blending code between the virtual and physical platforms allows researchers to explore new scenarios and behaviours while ensuring that the resulting algorithms are robust when transferred to hardware.
-
+The GitHub repository \url{https://github.com/kslhuy/QCar2_Cran} contains all algorithms developed in this thesis.
 \section{Quanser QCar2/QLabs experimental platform}\label{chp6_sec_platform}
 
 \subsection{Virtual environment and scenario definition}\label{chp6_subsec_virtual_env}
@@ -105,22 +105,24 @@ Table~\ref{tab:ch6_qcar_measurements} summarizes the measurements used in the re
 	\centering
 	\caption{Summary of measurements and metadata available on QCar2/QLabs used for control, estimation, and trust evaluation.}
 	\label{tab:ch6_qcar_measurements}
-	\renewcommand{\arraystretch}{1.15}
-	\begin{tabular}{p{0.21\linewidth} p{0.26\linewidth} p{0.24\linewidth} p{0.25\linewidth}}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\renewcommand{\arraystretch}{1.12}
+	\begin{tabular}{p{0.18\linewidth} p{0.23\linewidth} p{0.23\linewidth} p{0.27\linewidth}}
 		\hline
-			\textbf{Category} & \textbf{Measurement / Metadata} & \textbf{Source} & \textbf{Usage} \\
+			\textbf{Category} & \textbf{Measurement / metadata} & \textbf{Source} & \textbf{Usage} \\
 		\hline
-		Onboard sensors (raw) & Position $(x,y)$ and timestamp & QLabs virtual GPS (GPSSync API) & Time alignment and trajectory registration \\
+		Onboard sensors (raw) & Position $(x,y)$ and timestamp & QLabs virtual GPS (GPSSync API) & Time alignment and trajectory matching \\
 		Onboard sensors (raw) & Acceleration and angular rate & IMU (accelerometers, gyros) & Instantaneous vehicle dynamics \\
-		Onboard sensors (raw) & 2D point cloud & LiDAR (RPLiDAR A2, $12\,\mathrm{m}$ range) & 360$^\circ$ obstacle sensing \\
-		Onboard sensors (raw) & RGB / depth images & Cameras (Intel RealSense D435 and CSI 360$^\circ$) & Visual perception \\
+		Onboard sensors (raw) & 2D point cloud & LiDAR (RPLiDAR A2, $12\,\mathrm{m}$) & 360$^\circ$ obstacle sensing \\
+		Onboard sensors (raw) & RGB/depth images & Cameras (RealSense D435, CSI 360$^\circ$) & Visual perception \\
 		Onboard sensors (raw) & Wheel speed and steering angle & Motor encoder and steering servo & Inputs for longitudinal/lateral control \\
 		Derived kinematics & Position, orientation $(\psi)$ & QLabs global state & Absolute vehicle state in the map \\
 		Derived kinematics & Longitudinal speed $(v)$ & Encoder + Kalman filter & Smoothed speed estimate \\
 		Derived kinematics & Longitudinal acceleration $(a)$ & Derivative of $v$ (Kalman) or IMU & Longitudinal acceleration estimate \\
-		Cooperative variables & Inter-vehicle distance $(d)$ & LiDAR-camera fusion pipeline & Reliable distance for cooperative control \\
-		Cooperative variables & Relative speed $(\Delta v)$ & Temporal derivative of $d$ & Rate of change of inter-vehicle gap \\
-		V2V metadata & Neighbor states $(p,v,a)$ & Periodic V2V messages & Cooperation / distributed estimation \\
+		Relative variables & Inter-vehicle distance $(d)$ & LiDAR-camera fusion pipeline & Reliable distance for cooperative control \\
+		Relative variables & Relative speed $(\Delta v)$ & Temporal derivative of $d$ & Rate of change of inter-vehicle gap \\
+		V2V metadata & Neighbor states $(p,v,a)$ & Periodic V2V messages & Cooperative/distributed estimation \\
 		V2V metadata & Link quality & Packet loss rate, delays & Communication reliability for trust \\
 		\hline
 	\end{tabular}
@@ -272,9 +274,11 @@ This flexibility enables systematic benchmarking of the trust-aware estimation f
 \end{figure}
 
 \section{Control architecture}\label{chp6_sec_control}
+We have separated 2 types of controllers: one for path following (MPC) and one for vehicle following (CACC).
+To follow a vehicle, the control system can have separated longitudinal and lateral control loops, which are respectively CACC and ELC.
 
 \subsection{Longitudinal control: cooperative cruise control}\label{chp6_subsec_longitudinal}
-The longitudinal control loop is based on cooperative adaptive cruise control (CACC) to regulate both velocity and inter-vehicle spacing.
+The longitudinal control loop is based on Cooperative Adaptive Cruise Control (CACC) to regulate both velocity and inter-vehicle spacing.
 The control input combines locally measured quantities (e.g., speed/acceleration) with cooperative information received via V2V (e.g., predecessor acceleration), and relies on the perception-derived distance $d$ and relative speed $\Delta v$.
 This chapter focuses on the experimental integration and validation aspects; the detailed CACC modeling and resilient observer-based compensation are developed in earlier chapters.
 
@@ -287,15 +291,16 @@ This improves curve tracking and helps maintain the spacing policy (e.g., consta
 
 \begin{figure}[!ht]
 	\centering
-	\fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for corner-cutting comparison without/with look-ahead control ("Figures 10--11" in the provided report).\vspace{1.7cm}}}
+	\includegraphics[width=\linewidth]{ch6/fig/ill_conercut.png}
+	% \fbox{\parbox{0.92\linewidth}{\vspace{1.7cm}\centering Placeholder for corner-cutting comparison without/with look-ahead control ("Figures 10--11" in the provided report).\vspace{1.7cm}}}
 	\caption{Effect of extended look-ahead on corner cutting in curves.}
 	\label{fig:ch6_corner_cutting}
 \end{figure}
 
 \subsection{MPC for following path}\label{chp6_subsec_MPC}
 The MPC for path following is designed to track a reference trajectory defined by the leader's waypoints while respecting the vehicle's kinematic constraints and ensuring smooth control actions.
-That also suupport the lateral control loop by providing a reference heading and curvature that the look-ahead controller can use to compute steering commands.
-The MPC optimization problem is solved at each control step, using the current state estimate and the reference
+This also supports the lateral control loop by providing a reference heading and curvature that the look-ahead controller can use to compute steering commands.
+The MPC optimization problem is solved at each control step, using the current state estimate and the reference trajectory to compute the optimal steering and acceleration commands to minimize tracking error.
 
 
 % \section{Observer-based estimation and trust-aware distributed fusion}\label{chp6_sec_observers_trust}
@@ -405,50 +410,86 @@ The MPC optimization problem is solved at each control step, using the current s
 
 \subsection{Motivation and design objectives}\label{chp6_subsec_board_motivation}
 Transitioning from simulation-based validation and small-scale experiments to real vehicle trials requires an onboard implementation of the proposed estimation and trust mechanisms.
-Although deploying software directly on a vehicle computer may be acceptable for a single dedicated platform, this approach becomes impractical when scaling up to test multiple vehicles or when working across different testbeds: the software environment is strongly vehicle-dependent, access to low-level signals and time bases can be constrained, and modifications to each onboard stack increase integration time, maintenance effort, and safety risk.
-The proposed embedded electronic board addresses these issues by acting as a self-contained module that can be integrated as an add-on to different platforms without deeply modifying the vehicle control architecture.
+Running all software on a central vehicle computer (e.g., industrial PC or NVIDIA Jetson) is useful for proof-of-concept, but it is less practical for deployment across heterogeneous platforms.
+In practice, OS scheduling and middleware layers often hide low-level timing behavior, creating non-deterministic delays that affect high-rate estimation loops.
+Portability is also reduced when the implementation depends on a specific vehicle sensing stack, since testbeds such as QCar and full-scale passenger cars use different sensors and communication buses (CAN, Automotive Ethernet, etc.).
 
-In addition, the board is designed as a \emph{portable ecosystem}: it provides a stable hardware/software baseline (drivers, timestamping, message formats, diagnostics, logging) so that the same implementation can be reused across multiple testbeds (scaled vehicles such as QCar, experimental prototypes, and future full-scale platforms).
-This portability reduces the cost of transferring algorithms between platforms, improves experiment repeatability, and supports progressive deployment (monitoring-only mode first, then tighter coupling with control once validated).
+In this thesis, the embedded board is therefore treated as an \emph{intelligent soft sensor} and an edge estimation node.
+It reconstructs non-measured variables, checks cooperative-data consistency, and provides state/trust indicators to higher-level control and decision layers.
+This choice is also driven by practical constraints: directly measuring all cooperative-control quantities (relative distance/speed/acceleration, heading, road-adhesion proxies, etc.) is costly, and some variables are not accessible with standard instrumentation.
+Model-based observers can recover missing information online, but only with deterministic timing, consistent timestamping, and reliable access to local sensing and V2V data.
+Accordingly, the VEHALSECU effort targets a compact onboard module for state estimation and cyberattack-aware consistency monitoring under reduced sensing and intermittent/corrupted V2V communication~\cite{chaix2026vehalsecu}.
+Within an RCP workflow, the module can first operate in monitoring-only mode, then be progressively integrated into closed-loop operation after validation.
 
-In this thesis, the board is therefore envisioned as an embedded \emph{intelligent soft sensor}: it reconstructs non-measured variables, monitors the consistency of cooperative data, and exports reliable state and trust indicators to higher-level decision and control.
-This rationale is also driven by practical deployment constraints: in connected and autonomous vehicles, simultaneously measuring all the variables required by cooperative control and diagnosis (distances, relative velocities/accelerations, attitude/heading, road adhesion proxies, etc.) is often costly, and some quantities remain inaccessible with the available instrumentation.
-Model-based observers can compensate for missing measurements by reconstructing critical states online, but their effectiveness depends on deterministic timing, consistent timestamping, and reliable access to both local sensor data and cooperative messages.
-The VEHALSECU R\&D effort therefore targets a compact onboard module able to perform state estimation and cyberattack-aware consistency monitoring even under reduced sensing and intermittent/corrupted V2V communication~\cite{chaix2026vehalsecu}.
+\subsection{Architectural Alignment with State-of-the-Art}\label{chp6_subsec_sota_alignment}
+To bridge academic research and industrial automotive practice, the hardware selection prioritizes data integrity, precise synchronization, and interoperability with established robotics frameworks (e.g., ROS 2 / micro-ROS).
+The objective is to keep research flexibility while approaching the integration constraints of commercial telematics units.
 
-From a system engineering viewpoint, the board design addresses three main challenges: (i) ensuring deterministic real-time behavior for observer and control tasks (e.g., $\approx 100\,\mathrm{Hz}$ loops with bounded jitter), (ii) integrating multiple sensor modalities and communication interfaces while maintaining time consistency across all data streams, and (iii) supporting deployment across different vehicle platforms through standardized interfaces and a portable software baseline.
+\paragraph{Commercial Off-the-Shelf (COTS) landscape and motivation.}
 
-\paragraph{Functional requirements.}
-To meet these objectives, the needs analysis identifies the following embedded capabilities required for onboard deployment:
+Recent COTS  V2X products already offer mature features for deployment use cases.
+Representative examples include the Cohda MK6 (strong positioning and V2X-Locate capabilities)~\cite{cohda2025mk6}, the Commsignia OB4 (high-throughput HSM integration for large-scale signed messaging)~\cite{commsignia2025ob4}, and modular platforms such as the Unex SOM-351U for Tier-1 style integration flows~\cite{unex2024som}.
+Infrastructure-side deployments also rely on interoperable RSU solutions in European C-ITS programs, including NeoGLS-class setups in C-Roads testing contexts~\cite{croads2023interop}.
+These product lines evolve under standards and regulatory frameworks such as 3GPP NR V2X~\cite{3gpp_rel16_v2x}, SAE J2735 message dictionaries~\cite{saej2735_2024}, and the DSRC-to-C-V2X transition reflected in recent spectrum policy updates~\cite{fcc2024v2x}.
+However, for research labs and early prototypes, accessibility remains limited by cost, procurement, closed software stacks, and integration constraints.
+This gap motivates a custom embedded board: not to replace commercial OBUs/RSUs, but to provide an open and portable platform for observer, trust, and cyber-resilience experimentation before industrial transfer.
+
+\begin{table}[!ht]
+    \centering
+    \caption{Examples of COTS V2X products relevant to this thesis motivation.}
+    \label{tab:ch6_cots_products}
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular}{p{0.24\linewidth} p{0.27\linewidth} p{0.43\linewidth}}
+        \hline
+        \textbf{Product} & \textbf{Best for} & \textbf{Key differentiator} \\
+        \hline
+        Cohda MK6 & Research and urban-canyon operation & High-accuracy positioning (V2X-Locate)~\cite{cohda2025mk6} \\
+        Commsignia OB4 & Large-scale fleet deployment & High-throughput HSM for message signing~\cite{commsignia2025ob4} \\
+        Unex SOM-351U & Tier-1 hardware integration & Modular PCIe form factor for custom PCB integration~\cite{unex2024som} \\
+        NeoGLS RSU class & European infrastructure deployment & Alignment with C-Roads and French/European interoperability contexts~\cite{croads2023interop} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\paragraph{Component Selection and Functional Requirements.}
+The specific functional requirements are mapped to state-of-the-art component categories as follows:
+
 \begin{itemize}
-	\item \textbf{Inertial sensing:} an Inertial Measurement Unit (IMU) combined with a magnetometer to measure acceleration, angular rates, and heading;
-	\item \textbf{Positioning and time reference:} a Global Navigation Satellite System (GNSS) receiver to provide absolute position and a synchronized time base;
-	\item \textbf{Data logging:} removable storage (e.g., microSD card) to record sensor data, received messages, and estimation outputs for offline analysis;
-	\item \textbf{Wired diagnostics interface:} Universal Serial Bus (USB) and Universal Asynchronous Receiver-Transmitter (UART) connections for firmware programming, debugging, and telemetry;
-	\item \textbf{Wireless communication:} a short-range wireless interface (Wi-Fi) to support Vehicle-to-Vehicle (V2V) data exchange;
-	\item \textbf{Power management:} a regulated power stage capable of converting the nominal vehicle supply voltage ($12\,\mathrm{V}$) into stable rails for digital and RF components.
+    \item \textbf{Real-Time Processing Core:}
+    To guarantee deterministic execution of the estimation loops (target $\approx 100\,\mathrm{Hz}$), the design leverages high-performance microcontrollers (e.g., \textbf{ARM Cortex-M7} series such as the STM32H7 or NXP i.MX RT).
+    Unlike standard Linux-based embedded computers, these cores provide bare-metal or RTOS-based execution with negligible interrupt latency, essential for synchronizing sensor acquisition with V2V message arrival.
+
+    \item \textbf{High-Fidelity Inertial Sensing:}
+    The board integrates a 6-DoF Industrial-grade Inertial Measurement Unit (IMU) (e.g., \textbf{Bosch BMI088} or \textbf{TDK InvenSense ICM-42688}).
+    Selected for their vibration robustness and low bias instability, these sensors represent the current standard for automotive electronic stability control (ESC) and navigation support, offering a significant upgrade over consumer-grade MEMS found in basic development kits.
+
+    \item \textbf{Precision Positioning and Timing:}
+    A multi-constellation GNSS receiver (e.g., \textbf{u-blox F9 series}) is employed not only for absolute positioning but as a precise time source.
+    By utilizing the GNSS Timepulse (1PPS signal) to discipline the microcontroller's internal clock, the board ensures that all local data and V2V messages are timestamped to a global reference (UTC), a critical requirement for cooperative perception and sensor fusion in multi-agent systems.
+
+    \item \textbf{Wireless V2X/V2V Interface:}
+    While full-scale automotive deployments use C-V2X (3GPP PC5) or DSRC (802.11p), this research platform uses a modular Wi-Fi interface (e.g., \textbf{Espressif ESP32} or dedicated 802.11 modules) to emulate V2V functionality.
+    This module handles the physical layer broadcast of state vectors, allowing the main processor to focus on estimation logic.
+    For future-proofing, the hardware interface (UART/SPI) is designed to be compatible with commercial C-V2X modules (e.g., from Quectel or u-blox) for seamless migration to standard automotive protocols.
+
+    \item \textbf{Data Integrity and Connectivity:}
+    Robust logging is handled via an SDIO interface to high-speed storage, enabling "black box" recording of raw sensor data for offline replay.
+    External connectivity includes both USB for development and robust vehicle buses (CAN/CAN-FD) to broadcast the "trust indicators" and estimated states to the vehicle's central planning unit.
 \end{itemize}
-This modular architecture ensures that the board can operate independently while interfacing with different vehicle platforms~\cite{chaix2026vehalsecu}.
 
-From a vehicle-integration perspective, this embedded demonstrator must also remain robust to typical onboard constraints, including supply transients, Electrostatic Discharge (ESD) events on external cabling, mechanical vibration, and Electromagnetic Interference (EMI) generated by actuators and switching power stages.
-These constraints directly influence the PCB stack-up and placement (return-path control and RF keep-outs), connector and protection choices, and firmware safety mechanisms such as watchdog supervision and brown-out handling.
+Overall, this modular architecture enables the board to verify incoming cooperative data before forwarding estimates and trust indicators to trajectory-level functions.
 
-Finally, the move to embedded hardware opens the door to security-by-design evaluations that are difficult to emulate in a PC-only setup (device identity, secure storage, authenticated firmware updates, and message authentication).
-While the present prototype focuses on functionality and timing, the architecture is intended to remain compatible with later upgrades toward authenticated communication and secure boot.
-
-Compared with a purely PC-based ground-station deployment, the embedded approach also addresses practical constraints that become critical on a vehicle: compactness and wiring reduction, controlled power distribution, electromagnetic compatibility (EMC), and reliable boot/execution behavior.
-The overall role of the board is therefore to acquire onboard sensing data, exchange information with neighboring vehicles, fuse local and remote information, and publish consolidated variables (including trust indicators) to the vehicle-level decision and control system.
 
 \subsection{Architecture and PCB design}\label{chp6_subsec_board_hw}
 The development process is structured into four phases: (i) functional needs analysis and block-architecture definition, (ii) electronic CAD design, (iii) prototyping and embedded programming, and (iv) experimental verification with rigorous test protocols.
-The design identifies the required sensors, the target microcontroller family, and the relevant communication protocols, including \textbf{SPI}, \textbf{I$^2$C}, \textbf{UART}, and \textbf{Wi-Fi 6}.
+The design identifies required sensors, the target microcontroller family, and the main communication protocols (\textbf{SPI}, \textbf{I$^2$C}, \textbf{UART}, and \textbf{Wi-Fi 6}).
 \paragraph{Sizing and interface selection.}
-To keep the embedded implementation compatible with the thesis algorithms, the architecture definition includes a first-order sizing step: expected sensor sampling rates and message rates are translated into data throughput and storage requirements, which then guide the selection of memory resources and logging mechanisms~\cite{chaix2026vehalsecu}.
-In practice, this motivates (i) separating time-critical sensor acquisition from less deterministic communication bursts and (ii) providing an onboard storage path to retain raw measurements and intermediate signals for offline analysis.
+To keep the embedded implementation compatible with the thesis algorithms, the architecture includes a first-order sizing step: expected sensor sampling rates and message rates are translated into throughput and storage requirements, guiding memory and logging choices~\cite{chaix2026vehalsecu}.
+In practice, this leads to (i) separating time-critical sensor acquisition from less deterministic communication bursts and (ii) keeping an onboard storage path for raw and intermediate signals used in offline analysis.
 
 \paragraph{Communication choice for the first prototype.}
 Several V2V candidates were considered (DSRC / ITS-G5, C-V2X, and Wi-Fi-based solutions).
-For the first experimental prototype deployed on a scaled test platform, Wi-Fi~6 was retained because it is comparatively accessible to implement while still providing sufficient performance for short-range V2V exchanges; this choice also simplifies integration and experimentation before migrating to more automotive-oriented stacks if required~\cite{chaix2026vehalsecu}.
+For the first experimental prototype on a scaled test platform, Wi-Fi~6 was retained because it is comparatively accessible to implement while still providing sufficient short-range V2V performance; it also simplifies early integration before migration to more automotive-oriented stacks if required~\cite{chaix2026vehalsecu}.
 The electronic design is implemented in KiCad and routed on a \textbf{4-layer PCB}, which offers two main benefits: (i) dedicated reference planes to control return paths and reduce EMI, and (ii) improved power distribution and decoupling compared with 2-layer prototypes.
 Following the layout strategy reported in~\cite{chaix2026vehalsecu}, inner layers are used as continuous planes (ground and the main $3.3\,\mathrm{V}$ distribution) to stabilize return paths and supply impedance while freeing outer layers for routing and component placement.
 This 4-layer choice also reflects a compromise between routability/EMC and manufacturing cost: while additional layers can further ease routing and improve isolation, they were not retained for the first prototype iteration~\cite{chaix2026vehalsecu}.
@@ -471,7 +512,7 @@ The main layout guidelines are summarized below:
 	\item \textbf{High-speed / RF routing:} controlled-impedance routing and keep-out zones for the Wi-Fi/RF section, plus careful placement of the GNSS/RF components to minimize coupling.
 	\item \textbf{Robust I/O:} ESD-aware connector placement and protection where needed (especially for external cables), as well as clear separation between internal buses (SPI/I$^2$C) and external-facing ports.
 \end{itemize}
-Particular care is therefore devoted to power integrity, impedance constraints, electromagnetic compatibility, and high-frequency signal management (Wi-Fi and GNSS).
+These rules are used to keep power quality, EMC behavior, and RF/high-frequency routing robust in onboard conditions.
 
 \begin{table}[!ht]
 	\centering
@@ -541,9 +582,9 @@ Particular care is therefore devoted to power integrity, impedance constraints, 
 \end{figure}
 
 \subsection{Firmware structure and first validation tests}\label{chp6_subsec_board_fw}
-In order to validate the hardware early and de-risk the integration, initial firmware developments are performed using development modules before deployment on the final board.
-The embedded software is prepared using STM32CubeMX and STM32CubeIDE, and integrates a real-time operating system (RTOS).
-The firmware is designed as a modular set of drivers and tasks that mirrors the software decomposition used in the QLabs experiments (sensing, communication, estimation, and trust update), while respecting embedded constraints (bounded memory, fixed timing, and robust I/O).
+To validate hardware early and reduce integration risk, initial firmware developments are performed on development modules before deployment on the final board.
+The software is prepared using STM32CubeMX and STM32CubeIDE, with RTOS integration.
+The firmware remains modular and follows the same main functions as in QLabs experiments (sensing, communication, estimation, trust update), while respecting embedded constraints (bounded memory, fixed timing, robust I/O).
 
 \paragraph{Traceability and experiment reproducibility.}
 Because the goal is to transition from simulation to real-world deployment, a key practical requirement is the ability to \emph{trace} what happened during a run: raw sensor samples, timestamps, received packets, link-quality indicators, intermediate observer quantities, and final state/trust outputs.
@@ -566,39 +607,39 @@ At a functional level, the firmware implements the following services:
 	\item fuse received information with local measurements for a coherent view;
 	\item transmit consolidated variables to the vehicle system for decision making.
 \end{itemize}
-The sensing layer provides unified data structures that include both numerical values and metadata (timestamps, validity flags, and optional quality indicators).
-The communication layer provides packet framing, serialization/deserialization, and hooks for monitoring link quality (e.g., packet counters, estimated loss, and delay statistics).
-At the application level, the embedded ``observer/soft-sensor'' logic consumes these time-stamped inputs and outputs a consistent state estimate together with trust-related indicators that can be logged or transmitted to the vehicle control stack.
+The sensing layer provides unified data structures with numerical values and metadata (timestamps, validity flags, optional quality indicators).
+The communication layer handles packet framing/serialization and exposes link-quality hooks (packet counters, estimated loss, delay statistics).
+At application level, the embedded ``observer/soft-sensor'' consumes these inputs and outputs consistent state estimates plus trust-related indicators for logging or transmission to the vehicle control stack.
 
 \paragraph{Verification philosophy.}
-The first firmware iterations focus on hardware bring-up and repeatable tests that validate each subsystem independently before enabling closed-loop operation.
-This staged validation reduces integration risk: peripherals are tested with controlled stimuli, and each interface is instrumented with debug traces before moving to multi-task real-time execution.
-The initial validation protocols described in~\cite{chaix2026vehalsecu} confirm:
+The first firmware iterations focus on hardware bring-up and repeatable subsystem tests before enabling closed-loop operation.
+This staged approach validates peripherals with controlled stimuli and debug traces before moving to multi-task real-time execution.
+Initial protocols confirm:
 \begin{itemize}
 	\item sensor data readout and transmission via UART;
 	\item stable RTOS scheduler operation at $100\,\mathrm{Hz}$;
 	\item correct interrupt and asynchronous task handling;
 	\item compatibility between configured peripherals and the target hardware.
 \end{itemize}
-In practice, these checks provide evidence that the embedded platform can sustain the required sampling and communication rates, and that timing-critical sections (interrupt handlers, DMA transfers if used, and inter-task synchronization) behave reliably under continuous operation.
+These checks indicate that the platform can sustain required sampling/communication rates and that timing-critical sections (interrupt handlers, DMA transfers when used, inter-task synchronization) remain reliable in continuous operation.
 
 \paragraph{Bring-up and interface test protocol.}
 The verification procedure follows a hierarchical approach.
-First, power integrity is validated through visual inspection and continuity checks, then by a progressive power-up with current limiting; regulated rails are verified under no-load conditions and their ripple is measured with an oscilloscope to detect unstable regulators or layout-related issues.
-Second, the communication interfaces are validated with simple, repeatable transactions: UART loopback/telemetry, I$^2$C bus scan and register reads, SPI transfers to a known peripheral (or a synthetic test pattern), and finally GNSS acquisition and Wi-Fi association followed by basic data transfer tests (IP assignment, ping, packet sending)~\cite{chaix2026vehalsecu}.
+First, power integrity is checked through inspection/continuity, progressive power-up with current limiting, and ripple measurements on regulated rails.
+Second, interfaces are validated with repeatable transactions: UART loopback/telemetry, I$^2$C bus scan and register reads, SPI transfers to a known peripheral (or synthetic pattern), then GNSS acquisition and Wi-Fi association with basic packet tests (IP assignment, ping, packet sending)~\cite{chaix2026vehalsecu}.
 
-In addition to software-level checks, bench bring-up measurements provide quantitative confidence in the electrical design.
-Reported results include a regulated $3.3\,\mathrm{V}$ rail close to nominal with limited ripple, stable bidirectional UART communication (e.g., $115200$\,baud), GNSS fix acquisition within tens of seconds with meter-level horizontal accuracy, and a functional Wi-Fi~6 link with measured throughput on the order of tens of Mbit/s in a test setup~\cite{chaix2026vehalsecu}.
+Bench measurements complement software checks and provide quantitative confidence in the electrical design.
+Reported results include a regulated $3.3\,\mathrm{V}$ rail close to nominal with limited ripple, stable bidirectional UART communication (e.g., $115200$\,baud), GNSS fix acquisition within tens of seconds with meter-level horizontal accuracy, and a functional Wi-Fi~6 link with throughput on the order of tens of Mbit/s in a test setup~\cite{chaix2026vehalsecu}.
 
 \subsection{Integration roadmap with thesis algorithms}\label{chp6_subsec_board_roadmap}
-The embedded platform is designed to support a progressive transfer of the estimation and resilience mechanisms developed throughout the thesis:
+The embedded platform supports a staged transfer of the estimation and resilience mechanisms developed throughout the thesis:
 \begin{itemize}
 	\item implementing the local observer as a periodic real-time task (sensor acquisition, filtering, state update);
 	\item implementing the distributed observer and trust update as event-driven tasks synchronized with V2V message reception;
 	\item maintaining time consistency via timestamping (synchronized clock) and heartbeat/ACK mechanisms;
 	\item ensuring safe degradation modes under detected faults/attacks by down-weighting or isolating untrusted neighbors.
 \end{itemize}
-The proposed integration is intentionally incremental.
+The transfer follows three stages:
 First, the embedded platform is used as a data concentrator and logger to validate sensing and timestamping on the vehicle.
 Second, the local observer is activated onboard, producing filtered kinematic estimates and residuals for fault detection.
 Third, V2V exchange is enabled and the distributed observer is executed, initially in a monitoring mode (estimating and logging without affecting control), then progressively coupled to the decision/control layer once stability and robustness are confirmed.

@@ -276,7 +276,7 @@ To avoid cumbersome equations, we omit the subscripts $i$ and $i-1$ when represe
 
 The primary objective in the CACC control problem is to estimate the false data, $f^c$, and compensate for it within the controller $u_{\text{i}}$. A natural solution involves using the Unknown Input Observer (UIO) technique to simultaneously estimate the state $x$ and the false data $f^{c}$.
 
-However, standard UIO design requires a specific rank condition, namely $\rank(C W) = \rank(W)$~\cite{chaouche2022unknown,trinh2011functional}. For the CACC system defined in~\eqref{CACC}, we observe that $\rank(C W) = 0$ while $\rank(W) = 1$. Consequently, the standard rank constraint is not satisfied, preventing direct application of the method.
+However, standard UIO design requires a specific rank condition, namely $\rank(C W) = \rank(W)$ \cite{chaouche2022unknown,trinh2011functional}. For the CACC system defined in~\eqref{CACC}, we observe that $\rank(C W) = 0$ while $\rank(W) = 1$. Consequently, the standard rank constraint is not satisfied, preventing direct application of the method.
 
 To overcome this limitation, we require additional information, specifically the relative acceleration. One approach is to use a real-time differentiator to estimate the derivative of the relative velocity online. Since $CB = CF = C\Delta = CW = 0$, we can define the derivative of $y$ as a pseudo-measurement:
 \begin{equation}\label{ali_e4}

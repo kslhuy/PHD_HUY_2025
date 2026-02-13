@@ -9,7 +9,7 @@
 \section{Introduction}
 
 
-State estimation is a cornerstone of autonomous vehicle control, where safety depends on accurate knowledge of system states and external disturbances. Traditional methods rely on explicit physics-based models \cite{State_Esti2017}. However, in vehicle dynamics, highly nonlinear phenomena-such as variable tire-road friction or aerodynamic drag are difficult to model mathematically, leading to estimation errors that compromise control performance.
+State estimation is a cornerstone of autonomous vehicle control, where safety depends on accurate knowledge of system states and external disturbances. Traditional methods rely on explicit physics-based models \cite{State_Esti2017}. However, in vehicle dynamics, highly nonlinear phenomena- such as variable tire-road friction or aerodynamic drag are difficult to model mathematically, leading to estimation errors that compromise control performance.
 
 Data-driven methods, particularly Neural Networks (NNs), have emerged as powerful tools for approximating these complex nonlinear functions \citep{2006Apdat, HO_GP}. While NNs offer superior adaptability, they pose significant risks in safety-critical applications. 
 In online learning scenarios, small shifts in input data can cause NNs to behave unpredictably or diverge, lacking the stability guarantees provided by control theory. 
@@ -17,14 +17,14 @@ Consequently, recent research has shifted toward hybrid architectures that embed
 
 A major limitation in existing hybrid observers is their reliance on the standard observer matching condition. For many vehicle systems, this condition does not hold, making it theoretically impossible to decouple the unknown input from the state using standard techniques. While some methods attempt to bypass this using approximations, they often result in unbounded errors or require expensive additional sensors.
 
-To overcome these limitations, this paper proposes a layered Teacher-Student estimation architecture consisting of two distinct observers:
+To overcome these limitations, this chapter proposes a layered Teacher-Student estimation architecture consisting of two distinct observers:
 \begin{itemize}
     \item  A Generalized UIO (The Teacher): We introduce a regularization technique using output derivatives that ensures the observer exists even when the rank condition fails. This observer provides a robust, physics-guaranteed signal of the unknown input, ensuring the estimation error remains bounded. 
     
     % The generalized UIO does not rely on numerical differentiation of outputs. Instead, it augments the system with output-derivative states, which are either directly measured (e.g., via IMU sensors) or internally estimated by the observer, thereby increasing output richness and enabling unknown-input reconstruction even when classical rank conditions fail.
     \item A Neural Adaptive Observer (The Student): While the UIO estimates the current value of the disturbance, it cannot predict how that disturbance behaves at future states (e.g., along a reference trajectory). The Neural Observer utilizes the UIO's signal to learn the unknown dynamics as a function of the state ($\mu_\theta(x)$). This allows for refined precision and enables the controller to anticipate unmodeled dynamics.
 \end{itemize}
-This combination offers a specific advantage: the Generalized UIO guarantees the system never diverges (safety), while the Neural Network minimizes the residual error over time (performance). The contributions of this paper are:
+This combination offers a specific advantage: the Generalized UIO guarantees the system never diverges (safety), while the Neural Network minimizes the residual error over time (performance). The contributions of this chapter are:
 \begin{itemize}
     \item A Generalized UIO design that relaxes the rank condition using output derivatives ;
     \item A hybrid learning framework where the UIO acts as a supervisor, enforcing consistency in the neural training loop; 
@@ -37,7 +37,7 @@ This combination offers a specific advantage: the Generalized UIO guarantees the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem Formulation and Motivation}\label{sec2}
 %
-In this paper, we consider the class of continuous-time nonlinear systems in state-space form described by the following equations:
+In this chapter, we consider the class of continuous-time nonlinear systems in state-space form described by the following equations:
 
 \begin{equation}\label{sys_1}
     \begin{array}{l}
@@ -45,7 +45,7 @@ In this paper, we consider the class of continuous-time nonlinear systems in sta
         y = Cx, 
     \end{array}
 \end{equation}
-where $x\in \mathcal{X} \subseteq\mathbb{R}^{n_x}$ is the state vector, $y\in\mathbb{R}^{n_y}$ is the output measurement, $u\in\mathcal{U} \subseteq\mathbb{R}^{n_u}$ is the control input, and $\mu_{x}\in\mathbb{R}^{n_{\mu}}$ is an unknown nonlinear function that encapsulates the system uncertainty including both unmodeled dynamics and external disturbances. The matrices $C\in\mathbb{R}^{n_y}\times\mathbb{R}^{n_x}$ and $B\in\mathbb{R}^{n_x}\times\mathbb{R}^{n_{\mu}}$ are constant and known matrices. The function $\varphi: \mathcal{X} \times \mathcal{U} \to \mathbb{R}^{n_x}$ represents the known nonlinear component of the system. 
+where $x\in \mathcal{X} \subseteq\mathbb{R}^{n_x}$ is the state vector, $y\in\mathbb{R}^{n_y}$ is the output measurement, $u\in\mathcal{U} \subseteq\mathbb{R}^{n_u}$ is the control input, and $\mu_{x}\in\mathbb{R}^{n_{\mu}}$ is an unknown nonlinear function that encapsulates the system uncertainty including both unmodeled dynamics and external disturbances. The matrices $C\in\mathbb{R}^{n_y \times n_x}$ and $B\in\mathbb{R}^{n_x \times n_{\mu}}$ are constant and known matrices. The function $\varphi: \mathcal{X} \times \mathcal{U} \to \mathbb{R}^{n_x}$ represents the known nonlinear component of the system. 
 
 \begin{remark}
 For simplicity, we consider systems with linear output. Otherwise, if we have nonlinear output $y = h(x)$, we introduce a new state $\eta(t)$, with $\dot{\eta} \triangleq A_{\eta} \eta + \gamma y$ and $\eta_0 = \eta(0)$ known. Then, a new system with the augmented vector $\zeta = \begin{bmatrix} \eta \\ x \end{bmatrix}$ may be considered, which has as linear output the vector $\eta$.
@@ -60,11 +60,11 @@ The output vector $y$ has dimension greater than or equal to the number of unkno
 
 \begin{assumption}\label{ali_hyp2}
 %Assumption 2. 
-The nonlinear function $\varphi(.)$ is $\gamma_{\varphi}-$Lipschitz continuous on $\mathcal{X}$, uniformly on $u\in\mathcal{U}$.
+The nonlinear function $\varphi(\cdot)$ is $\gamma_{\varphi}$-Lipschitz continuous on $\mathcal{X}$, uniformly on $u\in\mathcal{U}$.
 \end{assumption}
 
 \begin{assumption}\label{ali_hyp3}
-The unknown nonlinearity $\mu_{x}(.)$ is Lebesgue measurable and $\mathcal{L}_{2}-$bounded.
+The unknown nonlinearity $\mu_{x}(\cdot)$ is Lebesgue measurable and $\mathcal{L}_{2}$-bounded.
 \end{assumption}
 
 
@@ -76,7 +76,7 @@ Moreover, since the regularization introduced later contains $\omega_{\delta_{1}
 }
 
 
-The objective of this paper is to estimate the unmodeled dynamics $\mu_{x}$. More specifically, we propose to estimate $\mu_{x}$ by combining an unknown input observer~(UIO) with a neural network--based approach, leveraging gradient-based methods to better capture the unmodeled components of the system. The key idea is to incorporate the UIO-based estimation into the loss function of the neural network, thereby enhancing residual regularization and ensuring consistency with the UIO. This, in turn, improves the robustness and performance of the overall estimation scheme. Unfortunately, it is not possible to estimate the unknown input, $\mu_x$, if the system fails to satisfy the following main necessary condition:
+The objective of this chapter is to estimate the unmodeled dynamics $\mu_{x}$. More specifically, we propose to estimate $\mu_{x}$ by combining an unknown input observer~(UIO) with a neural network--based approach, leveraging gradient-based methods to better capture the unmodeled components of the system. The key idea is to incorporate the UIO-based estimation into the loss function of the neural network, thereby enhancing residual regularization and ensuring consistency with the UIO. This, in turn, improves the robustness and performance of the overall estimation scheme. Unfortunately, it is not possible to estimate the unknown input, $\mu_x$, if the system fails to satisfy the following main necessary condition:
 \begin{equation}\label{rank}
 \textrm{rank}(C B) = \textrm{rank}(B).
 \end{equation}
@@ -191,7 +191,7 @@ where
 %
 %\vspace{-0.7cm}
 \begin{align}\label{ali_syst2_e1_4}
-\varphi_{\zeta}(\zeta,u) := \varphi(x,u) + B \mu_{x}.
+\varphi_{\zeta}(\zeta,u) := \begin{bmatrix} \varphi(x,u) + B \mu_{x} \\ 0_{n_{\mu}} \end{bmatrix}.
 \end{align}
 \end{subequations}
 %==
@@ -225,7 +225,7 @@ where $n_{\zeta} := n_{x} + n_{\mu}$. These matrices are exploited in the follow
 \end{array}
 \right.
 \end{equation}
-where $\hat{\zeta}$ is the estimate of $\zeta$ and $K \in\mathbb{R}^{n_{\zeta}}\times\mathbb{R}^{n_y}$ is the observer gain to be determined such that the estimation error, $\tilde{\zeta} : = \zeta - \hat{\zeta}$, satisfies the $\mathcal{H}^1$-optimality criterion~\eqref{ali_h1_e1_2} with appropriate $\lambda_{\delta}, \beta$, and $\xi_0$.
+where $\hat{\zeta}$ is the estimate of $\zeta$ and $K \in\mathbb{R}^{n_{\zeta} \times n_y}$ is the observer gain to be determined such that the estimation error, $\tilde{\zeta} : = \zeta - \hat{\zeta}$, satisfies the $\mathcal{H}^1$-optimality criterion~\eqref{ali_h1_e1_2} with appropriate $\lambda_{\delta}, \beta$, and $\xi_0$.
 %
 
 We have 
@@ -269,7 +269,7 @@ From this point onward, the analysis will be carried out with the vector~$\xi$ i
 Before presenting the proposed LMI-based UIO design procedure, we state an intermediate and general result in the following proposition.
 %-
 \begin{proposition}\label{ali_prop1}
-Le $\vartheta(.)$ be a Lyapunov function such that there exists $\vartheta_{\max} >0$ such that $\vartheta(z) \leq \vartheta_{\max}\| z \|^{2}$, for all $z \in \mathbb{R}^{n_\zeta}$. Consider a matrix $\mathcal{S} = \mathcal{S}^{\top} > 0$ and a real constant $\lambda >0$ such that the following inequality holds:
+Let $\vartheta(\cdot)$ be a Lyapunov function such that there exists $\vartheta_{\max} >0$ such that $\vartheta(z) \leq \vartheta_{\max}\| z \|^{2}$, for all $z \in \mathbb{R}^{n_\zeta}$. Consider a matrix $\mathcal{S} = \mathcal{S}^{\top} > 0$ and a real constant $\lambda >0$ such that the following inequality holds:
 \begin{equation}\label{ali_prop1_e1}
 \dot{\vartheta}(z) + \| z \|^{2} + \dot{z}^{\top} \mathcal{S} \dot{z} - \lambda \| w \|^{2} \leq 0,
  \forall z \in \mathbb{R}^{n_\zeta}, w \in \mathbb{R}^{2n_{\mu}}
@@ -313,7 +313,7 @@ $$
 $$
 and because $\vartheta(z(t)) \geq 0$ for all $t \geq 0$, implying that 
 $$
-\int_{0}^{+\infty} \vartheta(z(s)) \, {\rm d}s \;\geq\; - \vartheta(z(0)),
+\int_{0}^{+\infty} \dot{\vartheta}(z(s)) \, {\rm d}s \;=\; \lim_{T\to\infty} \vartheta(z(T)) - \vartheta(z(0)) \;\geq\; - \vartheta(z(0)),
 $$
 we can readily conclude~\eqref{ali_prop1_e2}.\\
 As for the second part of the proof, we will exploit the structure of $\xi$ and $\bm{\omega}_{\delta}$. First, $\xi$ and $\bm{\omega}_{\delta}$ satisfy~\eqref{ali_prop1_e2} proved in the first part. In addition, we have
@@ -379,6 +379,9 @@ where $\mathbb{M}\left( z,u \right)$ is defined in~\eqref{ali_thm_e4}. By applyi
 \end{equation}
 Hence, Proposition~\ref{ali_prop1} applies and the desired result follows.
 
+
+
+
 %=== M ===
 \begin{figure*}
 \hrule
@@ -387,13 +390,13 @@ Hence, Proposition~\ref{ali_prop1} applies and the desired result follows.
 {\small
 \begin{equation}\label{ali_thm_e4}
 \begin{bmatrix}
-\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{P} 
-+\mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)
+\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)^{\top} \mathcal{P} 
++\mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)
 &&
-\left[\mathcal{P} + \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S}\right] \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)
+\left[\mathcal{P} + \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)^{\top} \mathcal{S}\right] \Big( \mathcal{E} - K  \mathcal{D}\Big)
 \\~\\
-\Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \left[ \mathcal{P} + \mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) \right] && 
-- \lambda \mathbb{I}_{2n_{\mu}} + \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)
+\Big( \mathcal{E} - K  \mathcal{D}\Big)^{\top} \left[ \mathcal{P} + \mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right) \right] && 
+- \lambda \mathbb{I}_{2n_{\mu}} + \Big( \mathcal{E} - K  \mathcal{D}\Big)^{\top} \mathcal{S} \Big( \mathcal{E} - K  \mathcal{D}\Big)
 \end{bmatrix}
 \end{equation}
 }
@@ -406,20 +409,66 @@ Hence, Proposition~\ref{ali_prop1} applies and the desired result follows.
 
 \begin{equation}\label{ali_thm_e5}
 \begin{bmatrix}
-\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{P} 
-+ \mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)
+\left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)^{\top} \mathcal{P} 
++ \mathcal{P} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)
 &&
-\mathcal{P} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big) && \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right)^{\top} \mathcal{S}
+\mathcal{P} \Big( \mathcal{E} - K  \mathcal{D}\Big) && \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right)^{\top} \mathcal{S}
 \\~\\
-\Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{P} && 
-- \lambda \mathbb{I}_{2n_{\mu}} && \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)^{\top} \mathcal{S}
+\Big( \mathcal{E} - K  \mathcal{D}\Big)^{\top} \mathcal{P} && 
+- \lambda \mathbb{I}_{2n_{\mu}} && \Big( \mathcal{E} - K  \mathcal{D}\Big)^{\top} \mathcal{S}
 \\~\\
-\mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u) - K  \mathcal{H} \right) && 
-\mathcal{S} \Big( \mathcal{E}\left( \bm{z},u\right) - K  \mathcal{D}\Big)&& - \mathcal{S}
+\mathcal{S} \left( P_{\zeta} \nabla^{\varphi_{\zeta}}_{\zeta} - K  \mathcal{H} \right) && 
+\mathcal{S} \Big( \mathcal{E} - K  \mathcal{D}\Big)&& - \mathcal{S}
 \end{bmatrix} 
 < 0
 \end{equation}
 }
+
+
+
+% %=== M ===
+% \begin{figure*}
+% % \hrule
+% \vspace{0.2cm}
+% %
+% {
+% \[
+% \Xi(\bm z,u) := P_{\zeta}\nabla^{\varphi_{\zeta}}_{\zeta}(\bm z,u)-K\mathcal H,\qquad
+% \Upsilon(\bm z,u) := \mathcal E(\bm z,u)-K\mathcal D.
+% \]
+% \begin{equation}\label{ali_thm_e4}
+% \begin{bmatrix}
+% \Xi(\bm z,u)^{\top}\mathcal P + \mathcal P\Xi(\bm z,u)
+% & \left[\mathcal P + \Xi(\bm z,u)^{\top}\mathcal S\right]\Upsilon(\bm z,u)
+% \\[0.4ex]
+% \Upsilon(\bm z,u)^{\top}\left[\mathcal P + \mathcal S\Xi(\bm z,u)\right]
+% & -\lambda\mathbb I_{2n_{\mu}} + \Upsilon(\bm z,u)^{\top}\mathcal S\Upsilon(\bm z,u)
+% \end{bmatrix}
+% \end{equation}
+% }
+% %===
+% %\medskip
+% \bigskip
+% %===
+
+% {
+% \begin{equation}\label{ali_thm_e5}
+% \begin{bmatrix}
+% \Xi(\bm z,u)^{\top}\mathcal P + \mathcal P\Xi(\bm z,u)
+% & \mathcal P\Upsilon(\bm z,u)
+% & \Xi(\bm z,u)^{\top}\mathcal S
+% \\[0.4ex]
+% \Upsilon(\bm z,u)^{\top}\mathcal P
+% & -\lambda\mathbb I_{2n_{\mu}}
+% & \Upsilon(\bm z,u)^{\top}\mathcal S
+% \\[0.4ex]
+% \mathcal S\Xi(\bm z,u)
+% & \mathcal S\Upsilon(\bm z,u)
+% & -\mathcal S
+% \end{bmatrix} 
+% < 0
+% \end{equation}
+% }
 
 %===
 %\medskip
@@ -513,7 +562,7 @@ where the scalars $\delta_1 \geq 0$, $\delta_2 \geq 0$, and the matrices $E\in\m
 \noindent\textbf{Practical choice:} choosing $E$ and $D$ binary amounts to selecting which measured channels are used to restore the rank condition while keeping the design interpretable and sparse. In practice, one may start from a binary $D$ with $\mathrm{rank}(D)=n_{\mu}$ (select $n_{\mu}$ independent outputs), and then adjust $E$ (binary or structured) so that the resulting augmented matrices satisfy the required rank condition. A concrete selection of such a binary $D$ is given in the numerical vehicle example (Subsubsection \emph{UIO for the LPV Vehicle Model}).
 
 
-First, system~\eqref{ali_syst1} can be rewritten under the compact form:
+The regularized generalized system~\eqref{ali_syst3_e2} can be rewritten under the compact form:
 \begin{equation}\label{ali_syst3_e3}
     \begin{array}{l}
         \mathbb{E} \dot{\zeta} = \varphi_{\zeta}(\zeta,u) + \bar{E} \bm{\omega}_{\delta} \\
@@ -582,7 +631,7 @@ The matrices $E$, $D$, and $C_{\chi}$, and the scalars $\delta_1$ and $\delta_2$
 %--
 
 \begin{assumption}\label{ali_gen_hyp2}
-The function $\varphi_{\zeta}(.,u)$ defined in~\eqref{ali_syst3_e4_4} is globally Lipschitz, uniformly on $u$.
+The function $\varphi_{\zeta}(\cdot,u)$ defined in~\eqref{ali_syst3_e4_4} is globally Lipschitz, uniformly on $u$.
 \end{assumption}
 
 %----
@@ -666,18 +715,18 @@ The generalized UIO~\eqref{ali_syst3_e5} requires real-time knowledge of the der
 
 \begin{table}[ht!]
 \centering
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 \caption{Summary of specific cases: assumptions, design choices, and convergence properties.}
 \label{tab:uio_specific_cases_summary}
-\begin{tabular}{|p{0.25\linewidth}|p{0.25\linewidth}|p{0.25\linewidth}|p{0.2\linewidth}|}
+\begin{tabular}{|p{0.2\linewidth}|p{0.23\linewidth}|p{0.23\linewidth}|p{0.2\linewidth}|}
 \hline
-    \textbf{Case / setting} & \textbf{Design choice to satisfy Assumption~\ref{ali_gen_hyp1}} & \textbf{Main guarantee (what you get)} & \textbf{Use of $\dot{y}$} \\
+    \textbf{Case / setting} & \textbf{Design choice to satisfy Assumption~\ref{ali_gen_hyp1}} & \textbf{Main guarantee} & \textbf{Use of $\dot{y}$} \\
 \hline
-$\rank(CB) = \rank(B)$ (classical matching holds) & Pick $C_{\chi}\neq 0$; can set $\delta_{1}=\delta_{2}=0$ (no regularization, $\bm{\omega}_{\delta}\equiv 0$) & Exponential convergence of $\tilde{\zeta}(t)$ to $0$ (strongest case) & Required by the generalized structure, but estimated internally via $\hat{\chi}_{2}$ \\
+$\rank(CB)$$=$$\rank(B)$ (classical matching holds) & Pick $C_{\chi}\neq 0$; can set $\delta_{1}=\delta_{2}=0$ (no regularization, $\bm{\omega}_{\delta}\equiv 0$) & Exponential convergence of $\tilde{\zeta}(t)$ to $0$ (strongest case) & Required by the generalized structure, but estimated internally via $\hat{\chi}_{2}$ \\
 \hline
 $C_{\chi}=0$ (do not inject output derivatives) & Must rely on regularization through $D\neq 0$ and $\delta_{2}>0$ (often take $\delta_{1}=0$ for a tighter bound) & Only an $\mathcal{H}^{1}$ bound; exponential convergence to $0$ cannot be ensured & Not used \\
 \hline
-$\rank(CB) < \rank(B)$ (classical UIO fails) & Regularize: choose $E$, $D$, and $\delta_{1},\delta_{2}>0$ so that the augmented pair $(\mathbb{E},\mathcal{H})$ satisfies~\eqref{rank2} & $\mathcal{H}^{1}$ bound with tunable attenuation level $\lambda_{\delta}$ (via $\delta_{1},\delta_{2}$); exponential convergence not guaranteed & Typically used if $C_{\chi}\neq 0$; otherwise not needed \\
+$\rank(CB)$$<$$\rank(B)$ (classical UIO fails) & Regularize: choose $E$, $D$, and $\delta_{1},\delta_{2}>0$ so that the augmented pair $(\mathbb{E},\mathcal{H})$ satisfies~\eqref{rank2} & $\mathcal{H}^{1}$ bound with tunable attenuation level $\lambda_{\delta}$ (via $\delta_{1},\delta_{2}$); exponential convergence not guaranteed & Typically used if $C_{\chi}\neq 0$; otherwise not needed \\
 \hline
 \end{tabular}
 \end{table}
@@ -757,7 +806,7 @@ The error dynamics are given by:
 \begin{equation}\label{learning_uio_e5}
         \dot{\epsilon}_{\nn} = \Big( \nabla^{\varphi}_{x}(\bm{z}_{x},u) - \Lo_{\nn} C \Big) \epsilon_{\nn} + B \Delta_{x}(t)
 \end{equation}
-where $\nabla^{\varphi}_{x}(\bm{z}_{x},u)$ is the Jacobian of $\varphi$ evaluated at some $\bm{z}_{x}$. Under Assumption~\ref{ali_hyp2}, this Jacobian belongs to the convex polytope $\mathcal{H}^{x}_{\varphi}$ defined in~\eqref{varphi_x}.
+where $\nabla^{\varphi}_{x}(\bm{z}_{x},u)$ is the Jacobian of $\varphi$ evaluated at some $\bm{z}_{x}$. Under Assumption~\ref{ali_hyp2}, this Jacobian belongs to a convex polytope analogous to $\mathcal{H}_{\varphi}$ defined in~\eqref{varphi_zeta}, restricted to the state space $\mathbb{R}^{n_x}$.
 
 The following theorem provides sufficient LMI conditions for the existence of such an observer.
 
@@ -1161,7 +1210,7 @@ The Jacobian of $\varphi_\zeta$ with respect to $\zeta$ is therefore
 \begin{bmatrix}
 A(v_x) & E \\
 0_{2\times 4} & 0_{2\times 2}
-\end{bmatrix} \in \mathbb{R}^{4\times 6},
+\end{bmatrix} \in \mathbb{R}^{6\times 6},
 \end{equation}
 which is parameter-varying through $A(v_x)$. Using the polytopic embedding of Section~\ref{sec6_polytopic}, the Jacobian belongs to the polytope
 \begin{equation}\label{eq:vehicle_polytope_jacobian}
@@ -1173,7 +1222,7 @@ with the vertex matrices
 \begin{bmatrix}
 A_j & E \\
 0_{2\times 4} & 0_{2\times 2}
-\end{bmatrix} \in \mathbb{R}^{4\times 6}, \qquad j=1,\dots,\bar{n}.
+\end{bmatrix} \in \mathbb{R}^{6\times 6}, \qquad j=1,\dots,\bar{n}.
 \end{equation}
 For example, with $\bar{n}=2$ and the vertex matrices~\eqref{eq:vertex_Aj}, we have explicitly
 \begin{equation}
@@ -1280,46 +1329,49 @@ with
 This recursion highlights that learning remains explicitly anchored to the physical LPV structure through $A(\rho_k)$ at each sampling instant. The vehicle-specific Jacobians $\frac{\partial \mu_\theta}{\partial \hat{x}_k}$ and $\frac{\partial \mu_\theta}{\partial \theta}$ are computed by automatic differentiation through the neural network.
 
 \subsection{Results and Discussion}
-The following results illustrate the behavior of the student (NAO) during online learning, and highlight the benefit of using the teacher (UIO) estimate as a supervisory signal. For state estimation, we compare the NAO with a PI observer. For unknown-input estimation, we compare with the approach of \cite{GHANI20235685}.
+The following results illustrate the performance of the proposed two-layer Teacher--Student estimation architecture through numerical simulation of the autonomous vehicle scenario described above. The controller utilizes the state estimates produced by Layer~2 (NAO) as feedback for trajectory tracking.
+
+\subsubsection{Trajectory Tracking and Control Inputs}
+Figure~\ref{fig:Trajectories_ch4} presents the vehicle trajectory in the $XY$-plane alongside the corresponding control inputs. The inset shows the position tracking error, which remains near zero throughout the maneuver, confirming that the state estimates from Layer~2 provide sufficiently accurate feedback for the trajectory-tracking controller. The steering angle and throttle input profiles demonstrate smooth and physically consistent actuation, reflecting the quality of the underlying state estimation.
+
+\begin{figure}[htp!]
+    \centering
+    \includegraphics[width=\linewidth]{ch4/img/traj_control_py.png}
+    \caption{Vehicle trajectory in the $XY$-plane with near-zero position tracking error (inset), and the corresponding steering and throttle control inputs computed using the Layer~2 (NAO) state estimates as feedback.}
+    \label{fig:Trajectories_ch4}
+\end{figure}
 
 \subsubsection{State Estimation}
-Figures~\ref{fig:state_estimate_wo} and \ref{fig:state_estimate_w} report representative state-estimation results. As expected, the measured channels (in particular $v_x$ and $\psi$) are easily tracked by all methods, while the lateral dynamics are more sensitive to modeling errors. Without loss accumulation, the online adaptation produces transient oscillations due to the random initialization of the neural parameters and the limited information content of the measurements (Fig.~\ref{fig:state_estimate_wo}). When the loss accumulation strategy is applied, the parameter updates become smoother and the estimation spikes are strongly reduced, leading to more consistent tracking (Fig.~\ref{fig:state_estimate_w}).
+Figure~\ref{fig:state_estimate_wo} reports the state estimation results for both layers. All estimated states track the true signals closely. The measured channels ($v_x$, $\psi$, and $r$) are recovered with high fidelity, while the unmeasured lateral velocity $v_y$---which is the most challenging state to reconstruct---is also well estimated thanks to the observer structure exploiting the coupling in the vehicle dynamics.
 
-\begin{figure}[hb!]
+\begin{figure}[htp!]
     \centering
-    \includegraphics[width=9cm,height=5.5cm]{ch4/img/fig_state_batch_2.png}
-    \caption{State estimation: comparison between the true state, the proposed NAO, and the PI observer (without loss accumulation).}
+    \includegraphics[width=\linewidth]{ch4/img/State_est_py.png}
+    \caption{State estimation results: all estimated states closely follow the true signals, including the unmeasured lateral velocity $v_y$.}
     \label{fig:state_estimate_wo}
 \end{figure}
 
-\begin{figure}[hb!]
-    \centering
-    \includegraphics[width=9cm,height=5.5cm]{ch4/img/fig_state_batch_5.png}
-    \caption{State estimation with loss accumulation. The accumulation mitigates transient spikes and reduces estimation noise.}
-    \label{fig:state_estimate_w}
-\end{figure}
+\subsubsection{Tire-Force Residual Estimation}
+Figure~\ref{fig:Uncertainty} presents the reconstruction of the unknown tire-force residuals $\mu_x = [f_{yf},\; f_{yr}]^\top$, comparing the estimates from Layer~1 (UIO) and Layer~2 (NAO). While both layers provide bounded estimates---confirming that the estimation remains stable and does not diverge---Layer~2 exhibits noticeably faster convergence and higher precision in tracking the true residual signals. This improvement is attributed to the neural network's ability to learn the functional relationship $\mu_\theta(\hat{x})$, which refines the instantaneous UIO signal into a predictive model. Importantly, the Layer~2 estimates remain well-constrained, demonstrating that the teacher--student architecture successfully combines the robustness guarantees of the UIO with the adaptability of the neural observer.
 
-\subsubsection{Uncertainty Estimation}
-Figure~\ref{fig:Uncertainty} shows the reconstruction of the unknown input $\mu_x$ (tire-force residuals). The NAO estimate is compared with the method of \cite{GHANI20235685}. The proposed approach benefits from the teacher signal provided by the UIO through the regularization term in the loss function, which accelerates convergence and improves the tracking of nonlinear variations in the tire forces.
-
-\begin{figure}[hb!]
+\begin{figure}[htp!]
     \centering
-    \includegraphics[width=9cm,height=7cm]{ch4/img/fig_f_2.png}
-    \caption{Unknown-input estimation: comparison of the proposed NAO against the baseline approach of \cite{GHANI20235685}.}
+    \includegraphics[width=\linewidth]{ch4/img/tireforce_slip_py.png}
+    \caption{Tire-force residual and slip angle estimation: Layer~2 (NAO) achieves faster convergence and higher precision compared to Layer~1 (UIO), while both estimates remain bounded.}
     \label{fig:Uncertainty}
 \end{figure}
 
-\subsubsection{Convergence Analysis}
-The evolution of the learning loss is depicted in Fig.~\ref{fig:loss}. After an initial transient, the loss stabilizes around an average value of $0.0297$, indicating that the online learning process reaches a steady regime. Short spikes are observed during phases where the operating point changes rapidly (e.g., aggressive steering), but the loss quickly returns to its nominal level, which reflects the ability of the learner to adapt to new conditions while remaining bounded.
+% \subsubsection{Convergence Analysis}
+% The evolution of the learning loss is depicted in Fig.~\ref{fig:loss}. After an initial transient, the loss stabilizes around a low steady-state value, indicating that the online learning process reaches a stable regime. Short spikes are observed during phases where the operating point changes rapidly (e.g., aggressive steering), but the loss quickly returns to its nominal level. This behavior reflects the ability of the neural learner to adapt to new operating conditions while remaining bounded, which is consistent with the $\mathcal{L}_2$ performance guarantees of Theorem~\ref{ali_thm2}.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=9.5cm,height=4.5cm]{ch4/img/loss.eps}
-    \caption{Evolution of the learning loss during the simulation.}
-    \label{fig:loss}
-\end{figure}
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=\linewidth]{ch4/img/loss.eps}
+%     \caption{Evolution of the learning loss during the simulation.}
+%     \label{fig:loss}
+% \end{figure}
 
-Overall, these results support the proposed hybrid design: the UIO provides a stable physics-based supervisory signal, while the NAO refines the reconstruction of the unknown tire-force residuals and improves state-estimation quality under parametric mismatch.
+Overall, these results validate the proposed two-layer hybrid design: the UIO (Layer~1) provides a stable physics-based supervisory signal with guaranteed bounded estimation, while the NAO (Layer~2) refines the reconstruction of the unknown tire-force residuals with faster convergence and higher precision, ultimately delivering accurate state estimates for closed-loop trajectory tracking.
 %===============================
 \section{Open Problems and Future Directions}\label{sec_open_problems}
 Despite the promising theoretical guarantees and simulation results, several research questions remain open. The following points outline practical and theoretical directions that can improve the applicability of the proposed Teacher--Student estimation architecture.
@@ -1341,4 +1393,4 @@ Despite the promising theoretical guarantees and simulation results, several res
 \end{itemize}
 
 \section{Conclusion}\label{sec7}
-This paper presented a robust hybrid estimation framework designed to address the challenges of vehicle motion tracking in the presence of unmodeled nonlinearities. We proposed a layered architecture that integrates a physics-based Generalized Unknown Input Observer (UIO) with a data-driven Neural Adaptive Observer. To overcome the structural limitations of standard observers, specifically when the rank condition $rank(CB) = rank(B)$ is not met, we introduced a regularization technique combined with an output-derivative based generalized model. This approach ensures the existence of the observer and provides a reliable initial estimate of the unknown dynamics. This estimate subsequently serves as a supervisor for a neural network, which refines the approximation of complex nonlinearities, such as variable tire-road friction, through online learning. Theoretical analysis demonstrated that the proposed method guarantees $\mathcal{H}^1$ and $\mathcal{L}^2$ stability for the estimation errors, provided that the derived Linear Matrix Inequality (LMI) conditions are satisfied. Open problems and future directions are discussed in Section~\ref{sec_open_problems}, including experimental validation using real driving data and discrete-time formulations for embedded implementation.
+This paper presented a robust hybrid estimation framework designed to address the challenges of vehicle motion tracking in the presence of unmodeled nonlinearities. We proposed a layered architecture that integrates a physics-based Generalized Unknown Input Observer (UIO) with a data-driven Neural Adaptive Observer. To overcome the structural limitations of standard observers, specifically when the rank condition $\mathrm{rank}(CB) = \mathrm{rank}(B)$ is not met, we introduced a regularization technique combined with an output-derivative based generalized model. This approach ensures the existence of the observer and provides a reliable initial estimate of the unknown dynamics. This estimate subsequently serves as a supervisor for a neural network, which refines the approximation of complex nonlinearities, such as variable tire-road friction, through online learning. Theoretical analysis demonstrated that the proposed method guarantees $\mathcal{H}^1$ and $\mathcal{L}^2$ stability for the estimation errors, provided that the derived Linear Matrix Inequality (LMI) conditions are satisfied. Open problems and future directions are discussed in Section~\ref{sec_open_problems}, including experimental validation using real driving data and discrete-time formulations for embedded implementation.

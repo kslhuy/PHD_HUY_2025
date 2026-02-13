@@ -90,24 +90,24 @@ The discrete-time longitudinal dynamics of each vehicle $i \in \V$ are
 \begin{equation}\label{v_i}
     \begin{aligned}
         x_i(t+1) &= A_{\text{b}} x_i(t) + B_{\text{b}}u_{i}(t) + \Delta_i(t),\\
-        y_i(t) &= C_{i} x_i(t),
+        y_i(t) &= C_{\text{b}} x_i(t),
     \end{aligned} 
 \end{equation}
-where $x=\begin{bmatrix} s_i & v_i & a_i \end{bmatrix}^{\top}$ and $u_i$ denote the state and control input of vehicle $i$, respectively. $s_i$, $v_i$, and $a_i$ denote position, velocity, and acceleration. The system matrices are given by 
+where $x_i=\begin{bmatrix} s_i & v_i & a_i \end{bmatrix}^{\top}$ and $u_i$ denote the state and control input of vehicle $i$, respectively. $s_i$, $v_i$, and $a_i$ denote position, velocity, and acceleration. The system matrices are given by 
 \begin{equation*}
     A_{\text{b}}  =\begin{bmatrix}
     1 & T_s & \dfrac{T^2_s}{2} \\
     0 & 1 & T_s \\
-    0 &  0 & 1 - \dfrac{T_s}{\tau_b}
+    0 &  0 & 1 - \dfrac{T_s}{\tau}
         \end{bmatrix}, \
-    B_{b} =\begin{bmatrix}
+    B_{\text{b}} =\begin{bmatrix}
     0 \\
     0 \\
-    \dfrac{T_s}{\tau_b}
+    \dfrac{T_s}{\tau}
         \end{bmatrix}, 
     C_{\text{b}} = I_{3}, 
 \end{equation*}
-where $T_s$ is the sampling time and the constant $\tau_b>0$ is nominal engine time lag. $\Delta_i(t)$ captures the modeling differences and uncertainties caused by difference between nominal $\tau_b$ and the real value. 
+where $T_s$ is the sampling time and the constant $\tau>0$ is the nominal engine time lag. $\Delta_i(t)$ captures the modeling differences and uncertainties caused by the difference between the nominal $\tau$ and the real value. 
 
 % \subsubsection{Dynamic model of platoon:}
 Define the collective state as $x = \col{x_{1}, \cdots , x_{N}}$, the state-space equation of the platoon is 
@@ -118,7 +118,7 @@ Define the collective state as $x = \col{x_{1}, \cdots , x_{N}}$, the state-spac
 \begin{equation}\label{eq_paltoon}
       \left\{ \begin{array}{l}
       x(t+1) = (I_N \otimes A_{\text{b}}) x(t) + (I_N \otimes B_{\text{b}}) u(t) + \Delta (t)\\
-      y_i(t+1) = C_i x(t),
+      y_i(t) = C_i x(t),
       \end{array}\right.
 \end{equation}
 %-- $y = \col{y_{1}, \cdots , y_{N}}$ is the collective output measurement
@@ -145,6 +145,7 @@ Fig.~\ref{fig_observer_diagram} illustrates the architecture of the proposed dis
 
 \begin{figure*}
 \centering
+    \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
     vehicle/.style={draw=blue1, fill=blue1!20, thick, minimum width=2cm, minimum height=1cm},
     localobs/.style={draw=orange1, fill=orange1!20, thick, minimum width=2cm, minimum height=1cm},
@@ -246,7 +247,8 @@ Fig.~\ref{fig_observer_diagram} illustrates the architecture of the proposed dis
 
     \node[trust] at(8.25,-2.5) {Trust Layer};
     
-    \end{tikzpicture}
+    \end{tikzpicture}%
+    }
     \caption{Schematic diagram of the estimation method.}
     \label{fig_observer_diagram}
 \end{figure*}
@@ -258,7 +260,7 @@ Fig.~\ref{fig_observer_diagram} illustrates the architecture of the proposed dis
 %===
 The distributed state observer architecture considered in this study is characterized by the following set of equations~\eqref{eq_observer}:
 \begin{subequations}\label{eq_observer}
-% \begin{small}
+\begin{small}
 \begin{equation}\label{eq_LO}
 (\LO_i): \hat{x}_{0}^{(i)}(t+1) = A_{\text{b}} \hat{x}_{0}^{(i)}(t) + B_{\text{b}} u_i(t)
 + F_i\big(y_i(t) - C_{\text{b}} \hat{x}_{0}^{(i)}(t)\big) %\tag{\LO$_i$}
@@ -268,7 +270,7 @@ The distributed state observer architecture considered in this study is characte
    \big(\hat{x}_l^{(j)}(t)-\hat{x}_i^{(j)}(t)\big) +  w_{i 0}^{(j)}(t)
    \Big(\hat{x}_0^{(j)}(t)-\hat{x}_i^{(j)}(t)\Big) \right) + B_{\text{b}} \hat{u}_j(t)%\tag{\DO$_i^{(j)}$}
 \end{equation}
-% \end{small}
+\end{small}
 \end{subequations}
 where 
 \begin{itemize}
@@ -361,310 +363,7 @@ Each distributed observer $\DO_{i}^{(j)}$ requires reference information from th
 
 
 
-% \begin{figure*}[!t]
-% 	\centering
-% 	\begin{tikzpicture}
-% 		% 		\draw [help lines,step=0.1cm] (0,0) grid (15,5); % 辅助网格 
-% 		% % 画x和y轴坐标
-% 		% \draw[stealth-,line width=2pt] (0,0)--(15,0);
-% 		% % 画刻度
-% 		% \foreach \x in {0,1,...,5}
-% 		% {
-% 		% 	\draw[xshift=\x cm] (0,0) -- (0,0.1);
-% 		% };  
-% 		% % 标坐标原点
-% 		% \node[below] at (0,0){0};
-% 		% %标x轴刻度值
-% 		% \foreach \y in {1,2,...,15}
-% 		% \node[below] at(\y,0){\y};
-            
-%         \node[cloud,
-%             draw =black, dashed,
-%             text=cyan,
-%             cloud puffs = 40,
-%     cloud puff arc = 60,
-%             fill = gray!15,
-%     minimum width = 15cm,
-%     minimum height = 3.5cm] (c) at (7,3.75) {};
 
-%     \node[cloud,
-%             draw =black,
-%             text=cyan,
-%             cloud puffs = 60,
-%     cloud puff arc = 50,
-%             fill = blue!15,
-%     minimum width = 14cm,
-%     minimum height = 1.5cm] (c) at (7,3.85) {};
-
-%     \node[ fill=gray!15] at(11.5,5) {Virtual Communication Graph $\bar{\G}$};
-
-%     \node[ fill=blue!15] at(2.25,3.25) {Communication Graph $\G$};
-
-%     \node[inner sep=5pt, shape=rectangle, fill=yellow!50] at(7,5) {Trust Layer};
-    
-%         \node[inner sep=5pt, shape=rectangle, fill=green!20, draw=black, dashed, name=DO0] at(7,2.75) {Virtual Distributed Observer $\DO_{0}$};
-        
-% 		\foreach \n in {1,2,3,4}
-% 		{
-% 			\node[name=A\n] at(4*\n-3,0) {\includegraphics[width=0.1\textwidth]{img/vehicle.png}};	
-% 			\node[shape=rectangle] at(4*\n-3,-0.5) {Vehicle \n}; 		
-% 			\node[fill=blue!40,shape=rectangle,name=DO\n] at(4*\n-3,3.85) {$\DO_{\n}$};	
-%             \node[inner sep=5pt,fill=green,shape=rectangle,name=LO\n] at(4*\n-3,1.5) {$\LO_{\n}$};
-% 		};	
-       
-%         \node[
-%           name=Leader,
-%           draw, 
-%           dashed,
-%           shape=ellipse, 
-%           minimum width=3cm, 
-%           minimum height=1.25cm, 
-%           label=below:{Leader}
-%         ] at (1,-0.15) {};
-
-%         \node[
-%           name=Followers,
-%           draw, 
-%           dashed,
-%           shape=ellipse, 
-%           minimum width=11cm, 
-%           minimum height=1.55cm, 
-%           label=below:{Followers}
-%         ] at (9,-0.15) {};
-
-%         \draw [line width=1.5pt,color=black,-stealth] (Leader)-- node[below] {\color{black}$v_{\text{L}}$, $a_{\text{L}}$}(Followers);
-		
-%         \foreach \n in {1,2,3,4}{
-%         \draw [line width=1.5pt,color=black,-stealth] (A\n)-- node[left] {\color{black}$y_{\n}$}(LO\n); % Local outputs for LO
-
-%         \draw [line width=1.5pt,color=black,-stealth] (LO\n)-- node[below] {\color{black}$\hat{x}_{0}^{(\n)}$}(DO0);
-%         };
-
-% 	\end{tikzpicture}
-% 	\vspace{-0.25cm}
-% 	\caption{Schematic diagram of the estimation method.}
-% 	\label{fig_observer_diagram}
-% 	\vspace{-0.35cm}
-% \end{figure*}
-
-%% Old Image schematic estimation methde 
-% \begin{figure*}[!t]
-% 	\centering
-% 	\begin{tikzpicture}
-% 		% 		\draw [help lines,step=0.1cm] (0,0) grid (15,5); % 辅助网格 
-% 		% % 画x和y轴坐标
-% 		% \draw[stealth-,line width=2pt] (0,0)--(15,0);
-% 		% % 画刻度
-% 		% \foreach \x in {0,1,...,5}
-% 		% {
-% 		% 	\draw[xshift=\x cm] (0,0) -- (0,0.1);
-% 		% };  
-% 		% % 标坐标原点
-% 		% \node[below] at (0,0){0};
-% 		% %标x轴刻度值
-% 		% \foreach \y in {1,2,...,15}
-% 		% \node[below] at(\y,0){\y};
-        
-% 		\foreach \n in {1,2,3,4}
-% 		{
-%             \pgfmathparse{mod(\n,2)==0 ? 2.15 : -2.15}
-%             \let\ycloud\pgfmathresult 
-%             \pgfmathparse{mod(\n,2)==0 ? "above" : "below"}
-%         \let\labelpos\pgfmathresult
-%             \node[cloud,
-%             draw =black, dashed,
-%             text=cyan,
-%             cloud puffs = 20,
-%             cloud puff arc = 60,
-%             fill = gray!15,
-%             minimum width = 7cm,
-%             minimum height = 2.5cm,
-%             label=\labelpos:{Virtual Communication Graph $\bar{\G}^{(\n)}$}
-%         ] (c) at(4*\n-3,\ycloud) {};
-        
-%             \pgfmathparse{mod(\n,2)==0 ? -0.5: 0.5}
-%             \let\y_v\pgfmathresult 
-% 			\node[name=A\n,label=center:{Vehicle \n}] at(4*\n-3,0) {\includegraphics[width=0.1\textwidth]{img/vehicle.png}};	
-            
-%             \pgfmathparse{mod(\n,2)==0 ? 1.5 : -1.5}
-%             \let\yoffset\pgfmathresult 
-%             \node[inner sep=5pt,
-%             fill=userpurple!20,
-%             draw = userpurple,
-%             shape=rectangle,
-%             name=LO\n] at(4*\n-3,\yoffset) {$\LO_{\n}$};
-            
-%             \foreach \i in {1,2,3,4}{
-%             \pgfmathparse{mod(\n,2)==0 ? 2.75 : -2.75}
-%             \let\yoffset\pgfmathresult 
-%                 \node[fill=blue!40,
-%                 shape=rectangle,
-%                 draw = userblue,
-%                 fill=userblue!20,
-%                 name=DO\i_\n
-%                 ] at(4*\n-7+1.5*\i,\yoffset) {$\DO_{\i}^{(\n)}$};	
-%             }
-            
-% 		};	
-
-%        \draw [line width=1.5pt,
-%        color=usergreen!70,
-%        stealth-stealth] (LO1)-- (LO2);
-%        \draw [line width=1.5pt,
-%        color=usergreen!70,
-%        stealth-stealth] (LO2)-- (LO3);
-%        \draw [line width=1.5pt,
-%        color=usergreen!70,
-%        stealth-stealth] (LO3)-- (LO4);
-       
-    
-%         \node[
-%           name=Leader,
-%           draw, 
-%           dashed,
-%           shape=ellipse, 
-%           minimum width=3cm, 
-%           minimum height=1cm, 
-%           label=above:{Leader}
-%         ] at (1,0) {};
-
-%         \node[
-%           name=Followers,
-%           draw, 
-%           dashed,
-%           shape=ellipse, 
-%           minimum width=11cm, 
-%           minimum height=1.55cm, 
-%           label=above:{Followers}
-%         ] at (9,0) {};
-
-%         \draw [line width=1.5pt,
-%         color=usergreen!70,
-%         -stealth] (Leader)-- node[below] {\color{black}$v_{\text{L}}$, $a_{\text{L}}$}(Followers);
-		
-%         \foreach \n in {1,2,3,4}{
-%         % Local outputs for LO
-%         \draw [line width=1.5pt,
-%         color=userorange,
-%         -stealth] (A\n)-- node[left] {\color{black}$y_{\n}$}(LO\n); 
-%         };
-
-        
-% 	\end{tikzpicture}
-% 	\vspace{-0.25cm}
-% 	\caption{Schematic diagram of the estimation method.}
-% 	\label{fig_observer_diagram}
-% 	\vspace{-0.35cm}
-% \end{figure*}
-
-
-% \begin{figure*}
-% \centering
-%     \begin{tikzpicture}[
-%     vehicle/.style={draw=blue1, fill=blue1!20, thick, minimum width=2cm, minimum height=1cm},
-%     localobs/.style={draw=orange1, fill=orange1!20, thick, minimum width=2cm, minimum height=1cm},
-%     distobs/.style={draw=purple1, fill=purple1!20, thick, minimum width=2cm, minimum height=1cm},
-%     sigarrow/.style={-stealth, thick, color=blue1},
-%     commarrow/.style={
-%     double,
-%     double distance=1pt,
-%     line width=0.7pt,
-%     draw=green1,
-%     {Stealth[scale=1.2]}-{Stealth[scale=1.2]}
-%     },
-%     physics/.style={draw=blue1, shape=rectangle, fill=blue1!10,line width=0.75pt,dashed,minimum width=3cm, minimum height=4.5cm}, %
-%     trust/.style={draw=rose1, shape=rectangle, fill=rose1!10,thick,minimum width=14cm, minimum height=1cm}
-% ]
-%   %       		\draw [help lines,step=0.5cm] (0,0) grid (18,10); % 辅助网格 
-% 		% % 画x和y轴坐标
-% 		% \draw[stealth-,line width=2pt] (0,0)--(15,0);
-% 		% % 画刻度
-% 		% \foreach \x in {0,1,...,5}
-% 		% {
-% 		% 	\draw[xshift=\x cm] (0,0) -- (0,0.5);
-% 		% };  
-% 		% % 标坐标原点
-% 		% \node[below] at (0,0){0};
-% 		% %标x轴刻度值
-% 		% \foreach \y in {1,2,...,18}
-% 		% \node[below] at(\y,0){\y};
-
-%     \node[cloud,
-%             draw =green1,
-%             line width=1.5pt,
-%             text=cyan,
-%             cloud puffs = 30,
-%             cloud puff arc = 50,
-%             fill = green1!15,
-%             minimum width = 18cm,
-%             minimum height = 5cm,
-%             label=above:{Virtual Communication Graph $\bar{\G}^{(j)}$}
-%         ] (c) at(8.5, 4.5) {};
-    
-%     \draw[draw=blue1,fill=blue1!10,dashed,line width=0.75pt] (4.5,4) -- (4.5,6)--(16.5,6) -- (16.5,4) -- (12,4) -- (12,-1) -- (9,-1) -- (9,4) -- (4.5,4) ;
-%     \draw [decorate, decoration={brace, mirror, amplitude=20pt}, thick]
-%     (4.75,4.5) -- (16.25,4.5);
-%     \draw [decorate, decoration={brace, mirror, amplitude=10pt}, thick]
-%     (4.25,-1) -- (16.75,-1)
-%     node[midway, below=6pt, name=followers] {Followers};
-%     \draw [decorate, decoration={brace, mirror, amplitude=10pt}, thick]
-%     (-0.25,-1) -- (3.25,-1)
-%     node[midway, below=6pt, name=leader] {Leader};
-              
-%     \foreach \n in {1,2,3,4}
-% 		{    
-%             \ifnum\n=3
-%                 \node [name=PV\n,line width=0.75pt,minimum width=3cm, minimum height=4.5cm] at (4.5*\n-3,1.5) {};
-%             \else
-%                 \node [physics,line width=0.75pt,name=PV\n] at (4.5*\n-3,1.5) {};
-%             \fi
-            
-%             \ifnum\n=3
-%                 \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle $i$: $x^{(i)}$}; 
-%                 \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_i$: $\hat{x}_{0}^{(i)}$};
-%                 \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_i$: $\hat{x}_{i}$};
-%             \else
-%                 \ifnum\n=4
-%                     \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle $N$: $x^{(N)}$};
-%                     \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_N$: $\hat{x}_{0}^{(N)}$};
-%                     \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_N$: $\hat{x}_{N}$};
-%                 \else
-%                     \node[vehicle, name=V\n] at (4.5*\n-3, 0) {Vehicle \n: $x^{(\n)}$}; 
-%                     \node[localobs,name=LO\n] at(4.5*\n-3,1.5) {$\LO_{\n}$: $\hat{x}_{0}^{(\n)}$};
-%                     \node[distobs,name=DO\n] at(4.5*\n-3,3) {$\DO_{\n}$: $\hat{x}_{\n}$};
-%                 \fi
-%             \fi       
-% 		};
-%     \foreach \j in {1,2,3,4}
-%     {
-%         \ifnum\j=2
-%                 \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(j)}$: $\hat{x}_{i}^{(j)}$};
-%             \else
-%                 \ifnum\j=4
-%                     \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(N)}$: $\hat{x}_{i}^{(N)}$};
-%                 \else
-%                     \node[distobs,name=DOi\j] at(3*\j+3,5) {$\DO_{i}^{(\j)}$: $\hat{x}_{i}^{(\j)}$};
-%                 \fi
-%             \fi
-    
-%     };
-
-%     \node[localobs,name=node0,dashed] at(3,5) {Node 0: $\hat{x}_{0}^{(j)}$};
-%     \node[] at(8.25,0.75) {\large$\cdots$};
-%     \node[] at(12.75,0.75) {\large$\cdots$};
-
-%     \draw[commarrow,-{Stealth[scale=1.2]}] (leader) -- (followers) node[midway, below] {$v_{\text{L}}$, $a_{\text{L}}$};
-    
-%     \draw[commarrow] (PV1) -- (PV2);
-%     \draw[commarrow] (PV2) -- (PV3);
-%     \draw[commarrow] (PV3) -- (PV4);
-
-%     \node[trust] at(8.25,-2.5) {Trust Layer};
-    
-%     \end{tikzpicture}
-%     \caption{Schematic diagram of the estimation method.}
-%     \label{fig_observer_diagram}
-% \end{figure*}
 
 
 
@@ -822,7 +521,7 @@ Before trust computation, every received V2V packet data is validated for authen
     \end{cases}
 \end{equation}
 % When (\delta_{i,l}(t)=0), the data from vehicle (l) is treated as unavailable.
-Only packets satisfying $\delta_{i,l}(t)=1$ use in the following trust evaluation process.
+Only packets satisfying $\delta_{i,l}(t)=1$ are used in the following trust evaluation process.
 
 \vspace*{-0.3cm}
 \subsection{Local trust}\label{sub:local_trust}
@@ -852,7 +551,7 @@ The host estimates the expected velocity of the platoon leader using its last va
 \end{equation}
 
 % For the target vehicle $j$, where $j \in \bar{\N}_{i}^{(j)}$
-Then, the mismatch score of the target vehicle $i$ with the reference leader can be calculated as
+Then, the mismatch score of the target vehicle $l$ with the reference leader can be calculated as
 \begin{equation}
     v_{l,\text{L}} = 
         \begin{cases} 
@@ -924,14 +623,11 @@ To account for physical context, the mismatch is normalized by both distance and
 %     a_y = \max\left(1 - \left|\frac{v_\text{rel}}{t_s} \cdot a_\text{diff}\right|, 0\right),
 % \end{equation}
 \begin{equation}
-    \iota_{i,l}^{\text{accel}} =
-    \max\left(
-    \left|\frac{v_\text{rel}}{d_{i,l}} \cdot a_{\text{recv}}^{\text{rel}} - a_{\text{expect}}^{\text{rel}}\right|
-    ,
-    0
-    \right)
+    \iota_{i,l}^{\text{accel}} = \max\left(1 - 
+    \frac{|a_{\text{recv}}^{\text{rel}} - a_{\text{expect}}^{\text{rel}}|}
+    {a_{\text{th}} \cdot (1 + d_{i,l}/d_{\text{norm}})}, 0\right)
 \end{equation}
-
+where:
 % \begin{equation}
 %     \iota_{i,l}^{\text{accel}} =
 %     \max\left(
@@ -944,13 +640,13 @@ To account for physical context, the mismatch is normalized by both distance and
 %     0
 %     \right)
 % \end{equation}
-where \(d_{\text{norm}}\) are normalization constants reflecting typical spacing in the platoon.
+% where \(d_{\text{norm}}\) are normalization constants reflecting typical spacing in the platoon.
 
-% \begin{itemize}
-% % \item \(a_{\text{th}}\) is a nominal acceleration tolerance ($\approx 0.5 - 1 m/s^2$),
-% \item \(d_{i,l}\) is the inter-vehicle distance,
-% \item \(d_{\text{norm}}\) are normalization constants reflecting typical spacing in the platoon.
-% \end{itemize}
+\begin{itemize}
+\item \(a_{\text{th}}\) is a nominal acceleration tolerance,
+\item \(d_{i,l}\) is the inter-vehicle distance,
+\item \(d_{\text{norm}}\) are normalization constants reflecting typical spacing in the platoon.
+\end{itemize}
 This formulation tightens the trust threshold when vehicles are close or moving fast, where inconsistencies are more critical, and relaxes it when they are farther apart or nearly stationary. It provides smoother and dimensionally consistent trust updates while reducing false trust drops caused by minor sensor fluctuations.
 % This prevents small acceleration mismatches from being overly penalized when relative motion is low.
 
@@ -1007,7 +703,7 @@ The parameter $\lambda_h$ defines the slow decay during temporary losses.
 
 \subsection{Distributed trust}
 \vspace*{-0.3cm}
-Same concept of Local Trust but in the context of the distributed data. We denote $\DT_{i,l}$ represents how the host vehicle $i$ trusts the distributed estimation received from target vehicle $l$, which is defined as
+The Distributed Trust follows the same concept as the Local Trust, but is evaluated in the context of distributed estimation data. We denote $\DT_{i,l}$ represents how the host vehicle $i$ trusts the distributed estimation received from target vehicle $l$, which is defined as
 \begin{equation}
         \DT_{i,l}  = \begin{cases}
        \gamma_{i,l}^{\text{self}} \cdot \gamma_{i,l}^{\text{local}} \cdot
@@ -1025,7 +721,7 @@ The resulting $\DT_{i,l}$ is later fused with the local trust to build the targe
 To assess whether the global estimate from the target $l$ is trustworthy, the host can compare it directly to its own global estimate. 
 We use the Mahalanobis distance, which normalizes discrepancies based on covariance:
 \begin{equation}
-    r_{i,l}^{(j)} = \left( \hat{x}_i^{(j)} - \hat{x}_l^{(j)} \right)^{\top} \Sigma_{\text{host}}^{-1} \left( \hat{x}_i^{(j)} - \hat{x}_l^{(j)} \right), 
+    \rho_{i,l}^{(j)} = \left( \hat{x}_i^{(j)} - \hat{x}_l^{(j)} \right)^{\top} \Sigma_{\text{local}}^{-1} \left( \hat{x}_i^{(j)} - \hat{x}_l^{(j)} \right), 
     \label{eq_dis_glo}
 \end{equation}
 where $\Sigma_{\text{local}}$ is the diagonal covariance matrix  which captures variance and correlations between each state channel defined as 
@@ -1036,13 +732,13 @@ where $n$ is the number of states in the vehicle, and $\sigma^2_k$ is  the varia
 
 And then, add up these differences to get the total discrepancy score across the platoon as the following
 \begin{equation}
-    R_{i,l} = \sum_{j=1}^N r_{i,l}^{(j)}.
+    D_{i,l} = \sum_{j=1}^N \rho_{i,l}^{(j)}.
 \end{equation}
-A small  $R_{i,l}$ means the global estimate from vehicle $l$ is close to the host's, suggesting higher trustworthiness.
+A small  $D_{i,l}$ means the global estimate from vehicle $l$ is close to the host's, suggesting higher trustworthiness.
 
 Based on the total discrepancy score across the platoon, the trust score can be converted to be 
 \begin{equation}
-    \gamma_{i,l}^{\text{host}} = \exp\left( -{R_{i,l}} \right).
+    \gamma_{i,l}^{\text{host}} = \exp\left( -{D_{i,l}} \right).
 \end{equation}
 where $\gamma_{i,l}^{\text{host}} \in (0, 1]$. A value near 1 means high trust (small discrepancy), while a value near 0 means low trust (large discrepancy).
 
@@ -1104,7 +800,7 @@ This avoids the need for each node to transmit its own covariance.
 \vspace*{-0.3cm}
 \subsection{Target trust and temporal evolution}\label{subsec_evolution}
 \vspace*{-0.2cm}
-We can combine the global trust and the local trust to get one single trust of the target $l$ by following : 
+The target trust combines local and distributed trust into a single scalar indicator for target $l$: 
 \begin{equation}
     \T_{i,l}(t) =  \LT_{i,l} \cdot \DT_{i,l}. 
     \label{trs_sample_genral}
@@ -1297,16 +993,16 @@ where $O_i$ represents the current opinion of vehicle $i$ regarding all platoon 
 \noindent\textbf{1) Self-Trust.}
 Each vehicle assumes full confidence in its own state:
 \begin{equation}
-O_i(i) = 1 ,
+\O_i(i) = 1 ,
 \end{equation}
 % This value serves as an absolute reference and is not normalized.
 \vspace{1ex}
 \noindent\textbf{2) Direct-Neighbor Trust.}
 For every neighbor $j\in\mathcal{N}_i$ with which vehicle $i$ exchanges data directly, the trust opinion is set as :
 \begin{equation}
-O_i(j) = VT_{i,j} ,
+\O_i(j) = \VT_{i,j} ,
 \end{equation}
-where $VT_{i,j}$ is the smoothed target-trust value derived in the previous subsection.
+where $\VT_{i,j}$ is the smoothed target-trust value derived in the previous subsection.
 
 \vspace{1ex}
 \noindent\textbf{3) One-Hop Trust Propagation.}
@@ -1315,10 +1011,10 @@ the host vehicle $i$ estimates $O_i(j)$ using only information from its direct n
 % To ensure robustness, only credible and fresh neighbor opinions are considered:
 \begin{equation}
 S_{i,j} =
-\Bigl\{ O_k(j)
+\Bigl\{ \O_k(j)
 \;\big|\;
 k \in \mathcal{N}_i,~
-VT_{i,k} > \theta_{\min},~
+\VT_{i,k} > \theta_{\min},~
 \delta_{i,k}(t) = 1\Bigr\}
 \label{eq:Sij}
 \end{equation}
@@ -1329,7 +1025,7 @@ Here, $\theta_{\min}$ is the minimum acceptable trust threshold,
 Each valid neighbor $k$ is associated with a \emph{credibility weight} 
 \begin{equation}
 % w_{i,k} =  VT_{i,k}
-w_{i,k} = \frac{VT_{i,k}}{\sum_{p \in S_{i,j}} VT_{i,p}}
+\psi_{i,k} = \frac{\VT_{i,k}}{\sum_{p \in S_{i,j}} \VT_{i,p}}
 \label{eq:weight}
 \end{equation}
 % where $\Psi_{i,k}\in[0,1]$ quantifies the message credibility of neighbor $k$ as perceived by host $i$.
@@ -1339,10 +1035,10 @@ w_{i,k} = \frac{VT_{i,k}}{\sum_{p \in S_{i,j}} VT_{i,p}}
 If the credible set $S_{i,j}$ is non-empty, the propagated opinion is computed 
 using a \emph{weighted median} operator:
 \begin{equation}
-O_i(j) = \operatorname{wMed}
+\O_i(j) = \operatorname{wMed}
 \bigl(
-\{ O_k(j) \}_{k\in S_{i,j}},
-\{ w_{i,k} \}_{k\in S_{i,j}}
+\{ \O_k(j) \}_{k\in S_{i,j}},
+\{ \psi_{i,k} \}_{k\in S_{i,j}}
 \bigr),
 \label{eq:weighted_median}
 \end{equation}
@@ -1361,8 +1057,8 @@ which limits the influence of outliers or manipulated values.
 If the credible set $S_{i,j}$ is empty, 
 vehicle $i$ resorts to a \emph{host-centric distance weighting} of all its neighbors:
 \begin{equation}
-O_i(j) =
-\frac{\sum_{k\in\mathcal{N}_i} g_{i,k} \, O_k(j)}{\sum_{k\in\mathcal{N}_i} g_{i,k}},
+\O_i(j) =
+\frac{\sum_{k\in\mathcal{N}_i} g_{i,k} \, \O_k(j)}{\sum_{k\in\mathcal{N}_i} g_{i,k}},
 \qquad
 g_{i,k} = 
 \frac{1}
@@ -1443,14 +1139,14 @@ column sep=0.15cm
 \noindent\textbf{6) Final Expression.}
 Combining all cases, the complete definition of the generalized trust vector is
 \begin{equation}
-O_i(j) =
+\O_i(j) =
 \begin{cases}
 1, & j = i,\\[1ex]
-VT_{i,j}, & j \in \mathcal{N}_i,\\[1ex]
-\operatorname{wMed}\bigl(\{O_k(j)\}, \{w_{i,k}\}\bigr),
+\VT_{i,j}, & j \in \mathcal{N}_i,\\[1ex]
+\operatorname{wMed}\bigl(\{\O_k(j)\}, \{\psi_{i,k}\}\bigr),
 & S_{i,j} \neq \varnothing,\\[1ex]
 \displaystyle
-\frac{\sum_{k\in\mathcal{N}_i} g_{i,k} \, O_k(j)}{\sum_{k\in\mathcal{N}_i} g_{i,k}},
+\frac{\sum_{k\in\mathcal{N}_i} g_{i,k} \, \O_k(j)}{\sum_{k\in\mathcal{N}_i} g_{i,k}},
 & S_{i,j} = \varnothing.
 \end{cases}
 \label{eq:final_trust_vector}
@@ -1920,15 +1616,15 @@ Under the CTHS policy, the desired bumper-to-bumper spacing to the immediate pre
 % Introducing the IDM and its purpose
 The IDM is used as an inner controller for local longitudinal control. It computes the desired acceleration using ego-state estimates from the local observer $\LO_i$ together with relative measurements to the predecessor obtained from onboard sensing. The IDM acceleration for vehicle $i$ is given by:
 \begin{equation}
-    a_{\text{IDM},i} = \alpha \left[ 1 - \left( \frac{\hat{v}_0^{(i)}}{v_0} \right)^\delta - \left( \frac{s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i})}{s_{i-1,i}} \right)^2 \right],
+    a_{\text{IDM},i} = a_{\max} \left[ 1 - \left( \frac{\hat{v}_0^{(i)}}{v_0} \right)^\delta - \left( \frac{s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i})}{s_{i-1,i}} \right)^2 \right],
 \end{equation}
 where:
 \begin{itemize}
     \item $\hat{v}_0^{(i)}$ is the estimated velocity of vehicle $i$ from $\LO_i$.
     \item $s_{i-1,i} = s_{i-1} - s_i - L$ is the (measured) distance to the predecessor, with $L$ the vehicle length.
     \item $\Delta v_{i-1,i}$ is the (measured) relative velocity to the predecessor.
-    \item $s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i}) = s_0 + T \hat{v}_0^{(i)} + \frac{\hat{v}_0^{(i)} \Delta v_{i-1,i}}{2 \sqrt{\alpha \beta}}$ is the desired minimum gap.
-    \item $\alpha$, $\beta$, $\delta$, $v_0$, $s_0$, and $T$ are model parameters: maximum acceleration, comfortable deceleration, free-flow exponent, desired velocity, minimum gap, and time headway, respectively.
+    \item $s^*(\hat{v}_0^{(i)}, \Delta v_{i-1,i}) = s_0 + T \hat{v}_0^{(i)} + \frac{\hat{v}_0^{(i)} \Delta v_{i-1,i}}{2 \sqrt{a_{\max} b_{\text{comf}}}}$ is the desired minimum gap.
+    \item $a_{\max}$, $b_{\text{comf}}$, $\delta$, $v_0$, $s_0$, and $T$ are model parameters: maximum acceleration, comfortable deceleration, free-flow exponent, desired velocity, minimum gap, and time headway, respectively.
 \end{itemize}
 This inner loop remains fully local (no reliance on V2V) and therefore provides a natural fallback mode during communication degradation or when upstream information is deemed untrustworthy.
 
@@ -2034,7 +1730,7 @@ These expressions provide steady-state references for interpreting the simulatio
 % \end{figure}
 
 
-Figure~\ref{fig:controller_2 , fig:controller_3} shows the acceleration commands for vehicles 2 and 3. The trust-modulated $\gamma$ blending and the filter time constant $\tau_f = 0.2$ yield smooth transitions between the local (IDM) and cooperative (CACC) contributions, avoiding abrupt control jumps.
+Figures~\ref{fig:controller_2} and~\ref{fig:controller_3} shows the acceleration commands for vehicles 2 and 3. The trust-modulated $\gamma$ blending and the filter time constant $\tau_f = 0.2$ yield smooth transitions between the local (IDM) and cooperative (CACC) contributions, avoiding abrupt control jumps.
 
 \begin{figure}[ht!]
     \centering
