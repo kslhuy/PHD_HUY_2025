@@ -1,12 +1,7 @@
 \chapter[Resilient State Estimation and Cyber-Attack Reconstruction]{Resilient State Estimation and Cyber-Attack Reconstruction for Connected Autonomous Vehicles}\label{chp3_chap}
 \chaptermark{Resilient State Estimation and Cyber-Attack Reconstruction}
 
-\objectif{The primary objective of this chapter is to enhance the resilience of Cooperative Adaptive Cruise Control (CACC) systems against cyberattacks. Specifically, this work aims to:
-\begin{itemize}
-    \item Design a discrete-time Unknown Input Observer (UIO) capable of simultaneously estimating relative vehicle states and reconstructing false data injection signals.
-    \item Address the structural rank condition failures caused by standard discretization through advanced modeling techniques (output delay and exact discretization).
-    \item Develop an observer-based control strategy that compensates for attacks in real-time, ensuring the safety and stability of the vehicle platoon.
-\end{itemize}}
+\objectif{This chapter aims to improve CACC resilience against cyberattacks by designing a discrete-time Unknown Input Observer (UIO) to estimate relative vehicle states and reconstruct false data injection signals, addressing rank-condition issues caused by standard discretization through output delay and exact discretization, and developing observer-based control to compensate attacks in real time while maintaining platoon safety and stability.}
 
 
 
@@ -339,9 +334,8 @@ z_t \triangleq x_{k-1}~\text{and}~\bar{y}_{t} \triangleq y_{k-1}
 with $t = k-1$ and considering additive vector noises, $\omega_{t}$, in both the output measurements and in the process equation, we obtain the following new system
 \begin{equation}\label{CACC_discrete_delay}
       \left\{ \begin{array}{l}
-        z_{t+1} = \mathcal{A} z_{t}+\mathcal{B}  v_{i,t} + \mathcal{F}  \mu_{t} \\ 
-        \hspace{1cm}+ \bar{\Delta} - \mathcal{W}  f^c_{t} + E_{\omega} \omega_{t}\\
-         \bar{y}_{t} = \mathcal{C} z_{t} + D_{\omega} \omega_{t} \end{array}\right.
+        z_{t+1} = \mathcal{A} z_{t}+\mathcal{B}  v_{i,t} + \mathcal{F}  \mu_{t} + \bar{\Delta} - \mathcal{W}  f^c_{t} + E_{\omega} \omega_{t}\\
+        \bar{y}_{t} = \mathcal{C} z_{t} + D_{\omega} \omega_{t} \end{array}\right.
 \end{equation}
 for which the rank condition is satisfied, i.e.: 
 \begin{equation}\label{ali_rank}
@@ -414,8 +408,7 @@ By considering the following two-stage observer
 \end{equation}
 the estimation error $\tilde{\xi}_{t} = \hat{\xi}_{t} - \xi_{t}$ satisfies the equation:
 \begin{align}\label{ali_e9}
-\tilde{\xi}_{t+1} &=  \Big(P_z A_{\xi}-K C_{\xi}\Big) \tilde{\xi}_{t} \notag \\
-&\quad+ \begin{bmatrix}\Big(K D_{\omega} - P_z E_{\omega}\Big) & Q_z D_{\omega} \end{bmatrix} \bar{\omega}_{t},
+\tilde{\xi}_{t+1} &=  \Big(P_z A_{\xi}-K C_{\xi}\Big) \tilde{\xi}_{t} + \begin{bmatrix}\Big(K D_{\omega} - P_z E_{\omega}\Big) & Q_z D_{\omega} \end{bmatrix} \bar{\omega}_{t},
 \end{align}
 where $\bar{\omega}_{t}$ is defined as follows:
 \begin{equation}\label{ali_e10}
@@ -774,10 +767,10 @@ To quantify this observation, Table~\ref{tab:ch3_state_estimation_errors} report
 \begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{Metric} & \textbf{Position} & \textbf{Velocity} & \textbf{Acceleration} \\ \hline
-RMS (Euler)  & 0.035637 & 0.020425 & 1.508381 \\ \hline
-RMS (Exact)  & 0.035600 & 0.019503 & 0.912209 \\ \hline
-MSE (Euler)  & 0.001270 & 0.000417 & 2.275214 \\ \hline
-MSE (Exact)  & 0.001267 & 0.000380 & 0.832126 \\ \hline
+RMS (Euler)  & 0.35637 & 0.20425 & 1.508381 \\ \hline
+RMS (Exact)  & 0.35600 & 0.19503 & 0.912209 \\ \hline
+MSE (Euler)  & 0.01270 & 0.0417 & 2.275214 \\ \hline
+MSE (Exact)  & 0.01267 & 0.0380 & 0.832126 \\ \hline
 \end{tabular}
 \caption{State estimation error metrics for Euler and exact discretization (CARLA simulation).}
 \label{tab:ch3_state_estimation_errors}

@@ -68,12 +68,12 @@ The unknown nonlinearity $\mu_{x}(\cdot)$ is Lebesgue measurable and $\mathcal{L
 \end{assumption}
 
 
-{\color{blue}
+% {\color{blue}
 \begin{remark}
 Assumption~\ref{ali_hyp3} corresponds to a \emph{bounded-energy} uncertainty over $\Omega=[0,+\infty[$, which is standard in $\mathcal{H}_{\infty}$/\,$\mathcal{L}_{2}$-gain observer analysis. In the vehicle context, $\mu_x$ may represent aggregated effects such as unmodeled tire-force nonlinearities, residual parameter mismatches, aerodynamic disturbances, or actuator/sensor fault components.
 Moreover, since the regularization introduced later contains $\omega_{\delta_{1}}(t)=\delta_1\dot{\mu}_x(t)$, the subsequent $\mathcal{H}^1$ performance bound implicitly requires $\mu_x\in\mathcal{H}^1(\Omega)$ (i.e., $\mu_x\in\mathcal{L}_2(\Omega)$ and $\dot{\mu}_x\in\mathcal{L}_2(\Omega)$), which can be interpreted as \emph{bounded-energy variations} of the unknown input.
 \end{remark}
-}
+% }
 
 
 The objective of this chapter is to estimate the unmodeled dynamics $\mu_{x}$. More specifically, we propose to estimate $\mu_{x}$ by combining an unknown input observer~(UIO) with a neural network--based approach, leveraging gradient-based methods to better capture the unmodeled components of the system. The key idea is to incorporate the UIO-based estimation into the loss function of the neural network, thereby enhancing residual regularization and ensuring consistency with the UIO. This, in turn, improves the robustness and performance of the overall estimation scheme. Unfortunately, it is not possible to estimate the unknown input, $\mu_x$, if the system fails to satisfy the following main necessary condition:
@@ -136,12 +136,12 @@ The strategy consists in rewriting system~\eqref{sys_1} without modifying it. Th
 \end{equation}
 where $D \in \mathbb{R}^{n_y \times n_{\mu}}$ and $E \in \mathbb{R}^{n_x \times n_{\mu}}$ are given constant, full-column-rank matrix specified by the user; $E_{\delta_1} = \delta_{1} E, D_{\delta_2} = \delta_{2} D$; and $\omega_{\delta_{1}}(t) = \delta_{1} \dot{\mu}_{x}(t), \omega_{\delta_{2}}(t) = \delta_{2} \mu_{x}(t)$, with $\delta_{j} \geq 0$, with $(\delta_1,\delta_2) \neq (0,0)$, chosen sufficiently small to ensure the feasibility of some sufficient conditions that will be stated later. The purpose of this reformulation is to recover the rank condition~\eqref{rank2}, at the expense of introducing the additive terms $\omega_{\delta_{j}}(t), j=1,2$, which are handled as disturbances. 
 
-{\color{blue}
+% {\color{blue}
 \begin{itemize}
     \item \textbf{Design guideline for $E$ and $D$:} in practice, $E$ and $D$ can be selected as sparse (often binary) full-column-rank matrices that \emph{inject} the regularization terms into a subset of state/output channels so that the augmented pair $(\mathbb{E},\mathcal{H})$ satisfies Assumption~\ref{ali_hyp4}. A simple procedure is to (i) choose $D$ so that $\mathrm{rank}(D)=n_{\mu}$ (typically by selecting $n_{\mu}$ independent measured outputs), and then (ii) choose $E$ (possibly also sparse/binary) to complete the rank condition~\eqref{rank2} with minimal additional coupling.
     \item \textbf{Interpretation of $\delta_1,\delta_2$:} the scalars $\delta_1$ and $\delta_2$ quantify the trade-off between \emph{rank recovery} (feasibility of Assumption~\ref{ali_hyp4}) and \emph{disturbance amplification} through the induced terms $\omega_{\delta_1}$ and $\omega_{\delta_2}$.
 \end{itemize}
-}
+% }
 The next section presents LMI conditions that guarantee accurate estimation of $x$ and $\mu_{x}$ while satisfying an $\mathcal{H}_{\infty}$ criterion, or more specifically, an $\mathcal{L}_{2}$-optimality criterion---where the performance bound is proportional to $\delta_{j}, j=1,2$.
 
 
@@ -337,8 +337,8 @@ Hence, by substituting~\eqref{ali_prop1_e6} and~\eqref{ali_prop1_e7} in~\eqref{a
 \end{proof}
 %
 Before stating the main theorem, notice that from Assumption~\ref{ali_hyp2}, there exist constant matrices $\mathcal{A}_{j} \in \mathbb{R}^{n_\zeta \times n_\zeta}$ and functions $\alpha_{j}(\bm{z})$, $j=1,\dots \bar{n}_{\zeta}$ such that the Jacobian $\nabla^{\varphi_{\zeta}}_{\zeta}(\bm{z},u)$ belongs to the convex polytopic set defined as:
-\textcolor{blue}{This polytopic embedding is often less conservative than working with a single global Lipschitz constant, since it captures the variation of the Jacobian through a convex hull of vertex matrices and allows the LMI conditions to be enforced only at the vertices.
-}
+% \textcolor{blue}{This polytopic embedding is often less conservative than working with a single global Lipschitz constant, since it captures the variation of the Jacobian through a convex hull of vertex matrices and allows the LMI conditions to be enforced only at the vertices.
+%}
 %--
 \begin{equation}\label{varphi_zeta}
 \mathcal{H}_{\varphi} \triangleq \left\{ \sum^{\bar{n}_{\zeta}}_{j=1}\alpha_{j} (\bm{z}) \mathcal{A}_{j}, \sum^{\bar{n}_{\zeta}}_{j=1}\alpha_{j}(\bm{z}) =1, \alpha_{j}(\bm{z}) \geq0 \right\}
@@ -353,8 +353,8 @@ Suppose that Assumptions~\ref{ali_hyp1},~\ref{ali_hyp2}, and~\ref{ali_hyp3} hold
 \end{theorem}
 
 %
-\textcolor{blue}{\noindent\textbf{Roadmap of the proof:} the proof proceeds in three steps. First, a quadratic Lyapunov analysis is performed on the error dynamics to obtain a differential inequality of the form~\eqref{ali_prop1_e1}. Second, a Schur-complement (Schur lemma) argument is used to express this inequality as a matrix negativity condition. Third, convexification is applied by combining a change of variables with the polytopic representation~\eqref{varphi_zeta}, yielding vertex-wise LMIs.
-}
+% \textcolor{blue}{\noindent\textbf{Roadmap of the proof:} the proof proceeds in three steps. First, a quadratic Lyapunov analysis is performed on the error dynamics to obtain a differential inequality of the form~\eqref{ali_prop1_e1}. Second, a Schur-complement (Schur lemma) argument is used to express this inequality as a matrix negativity condition. Third, convexification is applied by combining a change of variables with the polytopic representation~\eqref{varphi_zeta}, yielding vertex-wise LMIs.
+% }
 \begin{proof}
 Consider the quadratic Lyapunov function $\vartheta(\xi) := \xi^{\top} \mathcal{P} \xi$. Then, the derivative of $\vartheta(.)$ along the trajectories of~\eqref{ali_syst2_e6} is given as follows:
 \begin{multline}\label{ali_thm_e1}
@@ -474,7 +474,7 @@ Hence, Proposition~\ref{ali_prop1} applies and the desired result follows.
 %\medskip
 %\bigskip
 %===
-\dashedhrule{0.4pt}{2pt 2pt}
+% \dashedhrule{0.4pt}{2pt 2pt}
 %\hrule
 \begin{equation}\label{ali_LMI}
 \begin{bmatrix}
@@ -791,7 +791,7 @@ The dynamics of the original system~\eqref{sys_1} can be rewritten as:
 where $\Delta_{x}(t) \triangleq \mu_{x}(t) -  \mu_{\theta}(\hat{x}_{\nn}(t))$ represents the approximation error of the neural network.
 
 %========
-\subsubsection{Design of the Neural Observer}
+\subsubsection{Design of the Neural Adaptive Observer}
 %--
 The objective is to determine the observer gain $\Lo_{\nn}$ such that the estimation error $\epsilon_{\nn} \triangleq x - \hat{x}_{\nn}$ satisfies an $\mathcal{L}^{2}$ performance criterion:
 \begin{equation}\label{learning_uio_e4}
@@ -861,7 +861,7 @@ The terms in~\eqref{loss_fun} are motivated as follows:
 
 This section details the numerical optimization procedure for tuning the neural network parameters $\theta$. We employ a gradient-based approach using a discretized version of the neural observer and sensitivity propagation.
 
-\subsubsection{Discretization of the Neural Observer}
+\subsubsection{Discretization of the Neural Adaptive Observer}
 
 Consider the continuous-time neural observer dynamics:
 \[
@@ -943,9 +943,9 @@ To address this, we adopt an experience replay mechanism using a fixed-size queu
 \end{enumerate}
 This approach ensures that the learned model retains information from past operating conditions while adapting to new data, thereby enhancing stability and robustness across the entire operating envelope.
 
-\begin{figure}[htp]
+\begin{figure}[!htp]
     \centering
-    \includegraphics[width=1\linewidth]{ch4/img/forgetting.png}
+    \includegraphics[width=0.8\linewidth]{ch4/img/forgetting.png}
     \caption{Schematic of the continuous learning with forgetting mechanism.}
     \label{fig:forgetting_schema}
 \end{figure}
@@ -979,90 +979,83 @@ with slip angles
 \end{equation}
 The functions $f_{yf}(\cdot)$ and $f_{yr}(\cdot)$ represent unmodeled tire dynamics and are treated as unknown inputs to be reconstructed.
 
+\subsubsection{QCar Simulation Setup and Residual Injection}
+The simulated platform is the Quanser QCar with nominal geometric and inertial parameters
+\[
+l=0.425~\mathrm{m},\quad w=0.192~\mathrm{m},\quad m=2.7~\mathrm{kg},\quad I_z=0.034~\mathrm{kg\,m^2},
+\]
+and axle distances $l_f=a=0.13~\mathrm{m}$, $l_r=b=0.13~\mathrm{m}$. The observer uses the linear tire model with
+\[
+C_f=C_r=120~\mathrm{N/rad}.
+\]
+In the simulation plant, the unknown input is injected as the mismatch between the true nonlinear tire force and this nominal linear model:
+\begin{equation}\label{eq:qcar_residual_injection}
+    w_f = F_{yf}^{\mathrm{true}} - C_f\alpha_f,\qquad
+    w_r = F_{yr}^{\mathrm{true}} - C_r\alpha_r,\qquad
+    \mu_x = \begin{bmatrix}w_f\\w_r\end{bmatrix}.
+\end{equation}
+Hence, the residual channels in~\eqref{eq:qcar_residual_injection} are exactly the unknown inputs reconstructed by the UIO/NAO architecture.
+
+The main simulation limits are chosen from the QCar configuration:
+\begin{equation*}
+|\delta|\leq 0.52~\mathrm{rad},\quad |\dot{\delta}|\leq 3.0~\mathrm{rad/s},\quad
+v_x\in[-1.5,\ 2.5]~\mathrm{m/s},\quad v_{\mathrm{switch}}=0.1~\mathrm{m/s}.
+\end{equation*}
+For start/stop maneuvers, a low-speed mode is used when $|v_x|<v_{\mathrm{switch}}$: the model switches to a kinematic update (and lateral tire-force terms are faded), which is numerically more robust near standstill. In addition, all terms that require $1/v_x$ use
+\[
+\tilde v_x=\max\!\left(|v_x|,v_{\mathrm{switch}}\right),
+\]
+so slip-related expressions never divide by a very small speed.
+The road/tire coefficients are set to $\mu_{\mathrm{road}}=1.0$ and $\mu=0.01$ (rolling term in the longitudinal dynamics).
+
 \subsection{LPV Model Used by the Observers}
-The observer design relies on the reduced state $x=[v_x,\ v_y,\ \psi,\ r]^\top$, input $u=[a,\ \delta]^\top$, and measured output $y=[v_x,\ \psi,\ r]^\top$. The following assumptions are adopted to obtain a tractable quasi-LPV model:
-\begin{enumerate}
-    \item $v_x(t)$ is measured, strictly positive, and used as the scheduling signal.
-    \item Small steering angles are considered, so $\cos(\delta)\approx 1$ and $\sin(\delta)\approx \delta$.
-    \item The longitudinal coupling term $-\tfrac{F_{yf}\sin(\delta)}{m}$ in $\dot v_x$ is neglected in the nominal model; remaining effects are treated as modeling error.
-\end{enumerate}
-Under these assumptions, the model used by the observers is
+The observer design relies on the reduced state $x=[v_x,\ v_y,\ \psi,\ r]^\top$, input $u=[a,\ \delta]^\top$, and measured output $y=[v_x,\ \psi,\ r]^\top$. In the implemented qLPV model, no small-angle approximation is used: the trigonometric terms are kept explicitly through online scheduling variables.
+
+Define the scheduling vector
+\begin{equation}\label{eq:qcar_rho}
+    \rho :=
+    \begin{bmatrix}
+        \mathrm{inv}\_v_x & \sin\delta & \cos\delta & v_x & v_y & \sin\psi & \cos\psi & s_v
+    \end{bmatrix}^{\!\top},
+\end{equation}
+with
+\[
+\mathrm{inv}\_v_x=\frac{1}{\tilde v_x},\qquad \tilde v_x:=\max\!\left(|v_x|,v_{\mathrm{switch}}\right),\qquad
+s_v:=\mathrm{clip}\!\left(\frac{\tilde v_x-v_{\mathrm{switch}}}{v_{\mathrm{blend}}-v_{\mathrm{switch}}},\,0,\,1\right),
+\]
+where $v_{\mathrm{switch}}=0.1~\mathrm{m/s}$ and $v_{\mathrm{blend}}=1.0~\mathrm{m/s}$. The factor $s_v$ scales lateral stiffness terms at low speed to avoid singular behavior near stop.
+
+The observer model is therefore written as
 \begin{equation}\label{vehicleLPV}
     \begin{cases}
-        \dot{x} = A(v_x)x + Bu + E\mu_x(x,u) \\
+        \dot{x} = A(\rho)x + B(\rho)u + E(\rho)\mu_x(x,u) \\
         y = Cx,
     \end{cases}
 \end{equation}
 where the unknown input collects the nonlinear tire-force residuals,
 \begin{equation}
-    \mu_x(x,u)=\begin{bmatrix} f_{yf}(\alpha_f) \\ f_{yr}(\alpha_r) \end{bmatrix}.
+    \mu_x(x,u)=\begin{bmatrix} w_f \\ w_r \end{bmatrix},
 \end{equation}
-The nominal matrices are
-\begin{equation*}
-    A(v_x)=
-    \begin{bmatrix}
-        0 & 0 & 0 & 0 \\
-        0 & -\frac{C_f+C_r}{mv_x} & 0 & \frac{l_rC_r-l_fC_f}{mv_x}-v_x \\
-        0 & 0 & 0 & 1 \\
-        0 & \frac{l_rC_r-l_fC_f}{I_zv_x} & 0 & -\frac{l_f^2C_f+l_r^2C_r}{I_zv_x}
-    \end{bmatrix},
-\end{equation*}
-\begin{equation*}
-    B=
-    \begin{bmatrix}
-        1 & 0 \\
-        0 & \frac{C_f}{m} \\
-        0 & 0 \\
-        0 & \frac{l_fC_f}{I_z}
-    \end{bmatrix}, \quad
-    E=
-    \begin{bmatrix}
-        0 & 0 \\
-        \frac{1}{m} & \frac{1}{m} \\
-        0 & 0 \\
-        \frac{l_f}{I_z} & -\frac{l_r}{I_z}
-    \end{bmatrix}, \quad
-    C=
-    \begin{bmatrix}
-        1 & 0 & 0 & 0 \\
-        0 & 0 & 1 & 0 \\
-        0 & 0 & 0 & 1
-    \end{bmatrix}.
-\end{equation*}
+with residual injection defined in~\eqref{eq:qcar_residual_injection}. The matrices $A(\rho)$, $B(\rho)$, and $E(\rho)$ are computed online from \eqref{eq:qcar_rho}, while $C$ is constant.
 
 \subsubsection{Rank Condition Check (Why a Generalized/Regularized UIO Is Needed)}
-For \eqref{vehicleLPV}, the unknown input $\mu_x\in\mathbb{R}^2$ enters the dynamics through $E\in\mathbb{R}^{4\times 2}$, while the measured output is $y\in\mathbb{R}^3$. A standard condition for unknown-input reconstruction in classical UIO theory is
+For \eqref{vehicleLPV}, the unknown input $\mu_x\in\mathbb{R}^2$ enters the dynamics through $E(\rho)\in\mathbb{R}^{4\times 2}$, while the measured output is $y\in\mathbb{R}^3$. A standard condition for unknown-input reconstruction in classical UIO theory must hold over the full scheduling envelope:
 \begin{equation}\label{rank_vehicle_classical}
-    \mathrm{rank}(CE)=\mathrm{rank}(E).
+    \mathrm{rank}\!\big(C\,E(\rho)\big)=\mathrm{rank}\!\big(E(\rho)\big),\quad \forall \rho.
 \end{equation}
-Using the matrices above,
-\[
-CE=
-\begin{bmatrix}
-0 & 0 \\
-0 & 0 \\
-\frac{l_f}{I_z} & -\frac{l_r}{I_z}
-\end{bmatrix},
-\]
-so that $\mathrm{rank}(E)=2$ and $\mathrm{rank}(CE)=1$ for $l_f,l_r,I_z>0$. Therefore, the classical rank condition is not satisfied for the sensor set $y=[v_x,\psi,r]^\top$. This motivates the generalized/regularized UIO in Section~\ref{uio}, which restores the required augmented rank condition (Assumption~\ref{ali_hyp4} and \eqref{rank2}) by introducing a controlled regularization of the output equation.
+In practice, this condition is not uniformly satisfied: for operating points near $\delta\approx 0$, the direct contribution of the front residual to the measured channel $v_x$ is attenuated by $\sin\delta$, and $\mathrm{rank}(C E(\rho))$ can drop below $\mathrm{rank}(E(\rho))$. Therefore, with the sensor set $y=[v_x,\psi,r]^\top$, the classical condition may fail on part of the operating domain. This motivates the generalized/regularized UIO in Section~\ref{uio}, which restores the required augmented rank condition (Assumption~\ref{ali_hyp4} and \eqref{rank2}) by introducing a controlled regularization of the output equation.
 
 % \subsection{Observer Design and Implementation}
 % To assess robustness to modeling errors, the simulated plant is generated with a $20\%$ parametric mismatch with respect to the nominal parameters used by the observers (e.g., $m_{\mathrm{true}}=1.2\,m_{\mathrm{nom}}$, and similarly for the cornering stiffnesses).
 
 \subsubsection{LPV Scheduling and Polytopic Embedding}\label{sec6_polytopic}
-Since $A(v_x)$ depends on both $v_x$ and $1/v_x$, the scheduling variables are
+The qLPV matrices are parameterized by the full scheduling vector \eqref{eq:qcar_rho}. At each sampling instant, $\rho(t)$ is computed from the measured/estimated state and steering input, then $A(\rho)$, $B(\rho)$, and $E(\rho)$ are updated online.
+
+For LMI-based synthesis, the admissible scheduling domain is bounded and approximated by a convex polytope:
 \[
-\rho_1(t):=v_x(t)\in[\underline{v}_x,\overline{v}_x], \qquad \rho_2(t):=\frac{1}{v_x(t)}\in\left[\frac{1}{\overline{v}_x},\frac{1}{\underline{v}_x}\right].
+\mathcal{A}_{\zeta}(\rho)\in \mathrm{Co}\{\mathcal{A}_{\zeta,1},\dots,\mathcal{A}_{\zeta,\bar n}\},
 \]
-Because $A(v_x)$ is \emph{affine} in $\rho_2=1/v_x$, the matrix belongs at every instant to the convex polytopic set
-\[
-A(v_x(t))\in\mathrm{Co}\{A_1,\dots,A_{\bar n}\},
-\]
-where the vertices $A_j$, $j=1,\dots,\bar{n}$ (typically $\bar{n}=2$ or $\bar{n}=4$, depending on whether one also treats $v_x$ as a separate scheduling variable), are obtained by evaluating $A(v_x)$ at the corners of $(\rho_1,\rho_2)$. Concretely, for a speed range $v_x\in[\underline{v}_x,\overline{v}_x]$ with $\bar{n}=2$, we obtain
-\begin{equation}\label{eq:vertex_Aj}
-A_1 := A(\underline{v}_x), \qquad A_2 := A(\overline{v}_x).
-\end{equation}
-For any admissible $v_x(t)$, there exist convex coefficients $\alpha_j(t)\geq 0$, $\sum_j \alpha_j(t)=1$, such that $A(v_x(t))=\sum_{j=1}^{\bar n}\alpha_j(t)A_j$. The observer gains are then synthesized by enforcing the LMI conditions \emph{simultaneously at all vertices} while searching for a single (parameter-independent) gain.
+where the vertices are obtained by evaluating the augmented Jacobian at selected corners/grid points of the bounded scheduling set (including $\mathrm{inv}\_v_x$, $\sin\delta$, $\cos\delta$, and the low-speed scaling factor $s_v$). The observer gains are then synthesized by enforcing the LMI conditions simultaneously at all selected vertices with a single parameter-independent gain.
 
 \subsubsection{Step-by-Step Application of the Generalized UIO to the Vehicle Model}\label{sec6_uio_vehicle}
 
@@ -1082,7 +1075,7 @@ so that $\mathrm{rank}(D)=2=n_\mu$. This choice injects the regularization into 
 Since the state dynamics in~\eqref{vehicleLPV} are already first-order, we may set $\delta_1=0$ (i.e., $E_{\delta_1}=0$) and rely only on the output regularization. In this case, the regularized system~\eqref{ali_syst1} reduces to
 \begin{equation}\label{eq:vehicle_regularized_system}
     \begin{cases}
-        \dot{x} = A(v_x)x + Bu + E\mu_x \\
+        \dot{x} = A(\rho)x + B(\rho)u + E(\rho)\mu_x \\
         y = Cx + \delta_2 D \mu_x + D\,\omega_{\delta_2},
     \end{cases}
 \end{equation}
@@ -1196,23 +1189,23 @@ The pair $(P_\zeta,Q_\zeta)$ is not unique: any solution of the linear system~\e
 \paragraph{Step 4: Augmented Jacobian polytope and LMI synthesis.}
 The augmented nonlinear function~\eqref{ali_syst2_e1_4} for the vehicle LPV model~\eqref{vehicleLPV} reads
 \begin{equation}\label{eq:vehicle_varphi_zeta}
-\varphi_\zeta(\zeta,u) = A(v_x)x + Bu + E\mu_x =
+\varphi_\zeta(\zeta,u) = A(\rho)x + B(\rho)u + E(\rho)\mu_x =
 \begin{bmatrix}
-A(v_x) & E \\
+A(\rho) & E(\rho) \\
 0_{2\times 4} & 0_{2\times 2}
 \end{bmatrix}
 \begin{bmatrix} x \\ \mu_x \end{bmatrix}
-+ \begin{bmatrix} Bu \\ 0 \end{bmatrix}.
++ \begin{bmatrix} B(\rho)u \\ 0 \end{bmatrix}.
 \end{equation}
 The Jacobian of $\varphi_\zeta$ with respect to $\zeta$ is therefore
 \begin{equation}\label{eq:vehicle_jacobian_zeta}
 \nabla^{\varphi_\zeta}_\zeta(\zeta,u) = 
 \begin{bmatrix}
-A(v_x) & E \\
+A(\rho) & E(\rho) \\
 0_{2\times 4} & 0_{2\times 2}
 \end{bmatrix} \in \mathbb{R}^{6\times 6},
 \end{equation}
-which is parameter-varying through $A(v_x)$. Using the polytopic embedding of Section~\ref{sec6_polytopic}, the Jacobian belongs to the polytope
+which is parameter-varying through $\rho$. Using the polytopic embedding of Section~\ref{sec6_polytopic}, the Jacobian belongs to the polytope
 \begin{equation}\label{eq:vehicle_polytope_jacobian}
 \nabla^{\varphi_\zeta}_\zeta(\zeta,u) \in \mathrm{Co}\left\{ \mathcal{A}_{\zeta,1},\dots,\mathcal{A}_{\zeta,\bar{n}} \right\},
 \end{equation}
@@ -1220,21 +1213,11 @@ with the vertex matrices
 \begin{equation}\label{eq:vehicle_Azeta_j}
 \mathcal{A}_{\zeta,j} = 
 \begin{bmatrix}
-A_j & E \\
+A_j & E_j \\
 0_{2\times 4} & 0_{2\times 2}
 \end{bmatrix} \in \mathbb{R}^{6\times 6}, \qquad j=1,\dots,\bar{n}.
 \end{equation}
-For example, with $\bar{n}=2$ and the vertex matrices~\eqref{eq:vertex_Aj}, we have explicitly
-\begin{equation}
-\mathcal{A}_{\zeta,1} = 
-\begin{bmatrix}
-0 & 0 & 0 & 0 & 0 & 0 \\
-0 & -\frac{C_f+C_r}{m\underline{v}_x} & 0 & \frac{l_rC_r-l_fC_f}{m\underline{v}_x}-\underline{v}_x & \frac{1}{m} & \frac{1}{m} \\
-0 & 0 & 0 & 1 & 0 & 0 \\
-0 & \frac{l_rC_r-l_fC_f}{I_z\underline{v}_x} & 0 & -\frac{l_f^2C_f+l_r^2C_r}{I_z\underline{v}_x} & \frac{l_f}{I_z} & -\frac{l_r}{I_z}
-\end{bmatrix},
-\end{equation}
-with $\mathcal{A}_{\zeta,2}$ obtained analogously by replacing $\underline{v}_x$ with $\overline{v}_x$.
+where $A_j:=A(\rho_j)$ and $E_j:=E(\rho_j)$ are obtained from the selected scheduling vertices/grid points.
 
 The auxiliary disturbance injection matrix at each vertex is computed as
 \begin{equation}\label{eq:vehicle_Ej}
@@ -1296,16 +1279,16 @@ The estimate $\hat{\mu}_x$ is then used as the teacher signal in the neural lear
 \subsubsection{Neural Adaptive Observer (NAO) --- Application of Theorem~\ref{ali_thm2}}\label{sec6_nao_vehicle}
 The student component is the NAO, which retains the LPV backbone while learning the unknown input through the neural approximation $\mu_\theta(\cdot)$:
 \begin{equation}\label{eq:vehicle_NAO}
-    \dot{\hat{x}}_{\nn} = A(v_x)\hat{x}_{\nn} + Bu + E\mu_\theta(\hat{x}_{\nn}) + \Lo_{\nn}\big(y-C\hat{x}_{\nn}\big).
+    \dot{\hat{x}}_{\nn} = A(\rho)\hat{x}_{\nn} + B(\rho)u + E(\rho)\mu_\theta(\hat{x}_{\nn}) + \Lo_{\nn}\big(y-C\hat{x}_{\nn}\big).
 \end{equation}
 The gain $\Lo_{\nn}$ is designed using Theorem~\ref{ali_thm2}. Specifically, one solves the following $\bar{n}$ vertex-wise LMIs for a symmetric positive definite $\mathcal{P}_{\nn}\in\mathbb{R}^{4\times 4}$, a matrix $\mathcal{Q}_{\nn}\in\mathbb{R}^{3\times 4}$, and a scalar $\sigma>0$:
 \begin{equation}\label{eq:vehicle_LMI_NAO}
 \begin{bmatrix}
 A_j^{\top} \mathcal{P}_{\nn} + \mathcal{P}_{\nn} A_j  - C^{\top} \mathcal{Q}_{\nn}  - \mathcal{Q}_{\nn}^{\top}  C + \mathbb{I}_4
 &
-\mathcal{P}_{\nn} E
+\mathcal{P}_{\nn} E_j
 \\[4pt]
-E^{\top} \mathcal{P}_{\nn} &
+E_j^{\top} \mathcal{P}_{\nn} &
 - \sigma \mathbb{I}_{2}
 \end{bmatrix} 
 < 0, \qquad j=1,\dots,\bar{n}.
@@ -1315,16 +1298,17 @@ The NAO gain is then $\Lo_{\nn} = \mathcal{P}_{\nn}^{-1} \mathcal{Q}_{\nn}^{\top
 \subsubsection{Gradient Computation Using the Vehicle LPV Model}\label{sec6_gradient}
 For the online update of $\theta$, the NAO~\eqref{eq:vehicle_NAO} is discretized with a forward Euler step $\Delta t$:
 \begin{equation}\label{eq:vehicle_NAO_discrete}
-\hat{x}_{k+1} = \hat{x}_k + \Delta t\Big(A(\rho_k)\hat{x}_k + Bu_k + E\mu_\theta(\hat{x}_k) + \Lo_{\nn}(y_k - C\hat{x}_k)\Big), \qquad \rho_k=v_{x,k}=y_{1,k}.
+\hat{x}_{k+1} = \hat{x}_k + \Delta t\Big(A(\rho_k)\hat{x}_k + B(\rho_k)u_k + E(\rho_k)\mu_\theta(\hat{x}_k) + \Lo_{\nn}(y_k - C\hat{x}_k)\Big),
 \end{equation}
+where $\rho_k$ is computed from $(\hat{x}_k,\delta_k)$ according to \eqref{eq:qcar_rho}.
 The sensitivity recursion (cf.~Section~\ref{ch4_sec4_1}) used to compute $\nabla_\theta\mathcal{L}$ is
 \begin{equation}\label{eq:vehicle_sensitivity}
 S_{k+1}=S_k+\Delta t\left(A_kS_k+B_k\right), \qquad S_0 = 0, \quad S_k:=\frac{\partial \hat{x}_k}{\partial \theta} \in \mathbb{R}^{4\times n_\theta},
 \end{equation}
 with
 \begin{align}
-    A_k &= \frac{\partial f_{\mathrm{obs}}}{\partial \hat{x}_k} = A(\rho_k) + E\frac{\partial\mu_\theta}{\partial\hat{x}_k} - \Lo_{\nn} C \in \mathbb{R}^{4\times 4}, \label{eq:vehicle_Ak}\\
-    B_k &= \frac{\partial f_{\mathrm{obs}}}{\partial \theta} = E\frac{\partial\mu_\theta}{\partial\theta} \in \mathbb{R}^{4\times n_\theta}. \label{eq:vehicle_Bk}
+    A_k &= \frac{\partial f_{\mathrm{obs}}}{\partial \hat{x}_k} = A(\rho_k) + E(\rho_k)\frac{\partial\mu_\theta}{\partial\hat{x}_k} - \Lo_{\nn} C \in \mathbb{R}^{4\times 4}, \label{eq:vehicle_Ak}\\
+    B_k &= \frac{\partial f_{\mathrm{obs}}}{\partial \theta} = E(\rho_k)\frac{\partial\mu_\theta}{\partial\theta} \in \mathbb{R}^{4\times n_\theta}. \label{eq:vehicle_Bk}
 \end{align}
 This recursion highlights that learning remains explicitly anchored to the physical LPV structure through $A(\rho_k)$ at each sampling instant. The vehicle-specific Jacobians $\frac{\partial \mu_\theta}{\partial \hat{x}_k}$ and $\frac{\partial \mu_\theta}{\partial \theta}$ are computed by automatic differentiation through the neural network.
 
@@ -1334,7 +1318,7 @@ The following results illustrate the performance of the proposed two-layer Teach
 \subsubsection{Trajectory Tracking and Control Inputs}
 Figure~\ref{fig:Trajectories_ch4} presents the vehicle trajectory in the $XY$-plane alongside the corresponding control inputs. The inset shows the position tracking error, which remains near zero throughout the maneuver, confirming that the state estimates from Layer~2 provide sufficiently accurate feedback for the trajectory-tracking controller. The steering angle and throttle input profiles demonstrate smooth and physically consistent actuation, reflecting the quality of the underlying state estimation.
 
-\begin{figure}[htp!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=\linewidth]{ch4/img/traj_control_py.png}
     \caption{Vehicle trajectory in the $XY$-plane with near-zero position tracking error (inset), and the corresponding steering and throttle control inputs computed using the Layer~2 (NAO) state estimates as feedback.}
@@ -1344,7 +1328,7 @@ Figure~\ref{fig:Trajectories_ch4} presents the vehicle trajectory in the $XY$-pl
 \subsubsection{State Estimation}
 Figure~\ref{fig:state_estimate_wo} reports the state estimation results for both layers. All estimated states track the true signals closely. The measured channels ($v_x$, $\psi$, and $r$) are recovered with high fidelity, while the unmeasured lateral velocity $v_y$---which is the most challenging state to reconstruct---is also well estimated thanks to the observer structure exploiting the coupling in the vehicle dynamics.
 
-\begin{figure}[htp!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=\linewidth]{ch4/img/State_est_py.png}
     \caption{State estimation results: all estimated states closely follow the true signals, including the unmeasured lateral velocity $v_y$.}
@@ -1354,7 +1338,7 @@ Figure~\ref{fig:state_estimate_wo} reports the state estimation results for both
 \subsubsection{Tire-Force Residual Estimation}
 Figure~\ref{fig:Uncertainty} presents the reconstruction of the unknown tire-force residuals $\mu_x = [f_{yf},\; f_{yr}]^\top$, comparing the estimates from Layer~1 (UIO) and Layer~2 (NAO). While both layers provide bounded estimates---confirming that the estimation remains stable and does not diverge---Layer~2 exhibits noticeably faster convergence and higher precision in tracking the true residual signals. This improvement is attributed to the neural network's ability to learn the functional relationship $\mu_\theta(\hat{x})$, which refines the instantaneous UIO signal into a predictive model. Importantly, the Layer~2 estimates remain well-constrained, demonstrating that the teacher--student architecture successfully combines the robustness guarantees of the UIO with the adaptability of the neural observer.
 
-\begin{figure}[htp!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=\linewidth]{ch4/img/tireforce_slip_py.png}
     \caption{Tire-force residual and slip angle estimation: Layer~2 (NAO) achieves faster convergence and higher precision compared to Layer~1 (UIO), while both estimates remain bounded.}
