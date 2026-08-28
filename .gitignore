@@ -45,7 +45,5 @@
 
 # LaTeX build tool files
 *.fdb_latexmk
-
-# PDF output (uncomment if you don't want to track PDFs)
-# *.pdf
+.tmp_presentation_vehicle_cybersecurity
 

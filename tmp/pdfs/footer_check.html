@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Trust-aware resilience for connected vehicle platoons - From attack-aware state estimation to an onboard edge module</title>
+<meta name="Subject" content=""/>
+<meta name="Keywords" content=""/>
+<meta name="Author" content="Quang Huy Nguyen"/>
+<meta name="Creator" content="LaTeX with Beamer class"/>
+<meta name="Producer" content="MiKTeX pdfTeX-1.40.25"/>
+<meta name="CreationDate" content="2026-08-28T08:19:04+02"/>
+<meta name="ModDate" content="2026-08-28T08:19:04+02"/>
+</head>
+<body>
+<doc>
+  <page width="453.543000" height="255.118000">
+    <flow>
+      <block xMin="17.575000" yMin="6.814933" xMax="338.332479" yMax="25.524790">
+        <line xMin="17.575000" yMin="6.814933" xMax="338.332479" yMax="25.524790">
+          <word xMin="17.575000" yMin="6.814933" xMax="137.146725" yMax="25.524790">Connectivity</word>
+          <word xMin="142.685959" yMin="6.814933" xMax="212.464359" yMax="25.524790">creates</word>
+          <word xMin="218.003593" yMin="6.814933" xMax="297.346137" yMax="25.524790">physical</word>
+          <word xMin="302.885371" yMin="6.814933" xMax="338.332479" yMax="25.524790">risk</word>
+        </line>
+      </block>
+      <block xMin="28.346000" yMin="59.131216" xMax="64.047216" yMax="66.147424">
+        <line xMin="28.346000" yMin="59.131216" xMax="64.047216" yMax="66.147424">
+          <word xMin="28.346000" yMin="59.131216" xMax="64.047216" yMax="66.147424">CONTEXT</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="28.346000" yMin="75.914176" xMax="395.640088" yMax="109.811023">
+        <line xMin="28.346000" yMin="75.914176" xMax="395.640088" yMax="90.882023">
+          <word xMin="28.346000" yMin="75.914176" xMax="120.464416" yMax="90.882023">Cooperative</word>
+          <word xMin="124.895791" yMin="75.914176" xMax="178.040418" yMax="90.882023">driving</word>
+          <word xMin="182.471794" yMin="75.914176" xMax="248.017896" yMax="90.882023">depends</word>
+          <word xMin="252.449272" yMin="75.914176" xMax="271.928196" yMax="90.882023">on</word>
+          <word xMin="276.359572" yMin="75.914176" xMax="309.132623" yMax="90.882023">data</word>
+          <word xMin="313.563999" yMin="75.914176" xMax="337.474299" yMax="90.882023">the</word>
+          <word xMin="341.905674" yMin="75.914176" xMax="395.640088" yMax="90.882023">vehicle</word>
+        </line>
+        <line xMin="28.346000" yMin="94.843176" xMax="161.845175" yMax="109.811023">
+          <word xMin="28.346000" yMin="94.843176" xMax="80.597976" yMax="109.811023">cannot</word>
+          <word xMin="85.029351" yMin="94.843176" xMax="117.563299" yMax="109.811023">fully</word>
+          <word xMin="121.994675" yMin="94.843176" xMax="161.845175" yMax="109.811023">trust.</word>
+        </line>
+      </block>
+      <block xMin="28.346000" yMin="118.721089" xMax="190.873119" yMax="130.882454">
+        <line xMin="28.346000" yMin="118.721089" xMax="190.873119" yMax="130.882454">
+          <word xMin="28.346000" yMin="118.721089" xMax="59.999222" yMax="130.882454">What</word>
+          <word xMin="63.599711" yMin="118.721089" xMax="139.171130" yMax="130.882454">connectivity</word>
+          <word xMin="142.771619" yMin="118.721089" xMax="190.873119" yMax="130.882454">enables</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="238.677000" yMin="118.442089" xMax="404.675094" yMax="130.603454">
+        <line xMin="238.677000" yMin="118.442089" xMax="404.675094" yMax="130.603454">
+          <word xMin="238.677000" yMin="118.442089" xMax="270.330222" yMax="130.603454">What</word>
+          <word xMin="273.930711" yMin="118.442089" xMax="289.044995" yMax="130.603454">an</word>
+          <word xMin="292.645484" yMin="118.442089" xMax="329.816002" yMax="130.603454">attack</word>
+          <word xMin="333.416491" yMin="118.442089" xMax="355.731753" yMax="130.603454">can</word>
+          <word xMin="359.332242" yMin="118.442089" xMax="404.675094" yMax="130.603454">change</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="50.165000" yMin="140.655374" xMax="207.568974" yMax="161.250389">
+        <line xMin="50.165000" yMin="140.655374" xMax="207.568974" yMax="149.594389">
+          <word xMin="50.165000" yMin="140.655374" xMax="81.321091" yMax="149.594389">Shared</word>
+          <word xMin="84.007628" yMin="140.655374" xMax="119.995619" yMax="149.594389">position,</word>
+          <word xMin="122.682155" yMin="140.655374" xMax="151.692883" yMax="149.594389">speed,</word>
+          <word xMin="154.379419" yMin="140.655374" xMax="188.763220" yMax="149.594389">heading</word>
+          <word xMin="191.449756" yMin="140.655374" xMax="207.568974" yMax="149.594389">and</word>
+        </line>
+        <line xMin="50.165000" yMin="152.311374" xMax="102.165908" yMax="161.250389">
+          <word xMin="50.165000" yMin="152.311374" xMax="102.165908" yMax="161.250389">acceleration</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="260.495000" yMin="140.376374" xMax="410.892719" yMax="160.971389">
+        <line xMin="260.495000" yMin="140.376374" xMax="410.892719" yMax="149.315389">
+          <word xMin="260.495000" yMin="140.376374" xMax="286.181380" yMax="149.315389">False,</word>
+          <word xMin="288.867917" yMin="140.376374" xMax="328.131936" yMax="149.315389">replayed,</word>
+          <word xMin="330.818473" yMin="140.376374" xMax="364.177910" yMax="149.315389">delayed</word>
+          <word xMin="366.864447" yMin="140.376374" xMax="375.455565" yMax="149.315389">or</word>
+          <word xMin="378.142101" yMin="140.376374" xMax="410.892719" yMax="149.315389">missing</word>
+        </line>
+        <line xMin="260.495000" yMin="152.032374" xMax="314.361021" yMax="160.971389">
+          <word xMin="260.495000" yMin="152.032374" xMax="278.759582" yMax="160.971389">V2V</word>
+          <word xMin="281.446118" yMin="152.032374" xMax="314.361021" yMax="160.971389">packets</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="50.165000" yMin="166.956374" xMax="181.022516" yMax="187.551389">
+        <line xMin="50.165000" yMin="166.956374" xMax="181.022516" yMax="175.895389">
+          <word xMin="50.165000" yMin="166.956374" xMax="101.924313" yMax="175.895389">Cooperative</word>
+          <word xMin="104.610849" yMin="166.956374" xMax="130.529161" yMax="175.895389">cruise</word>
+          <word xMin="133.215697" yMin="166.956374" xMax="162.216761" yMax="175.895389">control</word>
+          <word xMin="164.903297" yMin="166.956374" xMax="181.022516" yMax="175.895389">and</word>
+        </line>
+        <line xMin="50.165000" yMin="178.612374" xMax="139.874055" yMax="187.551389">
+          <word xMin="50.165000" yMin="178.612374" xMax="100.658355" yMax="187.551389">coordinated</word>
+          <word xMin="103.344891" yMin="178.612374" xMax="139.874055" yMax="187.551389">platoons</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="260.495000" yMin="166.678374" xMax="412.651531" yMax="187.273389">
+        <line xMin="260.495000" yMin="166.678374" xMax="412.651531" yMax="175.617389">
+          <word xMin="260.495000" yMin="166.678374" xMax="303.605212" yMax="175.617389">Corrupted</word>
+          <word xMin="306.291748" yMin="166.678374" xMax="347.643148" yMax="175.617389">estimates</word>
+          <word xMin="350.329685" yMin="166.678374" xMax="366.448903" yMax="175.617389">that</word>
+          <word xMin="369.135440" yMin="166.678374" xMax="412.651531" yMax="175.617389">propagate</word>
+        </line>
+        <line xMin="260.495000" yMin="178.334374" xMax="326.025228" yMax="187.273389">
+          <word xMin="260.495000" yMin="178.334374" xMax="288.954891" yMax="187.273389">across</word>
+          <word xMin="291.641427" yMin="178.334374" xMax="305.074109" yMax="187.273389">the</word>
+          <word xMin="307.760646" yMin="178.334374" xMax="326.025228" yMax="187.273389">fleet</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="50.165000" yMin="193.257374" xMax="183.602750" yMax="213.853389">
+        <line xMin="50.165000" yMin="193.257374" xMax="183.602750" yMax="202.196389">
+          <word xMin="50.165000" yMin="193.257374" xMax="92.057573" yMax="202.196389">Smoother</word>
+          <word xMin="94.744109" yMin="193.257374" xMax="118.275462" yMax="202.196389">traffic</word>
+          <word xMin="120.961999" yMin="193.257374" xMax="137.999278" yMax="202.196389">flow</word>
+          <word xMin="140.685815" yMin="193.257374" xMax="157.868051" yMax="202.196389">with</word>
+          <word xMin="160.554587" yMin="193.257374" xMax="183.602750" yMax="202.196389">fewer</word>
+        </line>
+        <line xMin="50.165000" yMin="204.914374" xMax="152.214728" yMax="213.853389">
+          <word xMin="50.165000" yMin="204.914374" xMax="85.621482" yMax="213.853389">onboard</word>
+          <word xMin="88.308019" yMin="204.914374" xMax="152.214728" yMax="213.853389">measurements</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="260.495000" yMin="192.979374" xMax="407.916269" yMax="213.574389">
+        <line xMin="260.495000" yMin="192.979374" xMax="407.916269" yMax="201.918389">
+          <word xMin="260.495000" yMin="192.979374" xMax="290.820004" yMax="201.918389">Unsafe</word>
+          <word xMin="293.506541" yMin="192.979374" xMax="322.507605" yMax="201.918389">control</word>
+          <word xMin="325.194141" yMin="192.979374" xMax="365.472859" yMax="201.918389">decisions</word>
+          <word xMin="368.159396" yMin="192.979374" xMax="394.483587" yMax="201.918389">based</word>
+          <word xMin="397.170123" yMin="192.979374" xMax="407.916269" yMax="201.918389">on</word>
+        </line>
+        <line xMin="260.495000" yMin="204.635374" xMax="353.760334" yMax="213.574389">
+          <word xMin="260.495000" yMin="204.635374" xMax="332.268043" yMax="213.574389">plausible-looking</word>
+          <word xMin="334.954579" yMin="204.635374" xMax="353.760334" yMax="213.574389">data</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="32.315000" yMin="223.235437" xMax="366.648591" yMax="231.841935">
+        <line xMin="32.315000" yMin="223.235437" xMax="366.648591" yMax="231.841935">
+          <word xMin="32.315000" yMin="223.235437" xMax="71.131316" yMax="231.841935">Preserve</word>
+          <word xMin="73.679353" yMin="223.235437" xMax="125.125866" yMax="231.841935">cooperative</word>
+          <word xMin="127.673902" yMin="223.235437" xMax="153.979174" yMax="231.841935">value;</word>
+          <word xMin="156.527211" yMin="223.235437" xMax="192.181395" yMax="231.841935">degrade</word>
+          <word xMin="194.729432" yMin="223.235437" xMax="220.484768" yMax="231.841935">safely</word>
+          <word xMin="223.032805" yMin="223.235437" xMax="246.460078" yMax="231.841935">when</word>
+          <word xMin="249.008115" yMin="223.235437" xMax="266.331099" yMax="231.841935">V2V</word>
+          <word xMin="268.879136" yMin="223.235437" xMax="307.970420" yMax="231.841935">evidence</word>
+          <word xMin="310.518457" yMin="223.235437" xMax="318.162567" yMax="231.841935">is</word>
+          <word xMin="320.710604" yMin="223.235437" xMax="366.648591" yMax="231.841935">unreliable.</word>
+        </line>
+      </block>
+      <block xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+        <line xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+          <word xMin="17.575000" yMin="246.680400" xMax="52.244950" yMax="252.854775">Trust-aware</word>
+          <word xMin="54.100600" yMin="246.680400" xMax="84.899050" yMax="252.854775">connected</word>
+          <word xMin="86.754700" yMin="246.680400" xMax="107.360425" yMax="252.854775">vehicle</word>
+          <word xMin="109.216075" yMin="246.680400" xMax="129.247750" yMax="252.854775">project</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+        <line xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+          <word xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">2/14</word>
+        </line>
+      </block>
+    </flow>
+  </page>
+  <page width="453.543000" height="255.118000">
+    <flow>
+      <block xMin="17.575000" yMin="6.814933" xMax="336.559128" yMax="25.524790">
+        <line xMin="17.575000" yMin="6.814933" xMax="336.559128" yMax="25.524790">
+          <word xMin="17.575000" yMin="6.814933" xMax="31.961067" yMax="25.524790">A</word>
+          <word xMin="37.500300" yMin="6.814933" xMax="81.774317" yMax="25.524790">trust</word>
+          <word xMin="87.313550" yMin="6.814933" xMax="133.241366" yMax="25.524790">layer</word>
+          <word xMin="138.780600" yMin="6.814933" xMax="216.987402" yMax="25.524790">protects</word>
+          <word xMin="222.526636" yMin="6.814933" xMax="336.559128" yMax="25.524790">cooperation</word>
+        </line>
+      </block>
+      <block xMin="28.346000" yMin="60.345216" xMax="102.094640" yMax="67.361424">
+        <line xMin="28.346000" yMin="60.345216" xMax="102.094640" yMax="67.361424">
+          <word xMin="28.346000" yMin="60.345216" xMax="63.486816" yMax="67.361424">PROJECT</word>
+          <word xMin="65.564032" yMin="60.345216" xMax="102.094640" yMax="67.361424">CONCEPT</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="41.768000" yMin="206.051108" xMax="405.716449" yMax="227.748132">
+        <line xMin="41.768000" yMin="206.051108" xMax="405.716449" yMax="215.593132">
+          <word xMin="41.768000" yMin="206.051108" xMax="59.835858" yMax="215.593132">The</word>
+          <word xMin="62.660866" yMin="206.051108" xMax="96.337403" yMax="215.593132">project</word>
+          <word xMin="99.162411" yMin="206.051108" xMax="122.880286" yMax="215.593132">does</word>
+          <word xMin="125.705294" yMin="206.051108" xMax="141.507048" yMax="215.593132">not</word>
+          <word xMin="144.332057" yMin="206.051108" xMax="179.919031" yMax="215.593132">replace</word>
+          <word xMin="182.744039" yMin="206.051108" xMax="197.986889" yMax="215.593132">the</word>
+          <word xMin="200.811897" yMin="206.051108" xMax="250.859254" yMax="215.593132">controller:</word>
+          <word xMin="254.354948" yMin="206.051108" xMax="260.563869" yMax="215.593132">it</word>
+          <word xMin="263.388877" yMin="206.051108" xMax="304.625867" yMax="215.593132">screens,</word>
+          <word xMin="307.450876" yMin="206.051108" xMax="341.899717" yMax="215.593132">weighs</word>
+          <word xMin="344.724725" yMin="206.051108" xMax="362.792583" yMax="215.593132">and</word>
+          <word xMin="365.617591" yMin="206.051108" xMax="405.716449" yMax="215.593132">corrects</word>
+        </line>
+        <line xMin="178.900000" yMin="218.206108" xMax="268.578768" yMax="227.748132">
+          <word xMin="178.900000" yMin="218.206108" xMax="194.142850" yMax="227.748132">the</word>
+          <word xMin="196.967858" yMin="218.206108" xMax="217.860725" yMax="227.748132">data</word>
+          <word xMin="220.685733" yMin="218.206108" xMax="256.719830" yMax="227.748132">feeding</word>
+          <word xMin="259.544838" yMin="218.206108" xMax="268.578768" yMax="227.748132">it.</word>
+        </line>
+      </block>
+      <block xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+        <line xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+          <word xMin="17.575000" yMin="246.680400" xMax="52.244950" yMax="252.854775">Trust-aware</word>
+          <word xMin="54.100600" yMin="246.680400" xMax="84.899050" yMax="252.854775">connected</word>
+          <word xMin="86.754700" yMin="246.680400" xMax="107.360425" yMax="252.854775">vehicle</word>
+          <word xMin="109.216075" yMin="246.680400" xMax="129.247750" yMax="252.854775">project</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+        <line xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+          <word xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">3/14</word>
+        </line>
+      </block>
+    </flow>
+  </page>
+  <page width="453.543000" height="255.118000">
+    <flow>
+      <block xMin="17.575000" yMin="6.814933" xMax="390.078483" yMax="25.524790">
+        <line xMin="17.575000" yMin="6.814933" xMax="390.078483" yMax="25.524790">
+          <word xMin="17.575000" yMin="6.814933" xMax="74.740686" yMax="25.524790">Board</word>
+          <word xMin="80.279919" yMin="6.814933" xMax="114.611211" yMax="25.524790">sits</word>
+          <word xMin="120.150444" yMin="6.814933" xMax="137.864036" yMax="25.524790">at</word>
+          <word xMin="143.403269" yMin="6.814933" xMax="173.291219" yMax="25.524790">the</word>
+          <word xMin="178.830453" yMin="6.814933" xMax="293.560330" yMax="25.524790">data-control</word>
+          <word xMin="299.099564" yMin="6.814933" xMax="390.078483" yMax="25.524790">boundary</word>
+        </line>
+      </block>
+      <block xMin="28.346000" yMin="64.086216" xMax="158.739872" yMax="71.102424">
+        <line xMin="28.346000" yMin="64.086216" xMax="158.739872" yMax="71.102424">
+          <word xMin="28.346000" yMin="64.086216" xMax="76.764560" yMax="71.102424">ELECTRONIC</word>
+          <word xMin="78.841776" yMin="64.086216" xMax="105.860528" yMax="71.102424">BOARD</word>
+          <word xMin="107.937744" yMin="64.086216" xMax="158.739872" yMax="71.102424">INTEGRATION</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="28.346000" yMin="81.133046" xMax="62.717000" yMax="91.891169">
+        <line xMin="28.346000" yMin="81.133046" xMax="62.717000" yMax="91.891169">
+          <word xMin="28.346000" yMin="81.133046" xMax="62.717000" yMax="91.891169">Inputs</word>
+        </line>
+      </block>
+      <block xMin="50.165000" yMin="100.640106" xMax="106.803779" yMax="120.368509">
+        <line xMin="50.165000" yMin="100.640106" xMax="106.803779" yMax="109.210509">
+          <word xMin="50.165000" yMin="100.640106" xMax="67.148295" yMax="109.210509">IMU</word>
+          <word xMin="69.724048" yMin="100.640106" xMax="85.178569" yMax="109.210509">and</word>
+          <word xMin="87.754322" yMin="100.640106" xMax="106.803779" yMax="109.210509">local</word>
+        </line>
+        <line xMin="50.165000" yMin="111.798106" xMax="93.925012" yMax="120.368509">
+          <word xMin="50.165000" yMin="111.798106" xMax="93.925012" yMax="120.368509">kinematics</word>
+        </line>
+      </block>
+      <block xMin="50.165000" yMin="125.945106" xMax="128.957111" yMax="145.673509">
+        <line xMin="50.165000" yMin="125.945106" xMax="128.957111" yMax="134.515509">
+          <word xMin="50.165000" yMin="125.945106" xMax="76.422860" yMax="134.515509">GNSS</word>
+          <word xMin="78.998614" yMin="125.945106" xMax="110.926837" yMax="134.515509">position</word>
+          <word xMin="113.502591" yMin="125.945106" xMax="128.957111" yMax="134.515509">and</word>
+        </line>
+        <line xMin="50.165000" yMin="137.103106" xMax="101.142681" yMax="145.673509">
+          <word xMin="50.165000" yMin="137.103106" xMax="73.856372" yMax="145.673509">1PPS</word>
+          <word xMin="76.432125" yMin="137.103106" xMax="101.142681" yMax="145.673509">timing</word>
+        </line>
+      </block>
+      <block xMin="50.165000" yMin="151.250106" xMax="136.276698" yMax="182.137509">
+        <line xMin="50.165000" yMin="151.250106" xMax="136.276698" yMax="159.820509">
+          <word xMin="50.165000" yMin="151.250106" xMax="97.640397" yMax="159.820509">Vehicle-bus</word>
+          <word xMin="100.216151" yMin="151.250106" xMax="118.246424" yMax="159.820509">data</word>
+          <word xMin="120.822178" yMin="151.250106" xMax="136.276698" yMax="159.820509">and</word>
+        </line>
+        <line xMin="50.165000" yMin="162.409106" xMax="129.179478" yMax="170.979509">
+          <word xMin="50.165000" yMin="162.409106" xMax="67.676417" yMax="170.979509">V2V</word>
+          <word xMin="70.252170" yMin="162.409106" xMax="104.385536" yMax="170.979509">packets:</word>
+          <word xMin="107.572799" yMin="162.409106" xMax="129.179478" yMax="170.979509">Wi-Fi</word>
+        </line>
+        <line xMin="50.165000" yMin="173.567106" xMax="119.497240" yMax="182.137509">
+          <word xMin="50.165000" yMin="173.567106" xMax="69.038416" yMax="182.137509">now,</word>
+          <word xMin="71.614169" yMin="173.567106" xMax="98.900478" yMax="182.137509">C-V2X</word>
+          <word xMin="101.476231" yMin="173.567106" xMax="119.497240" yMax="182.137509">later</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="167.246000" yMin="81.379046" xMax="250.114481" yMax="92.137169">
+        <line xMin="167.246000" yMin="81.379046" xMax="250.114481" yMax="92.137169">
+          <word xMin="167.246000" yMin="81.379046" xMax="195.372935" yMax="92.137169">Edge</word>
+          <word xMin="198.557981" yMin="81.379046" xMax="250.114481" yMax="92.137169">functions</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="140.962000" yMin="110.064675" xMax="165.749100" yMax="133.463697">
+        <line xMin="140.962000" yMin="110.064675" xMax="165.749100" yMax="133.463697">
+          <word xMin="140.962000" yMin="110.064675" xMax="165.749100" yMax="133.463697">⇒</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="189.065000" yMin="100.887106" xMax="272.397108" yMax="120.615509">
+        <line xMin="189.065000" yMin="100.887106" xMax="227.682770" yMax="109.457509">
+          <word xMin="189.065000" yMin="100.887106" xMax="209.652497" yMax="109.457509">Time</word>
+          <word xMin="212.228250" yMin="100.887106" xMax="227.682770" yMax="109.457509">and</word>
+        </line>
+        <line xMin="189.065000" yMin="112.045106" xMax="272.397108" yMax="120.615509">
+          <word xMin="189.065000" yMin="112.045106" xMax="247.158431" yMax="120.615509">packet-validity</word>
+          <word xMin="249.734184" yMin="112.045106" xMax="272.397108" yMax="120.615509">gates</word>
+        </line>
+      </block>
+      <block xMin="189.065000" yMin="126.192106" xMax="278.808696" yMax="145.920509">
+        <line xMin="189.065000" yMin="126.192106" xMax="278.808696" yMax="134.762509">
+          <word xMin="189.065000" yMin="126.192106" xMax="210.699476" yMax="134.762509">State</word>
+          <word xMin="213.275229" yMin="126.192106" xMax="258.072954" yMax="134.762509">estimation,</word>
+          <word xMin="260.648708" yMin="126.192106" xMax="278.808696" yMax="134.762509">trust</word>
+        </line>
+        <line xMin="189.065000" yMin="137.350106" xMax="276.520167" yMax="145.920509">
+          <word xMin="189.065000" yMin="137.350106" xMax="204.519520" yMax="145.920509">and</word>
+          <word xMin="207.095274" yMin="137.350106" xMax="234.900439" yMax="145.920509">source</word>
+          <word xMin="237.476193" yMin="137.350106" xMax="276.520167" yMax="145.920509">weighting</word>
+        </line>
+      </block>
+      <block xMin="189.065000" yMin="151.497106" xMax="281.699469" yMax="171.225509">
+        <line xMin="189.065000" yMin="151.497106" xMax="281.699469" yMax="160.067509">
+          <word xMin="189.065000" yMin="151.497106" xMax="226.978608" yMax="160.067509">Rollback,</word>
+          <word xMin="229.554361" yMin="151.497106" xMax="281.699469" yMax="160.067509">re-anchoring</word>
+        </line>
+        <line xMin="189.065000" yMin="162.655106" xMax="246.750758" yMax="171.225509">
+          <word xMin="189.065000" yMin="162.655106" xMax="204.519520" yMax="171.225509">and</word>
+          <word xMin="207.095274" yMin="162.655106" xMax="227.182444" yMax="171.225509">audit</word>
+          <word xMin="229.758198" yMin="162.655106" xMax="246.750758" yMax="171.225509">logs</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="314.085000" yMin="81.379046" xMax="357.999681" yMax="92.137169">
+        <line xMin="314.085000" yMin="81.379046" xMax="357.999681" yMax="92.137169">
+          <word xMin="314.085000" yMin="81.379046" xMax="357.999681" yMax="92.137169">Outputs</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="287.800000" yMin="110.064675" xMax="312.587100" yMax="133.463697">
+        <line xMin="287.800000" yMin="110.064675" xMax="312.587100" yMax="133.463697">
+          <word xMin="287.800000" yMin="110.064675" xMax="312.587100" yMax="133.463697">⇒</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="335.903000" yMin="100.887106" xMax="389.002434" yMax="120.615509">
+        <line xMin="335.903000" yMin="100.887106" xMax="389.002434" yMax="109.457509">
+          <word xMin="335.903000" yMin="100.887106" xMax="366.339511" yMax="109.457509">Trusted</word>
+          <word xMin="368.915264" yMin="100.887106" xMax="389.002434" yMax="109.457509">state</word>
+        </line>
+        <line xMin="335.903000" yMin="112.045106" xMax="375.549219" yMax="120.615509">
+          <word xMin="335.903000" yMin="112.045106" xMax="375.549219" yMax="120.615509">estimates</word>
+        </line>
+      </block>
+      <block xMin="335.903000" yMin="126.192106" xMax="424.062330" yMax="157.078509">
+        <line xMin="335.903000" yMin="126.192106" xMax="387.353211" yMax="134.762509">
+          <word xMin="335.903000" yMin="126.192106" xMax="364.041716" yMax="134.762509">Attack,</word>
+          <word xMin="366.617470" yMin="126.192106" xMax="387.353211" yMax="134.762509">trust,</word>
+        </line>
+        <line xMin="335.903000" yMin="137.350106" xMax="424.062330" yMax="145.920509">
+          <word xMin="335.903000" yMin="137.350106" xMax="378.217625" yMax="145.920509">availability</word>
+          <word xMin="380.793379" yMin="137.350106" xMax="396.247899" yMax="145.920509">and</word>
+          <word xMin="398.823652" yMin="137.350106" xMax="424.062330" yMax="145.920509">health</word>
+        </line>
+        <line xMin="335.903000" yMin="148.508106" xMax="355.471314" yMax="157.078509">
+          <word xMin="335.903000" yMin="148.508106" xMax="355.471314" yMax="157.078509">flags</word>
+        </line>
+      </block>
+      <block xMin="335.903000" yMin="162.655106" xMax="425.201961" yMax="193.541509">
+        <line xMin="335.903000" yMin="162.655106" xMax="403.845445" yMax="171.225509">
+          <word xMin="335.903000" yMin="162.655106" xMax="393.032840" yMax="171.225509">CAN/CAN-FD</word>
+          <word xMin="395.608593" yMin="162.655106" xMax="403.845445" yMax="171.225509">or</word>
+        </line>
+        <line xMin="335.903000" yMin="173.813106" xMax="403.521159" yMax="182.383509">
+          <word xMin="335.903000" yMin="173.813106" xMax="369.804733" yMax="182.383509">gateway</word>
+          <word xMin="372.380486" yMin="173.813106" xMax="390.410760" yMax="182.383509">data</word>
+          <word xMin="392.986513" yMin="173.813106" xMax="403.521159" yMax="182.383509">for</word>
+        </line>
+        <line xMin="335.903000" yMin="184.971106" xMax="425.201961" yMax="193.541509">
+          <word xMin="335.903000" yMin="184.971106" xMax="374.001914" yMax="193.541509">controller</word>
+          <word xMin="376.429422" yMin="184.971106" xMax="391.883943" yMax="193.541509">and</word>
+          <word xMin="394.302186" yMin="184.971106" xMax="425.201961" yMax="193.541509">planner</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="32.315000" yMin="204.843437" xMax="405.912998" yMax="224.372273">
+        <line xMin="32.315000" yMin="204.843437" xMax="405.912998" yMax="213.449935">
+          <word xMin="32.315000" yMin="204.843437" xMax="79.673655" yMax="213.449935">Integration</word>
+          <word xMin="82.221692" yMin="204.843437" xMax="123.476058" yMax="213.449935">principle:</word>
+          <word xMin="126.628000" yMin="204.935093" xMax="144.821716" yMax="213.413273">start</word>
+          <word xMin="147.369753" yMin="204.935093" xMax="154.500590" yMax="213.413273">in</word>
+          <word xMin="157.048626" yMin="204.935093" xMax="199.971131" yMax="213.413273">monitoring</word>
+          <word xMin="202.519168" yMin="204.935093" xMax="227.990370" yMax="213.413273">mode;</word>
+          <word xMin="230.538407" yMin="204.935093" xMax="268.236520" yMax="213.413273">introduce</word>
+          <word xMin="270.784557" yMin="204.935093" xMax="298.290522" yMax="213.413273">control</word>
+          <word xMin="300.838559" yMin="204.935093" xMax="336.126119" yMax="213.413273">authority</word>
+          <word xMin="338.674156" yMin="204.935093" xMax="355.483866" yMax="213.413273">only</word>
+          <word xMin="358.031903" yMin="204.935093" xMax="376.372269" yMax="213.413273">after</word>
+          <word xMin="378.920306" yMin="204.935093" xMax="405.912998" yMax="213.413273">timing,</word>
+        </line>
+        <line xMin="32.315000" yMin="215.894093" xMax="223.326104" yMax="224.372273">
+          <word xMin="32.315000" yMin="215.894093" xMax="76.960638" yMax="224.372273">robustness</word>
+          <word xMin="79.508674" yMin="215.894093" xMax="94.796895" yMax="224.372273">and</word>
+          <word xMin="97.344932" yMin="215.894093" xMax="121.523785" yMax="224.372273">safety</word>
+          <word xMin="124.071822" yMin="215.894093" xMax="146.490879" yMax="224.372273">gates</word>
+          <word xMin="149.038916" yMin="215.894093" xMax="162.283208" yMax="224.372273">are</word>
+          <word xMin="164.831245" yMin="215.894093" xMax="223.326104" yMax="224.372273">demonstrated.</word>
+        </line>
+      </block>
+      <block xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+        <line xMin="17.575000" yMin="246.680400" xMax="129.247750" yMax="252.854775">
+          <word xMin="17.575000" yMin="246.680400" xMax="52.244950" yMax="252.854775">Trust-aware</word>
+          <word xMin="54.100600" yMin="246.680400" xMax="84.899050" yMax="252.854775">connected</word>
+          <word xMin="86.754700" yMin="246.680400" xMax="107.360425" yMax="252.854775">vehicle</word>
+          <word xMin="109.216075" yMin="246.680400" xMax="129.247750" yMax="252.854775">project</word>
+        </line>
+      </block>
+    </flow>
+    <flow>
+      <block xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+        <line xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">
+          <word xMin="422.979000" yMin="246.680400" xMax="435.968550" yMax="252.854775">4/14</word>
+        </line>
+      </block>
+    </flow>
+  </page>
+</doc>
+</body>
+</html>
