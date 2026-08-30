@@ -15,10 +15,12 @@
 \exhyphenpenalty=10000
 \tolerance=2000
 
-\definecolor{Ink}{HTML}{111827}
-\definecolor{Muted}{HTML}{667085}
-\definecolor{Accent}{HTML}{3D8DFF}
-\definecolor{Panel}{HTML}{EEF1F5}
+\definecolor{Ink}{HTML}{172033}
+\definecolor{Muted}{HTML}{657286}
+\definecolor{BrandBlue}{HTML}{184D6B}
+\definecolor{BrandCyan}{HTML}{009BDA}
+\definecolor{BrandMagenta}{HTML}{BF2F88}
+\definecolor{Panel}{HTML}{F1F4F6}
 
 \color{Ink}
 \pagestyle{fancy}
@@ -31,12 +33,12 @@
 
 \newcommand{\slidetitle}[3]{%
   \clearpage
-  {\color{Accent}\large\bfseries SLIDE #1}\hfill
+  {\color{BrandCyan}\large\bfseries SLIDE #1}\hfill
   {\color{Muted}\small Suggested time: #3}\par
   \vspace{0.18cm}
-  {\LARGE\bfseries #2}\par
+  {\color{BrandBlue}\LARGE\bfseries #2}\par
   \vspace{0.20cm}
-  {\color{Muted}\rule{\textwidth}{0.5pt}}\par
+  {\color{BrandMagenta}\rule{1.1cm}{1.2pt}}\par
   \vspace{0.12cm}
 }
 
@@ -50,226 +52,256 @@
 \begin{document}
 
 \begin{titlepage}
-  \vspace*{2.0cm}
-  {\color{Accent}\large\bfseries COMPLETE SPEAKER SCRIPT}\par
-  \vspace{0.35cm}
-  {\Huge\bfseries Trust-aware resilience for connected\par vehicle platoons}\par
-  \vspace{0.45cm}
-  {\Large\color{Muted}From attack-aware state estimation to an onboard edge module}\par
-  \vspace{1.1cm}
+  \vspace*{1.8cm}
+  {\color{BrandCyan}\large\bfseries COMPLETE SPEAKER SCRIPT}\par
+  \vspace{0.30cm}
+  {\color{BrandBlue}\Huge\bfseries Trust-aware resilience for connected\par vehicle platoons}\par
+  \vspace{0.38cm}
+  {\Large\color{Muted}Trust-aware state estimation and embedded validation}\par
+  \vspace{1.0cm}
   {\large Quang Huy Nguyen}\par
-  \vspace{0.15cm}
+  \vspace{0.12cm}
   {\color{Muted}CRAN / SEGULA Engineering}\par
   \vfill
   \colorbox{Panel}{%
     \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-      \raggedright This script follows the 14-slide project presentation. It is written for potential users, industrial partners and decision-makers. The suggested delivery time is approximately 16 to 20 minutes, excluding questions.}}
+      \raggedright This script follows the 17-slide project presentation. It is written for potential users, industrial partners and decision-makers. A natural delivery is approximately 19 to 23 minutes, excluding questions.}}
 \end{titlepage}
 
 \slidetitle{1}{Trust-aware resilience for connected vehicle platoons}{45--60 seconds}
 
-Good morning, and thank you for the opportunity to present this project.
+Good morning, and thank you for the opportunity to present this work.
 
-The project addresses a practical question for connected and cooperative vehicles: how can a vehicle continue to benefit from information received from other vehicles when that information may be unreliable or deliberately manipulated?
+The project asks a practical question: how can a connected vehicle continue to benefit from information received from other vehicles when some of that information may be unreliable or deliberately manipulated?
 
-The work combines three elements. First, it evaluates the reliability of local and communicated information in real time. Second, it corrects the estimated vehicle state when an attack is detected after corrupted data has already influenced the system. Third, it transfers these functions toward a dedicated onboard electronic module.
+The proposed answer has three parts. The system evaluates the reliability of each source in real time. If corrupted data has already affected the estimated state, it revises that recent history through rollback and anchoring. Finally, the same functions are transferred toward a dedicated embedded platform.
 
-Today I will focus on the overall approach, the experimental results, the way the electronic board can be integrated into a vehicle, and the remaining steps toward industrial use. I will not go deeply into the mathematical or algorithmic development, but I can discuss those details afterward if they are useful.
+I will focus on the operating concept, the evidence from simulation and physical tests, the electronic board, and the steps required to move from a research demonstrator toward an onboard product.
 
-The central message is that cooperative driving does not have to be abandoned when communication becomes uncertain. The cooperation can instead be managed according to the measured trust in each source.
+The central message is simple: cooperation does not need to be abandoned as soon as communication becomes uncertain. Its influence can be managed according to measured trust.
 
-\transition{I will begin with the problem created by connected vehicle data.}
+\transition{I will begin with the problem created by cooperative vehicle data.}
 
-\slidetitle{2}{Connectivity creates physical risk}{60--75 seconds}
+\slidetitle{2}{Why cooperative driving needs a trust boundary}{60--75 seconds}
 
-Cooperative driving relies on data that a vehicle does not measure entirely by itself. Vehicles exchange position, speed, heading and acceleration. This makes functions such as cooperative cruise control and platooning possible, and it can improve traffic flow by giving each vehicle information beyond the range of its own sensors.
+Cooperative driving gives each vehicle a preview of what its neighbours are doing. Position, speed, heading and acceleration can support coordinated platooning and cooperative cruise control beyond the range of local sensing alone.
 
-However, the same communication channel creates a physical risk. A received packet can be false, replayed, delayed or missing. More importantly, the data can remain plausible enough to be accepted by a conventional controller. A corrupted value can then affect the state estimate and propagate into a control decision.
+The same data path also creates a physical risk. A packet may be false, replayed, delayed or missing. It may also remain plausible enough to pass a basic check. If that value enters the fused state, it can affect the whole platoon before the controller recognises the problem.
 
-The objective is therefore not simply to switch communication on or off. If all cooperative information is rejected at the first sign of uncertainty, much of the value of V2V communication is lost. If all information is accepted, the vehicle becomes vulnerable to manipulated data.
+The design objective is therefore not to accept everything and not to reject everything. The vehicle should preserve useful cooperative information while reducing dependence on sources whose behaviour no longer agrees with the dynamics, the other measurements or recent history.
 
-Our objective is to preserve useful cooperative information while reducing the influence of sources that become unreliable. When cooperation can no longer be trusted, the system should degrade toward local sensing and local control in a controlled manner.
+That is the purpose of the trust boundary.
 
-\transition{This leads to the trust layer shown in the next slide.}
+\transition{The next slide shows where this boundary sits in the full operating loop.}
 
-\slidetitle{3}{A trust layer protects cooperation}{60--75 seconds}
+\slidetitle{3}{The trust layer sits between V2V data and the vehicle ECU}{60--75 seconds}
 
-This diagram summarizes the complete concept.
+This figure summarises the complete concept.
 
-On the left is the host vehicle. It has its local sensors, its local observer and its existing vehicle logic. The vehicle also exchanges information with neighboring vehicles through a V2V network. In the experimental platform, this exchange is implemented through UDP over Wi-Fi so that attacks, delays and packet loss can be introduced in a controlled way.
+The host vehicle has local sensors, a local observer and its existing vehicle logic. It exchanges state information with peer vehicles through a V2V network. In the experimental platform, UDP over Wi-Fi is used because it allows attacks, delays and packet loss to be introduced in a controlled way.
 
-The trust-based observer sits between the incoming evidence and the final state used by the vehicle. It evaluates whether each source is consistent with the vehicle dynamics, the other measurements and the recent history. The contribution of a source is then adjusted according to its trust.
+The trust-based observer evaluates the consistency and freshness of each source. A source that remains credible keeps contributing. A source that becomes inconsistent progressively loses influence and can ultimately be isolated.
 
-The important integration principle is that this project does not replace the complete vehicle controller. The trust layer screens, weights and, when necessary, corrects the information provided to that controller.
+The important boundary is on the right of the trust layer. The project does not replace the complete vehicle controller. It provides a trusted state estimate, source-health information, attack flags and logs that the existing vehicle logic can use.
 
-The outputs are trusted state estimates, trust scores, attack indicators and diagnostic logs. These outputs can support monitoring first, and later support a controlled fallback strategy if the vehicle manufacturer authorizes that function.
+Monitoring is the first deployment mode. A fallback request is considered only later and only through the authorised vehicle controller.
 
-\transition{I will now show where the electronic board would sit in the vehicle architecture.}
+\transition{I will make that integration boundary explicit on the next slide.}
 
-\slidetitle{4}{Board sits at the data-control boundary}{75--90 seconds}
+\slidetitle{4}{System boundary: the vehicle ECU keeps control}{60--75 seconds}
 
-The electronic board is intended to sit at the boundary between data acquisition, communication and vehicle control.
+The electronic module sits between data acquisition, communication and the vehicle controller.
 
-Its first group of inputs comes from the vehicle itself: inertial measurements, local kinematic information, GNSS position and precise timing. A production version would also receive selected signals from the vehicle bus through CAN, CAN-FD or an automotive gateway.
+Its inputs include an inertial measurement unit, local kinematics, GNSS position and one-pulse-per-second timing. A vehicle implementation would also receive selected signals from a CAN, CAN-FD or gateway interface. The second input group is the V2V stream. Wi-Fi is used today for research; a production system would connect to a representative C-V2X or NR-V2X modem.
 
-The second group of inputs comes from V2V communication. In the current prototype, Wi-Fi is used for research and validation. A production-oriented version could instead connect to an external C-V2X or NR-V2X modem.
+Inside the module, the software checks packet timing and validity, estimates vehicle state, scores the trust of each source and performs rollback or re-anchoring when a delayed decision reveals earlier contamination.
 
-Inside the board, the software checks timing and packet validity, estimates the vehicle state, evaluates the trust of each source and performs rollback or re-anchoring when delayed detection reveals that recent data were contaminated.
+The outputs are trusted estimates, trust and health flags, attack indicators and audit logs. A safe-mode request can be sent through a gateway, but acceleration and braking authority remain with the existing ACC or CACC ECU.
 
-The outputs are not raw actuator commands. The board provides trusted state estimates, attack and availability flags, source-health information and audit logs. These can be transmitted to the existing vehicle controller or planner through a gateway.
+The recommended route is monitor-only first. Control influence is introduced only after timing, robustness, cybersecurity and functional-safety evidence is available.
 
-The recommended integration path is monitoring first. Direct influence on control should be introduced only after timing, robustness, cybersecurity and functional-safety gates have been demonstrated.
+\transition{The next slide shows how the response changes as confidence in a source decreases.}
 
-\transition{The next slide explains how the response changes progressively with the level of trust.}
+\slidetitle{5}{Response to an unreliable packet}{60--75 seconds}
 
-\slidetitle{5}{Intervention is graduated, not binary}{60--75 seconds}
+The response is progressive rather than binary.
 
-The response is designed as a progression rather than a single binary decision.
+When a packet is fresh and consistent, it is accepted. If a neighbouring source begins to disagree with the physical behaviour or the other evidence, its influence is reduced. If that inconsistency persists and crosses the threshold, the source is isolated and its fusion weight becomes zero.
 
-When a packet is fresh and consistent, it is accepted normally. If a neighboring source begins to disagree with the physical behavior or the other evidence, its influence is reduced. If the inconsistency persists and crosses the detection threshold, the attacked source is isolated and its fusion weight becomes zero.
+Isolation stops future corrupted packets from entering the estimate. It does not remove corruption that has already been stored in the recent state history. Rollback therefore returns to a trusted point, reconstructs the state without the rejected source and, when a trusted relative measurement is available, re-anchors the corrected estimate.
 
-Isolation prevents future corrupted packets from influencing the estimate, but it does not remove contamination that has already entered the estimated state. This is why rollback and anchoring are important. The system returns to a trusted point in the recent history, reconstructs the state without the rejected source and, when an accepted relative measurement is available, re-anchors the corrected state.
+The trust output can then inform a controlled fallback. For example, the vehicle may reduce dependence on cooperative CACC and rely more strongly on local ACC. The vehicle ECU still decides and keeps command authority.
 
-Finally, the trust information can be used by the vehicle controller to reduce dependence on cooperation. For example, cooperative adaptive cruise control can move toward local adaptive cruise control.
+This distinction between future influence and stored contamination is important: rejection and recovery solve different parts of the same problem.
 
-At the present stage, this is a control-interaction concept and a feasibility demonstration. The research board does not claim direct actuator override, and command authority remains with the existing controller.
+\transition{I will now show how the complete architecture was validated.}
 
-\transition{I will now explain how these functions were validated from simulation to hardware.}
+\slidetitle{6}{Validation progressed from simulation to embedded hardware}{60--75 seconds}
 
-\slidetitle{6}{Validation moved from model to hardware}{60--75 seconds}
+The work was validated at three levels.
 
-The work followed a staged validation process.
+The first level was a five-vehicle numerical campaign with controlled ground truth and repeatable attacks on local and global communication channels.
 
-The first stage was a numerical campaign. A five-vehicle scenario provided controlled ground truth and made it possible to repeat attacks on different local and global communication channels.
+The second level used QLabs and physical QCar and LIMO vehicles. This added real packet exchange, timing, sensor noise, scheduling and closed-loop motion while retaining repeatable scenarios.
 
-The second stage used a digital twin and scale-model vehicles. The QLabs environment and the physical QCar and LIMO platforms allowed us to test actual packet exchange, timing behavior and closed-loop trajectories while retaining repeatable scenarios.
+The third level transferred the architecture toward embedded execution. That work covered a four-layer printed circuit board, RTOS scheduling, sensing, radio communication, timing and logging.
 
-The third stage transferred the architecture toward embedded execution. This included the design of a four-layer printed circuit board, an RTOS-based software structure and interfaces for sensors, radio communication, timing and logging.
+These levels answer different questions. Simulation tests the algorithm across controlled cases. The digital and physical loop tests system interaction. The embedded platform tests whether the required functions can run on dedicated hardware.
 
-Each stage answers a different question. Simulation shows whether the approach works across controlled attack cases. Digital-twin and scale-model tests show whether communication and control remain coherent in a realistic operating loop. Embedded transfer shows whether the sensing, scheduling and communication functions can be brought onto a dedicated platform.
+The next three slides show the three main functions: suppress unreliable information, repair delayed contamination and expose trust to the control decision.
 
-This progression reduces the gap between an algorithmic result and a component that could eventually be evaluated in a vehicle program.
+\transition{I will begin with the source-suppression result.}
 
-\transition{The next three slides present the main results from the three complementary approaches.}
+\slidetitle{7}{The trust logic suppresses corrupted sources in the tested campaign}{75--90 seconds}
 
-\slidetitle{7}{Trust suppresses unreliable sources}{75--90 seconds}
+Instead of assigning each source a fixed reliability, the observer updates its influence online. When a source becomes inconsistent, its trust falls and its contribution to the fused estimate is reduced.
 
-The first approach is trust-aware distributed state estimation.
+Across the tested attack and channel configurations, the detector identified every injected attack. This is a campaign result, not a universal guarantee for every attack that could exist.
 
-Instead of assuming that every source has a fixed reliability, the observer updates the influence of each source online. When the behavior of a source becomes inconsistent, its trust decreases and its contribution to the fused estimate is reduced.
+During the attack windows, the weight of the attacked source was zero between 80.64 and 98.44 percent of the time, depending on whether the corrupted channel was local, global, or both. The mean threshold-crossing delay was between 28 and 88 milliseconds after the ten-second attack onset.
 
-Across the tested attack and channel configurations, the detector identified all injected attacks. This is a result for the experimental campaign; it should not be interpreted as a universal guarantee for every possible attack.
+The value is not only the final attack flag. The trust score acts directly as a fusion weight, so a suspicious source loses influence before complete isolation. Reliable neighbours can continue to contribute instead of the whole cooperative function being switched off.
 
-During the attack windows, the attacked-source weight was driven to zero between 80.64 percent and 98.44 percent of the time, depending on whether the corrupted information came from a local channel, a global channel, or both. The mean threshold-crossing delay was between 28 and 88 milliseconds after the ten-second attack onset.
+\transition{Detection protects the future; the next result repairs the recent past.}
 
-The main value is not only the attack flag. The trust score acts directly as a fusion weight, so an inconsistent source progressively loses influence before complete isolation. This provides a smoother transition than a simple accept-or-reject rule and allows reliable neighbors to continue contributing.
+\slidetitle{8}{Rollback removes contamination already stored in the state}{75--90 seconds}
 
-\transition{Detection stops future influence; the next result addresses corruption already stored in the state.}
+The blue trajectory shows what happens when the attacked source is rejected but no rollback is applied. The estimate still contains the effect of corrupted data that entered before the decision. In this local-channel case, the trajectory RMSE is 0.983 metres.
 
-\slidetitle{8}{Rollback removes stored contamination}{75--90 seconds}
+The orange result applies rollback. Once the detection decision is reliable, the observer returns to a recent trusted state and reconstructs the trajectory without the rejected information. The RMSE falls to 0.247 metres.
 
-This slide shows why source isolation alone is not sufficient.
+The green result adds an accepted relative-pose anchor. That trusted geometric information reconnects the corrected local estimate with the appropriate reference. The RMSE then falls to 0.042 metres.
 
-The blue trajectory is the result when no rollback is applied. Even after the attacked channel is rejected, the estimated trajectory retains the effect of the earlier corrupted information. In this local-channel case, the trajectory RMSE is 0.983 metres.
+At the correction instant, rollback reduces the position error by 54.4 percent. The additional anchoring step reduces it by 75.2 percent.
 
-The orange result applies rollback. When the detection decision becomes reliable, the observer returns to a recent trusted state and reconstructs the trajectory without the rejected measurements. The RMSE falls to 0.247 metres.
+The practical lesson is that source isolation and state repair are complementary. One stops new contamination; the other corrects contamination that has already entered the estimate.
 
-The green result adds an accepted relative-pose anchor. This uses trusted geometric information to reconnect the corrected local estimate with the appropriate reference. The RMSE then falls to 0.042 metres.
+\transition{Once the trusted state is available, it can support a controlled fallback decision.}
 
-At the correction instant, rollback reduces the position error by 54.4 percent, and the additional anchoring step reduces it by 75.2 percent.
+\slidetitle{9}{Trust supports a controlled move from CACC toward local ACC}{75--90 seconds}
 
-The practical message is that detection prevents further contamination, while rollback and anchoring repair the recent history. These are complementary functions, especially when the detector needs some evidence before declaring that a source is compromised.
+This is the control application of the same trust-aware observer, not a separate algorithm.
 
-\transition{Once a trusted estimate is available, it can also support safer interaction with the controller.}
+During the attack window, the mean weight assigned to the attacked source remains below 0.05. The controller therefore depends mainly on the remaining trusted information rather than following the corrupted source.
 
-\slidetitle{9}{Trust enables safe control degradation}{75--90 seconds}
+The minimum path-projected gaps measured in the experiment are 0.681 metres for the first following vehicle and 0.637 metres for the second. Both remain above the 0.30-metre reporting margin used in the study.
 
-The third approach connects the trust-aware observer to the longitudinal control logic.
+The result shows that trust can be used to reduce dependence on cooperation before communication fails completely. It also has a clear limit: this is a feasibility result on the experimental trajectories, not a formal collision-avoidance guarantee for the full vehicle footprint.
 
-During the attack windows, the mean weight assigned to the attacked source remains below 0.05. The controller therefore depends primarily on the remaining trusted information instead of continuing to follow the corrupted source.
+A production function would still require a defined safety concept, timing analysis, validated fallback states and vehicle-level testing.
 
-The test also evaluates the path-projected gaps between vehicles. The minimum measured values were 0.681 metres for the first following vehicle and 0.637 metres for the second. Both values remain above the 0.30-metre reporting margin used in the study.
+\transition{The next slide shows how the same loop is reproduced virtually and on physical vehicles.}
 
-These results demonstrate that trust can be used to move smoothly from cooperative control toward greater dependence on local sensing. The controller does not have to wait for a complete communication failure before reducing the influence of a suspicious vehicle.
+\slidetitle{10}{The same operating loop is reproduced virtually and physically}{60--75 seconds}
 
-However, this result must be presented with the correct scope. It is a feasibility check on the experimental trajectories, not a formal collision-avoidance guarantee for the complete vehicle footprint. Production use would still require a defined safety concept, validated fallback states, timing analysis and vehicle-level tests.
+The QLabs environment provides repeatable routes, waypoints, ground truth and controlled attacks. It is useful for running the same scenario many times and comparing changes in the trust and recovery logic.
 
-\transition{The following slide shows how the complete operating loop was reproduced in virtual and physical environments.}
+The physical QCar and LIMO platforms add effects that a numerical model cannot reproduce fully: real wireless timing, sensor noise, scheduling delays, actuator response and practical multi-vehicle behaviour.
 
-\slidetitle{10}{Tests reproduce the full operating loop}{60--75 seconds}
+The research PCB can be mounted on the vehicle so that sensing, communication, estimation and logging are evaluated in the actual operating loop.
 
-The project was tested in both a digital-twin environment and on physical scale-model vehicles.
+The same state definitions, attacks and recovery events are used in both environments. This makes it possible to reproduce a physical observation in the digital twin, adjust the system and then return to the test track with a controlled comparison.
 
-The QLabs environment provides repeatable trajectories, waypoints and controlled attacks. It is useful for running the same scenario many times, changing attack parameters and comparing the results against known ground truth.
+\transition{I will now move from the vehicle tests to the development of the electronic board.}
 
-The QCar and LIMO vehicles add the physical effects that are absent from a purely numerical model. These include real wireless packet timing, sensor noise, scheduling delays, actuator response and the practical behavior of multiple vehicles moving on the track.
+\slidetitle{11}{Prototype evolution: breadboard to four-layer PCB}{60--75 seconds}
 
-The same operating concepts are maintained across both environments: local sensing, V2V packet exchange, state estimation, trust evaluation, control interaction and logging. This makes the digital twin useful not only for early development but also for reproducing problems observed during physical tests.
+The embedded work followed a visible progression.
 
-Qualitatively, the experiments show that attacks can be introduced while the vehicles are moving, unreliable sources can be identified, and the corrected state and control behavior can be observed in a complete closed loop.
+The breadboard and development setup were used to validate the sensor, display and communication interfaces. The next step translated the architecture into a four-layer PCB layout with dedicated grounding, power distribution and routing. The manufactured board then brought the processing, sensing, timing, communication and storage functions onto one platform.
 
-\transition{The next slide moves from the vehicle test platform to the dedicated electronic board.}
+Initial bring-up demonstrated stable RTOS execution at 100 hertz, UART communication, GNSS acquisition and functional Wi-Fi 6 tests.
 
-\slidetitle{11}{The deployment platform is tangible}{75--90 seconds}
+This progression matters because the project is no longer limited to offline simulation. Execution time, scheduling, synchronisation, communication delay and logging can now be measured on dedicated hardware.
 
-This is the manufactured four-layer electronic board developed for the embedded transfer of the project.
+It remains a research platform, but it gives the project a concrete base for the next revision.
 
-The board combines the processing, sensing, timing, communication and storage interfaces needed by the trust-aware architecture. Its layout uses EMC-oriented grounding and power routing, and the MCU and RTOS architecture targets an estimation cycle of approximately 100 hertz.
+\transition{The next slide separates what the current PCB already provides from what a vehicle product still needs.}
 
-The available interfaces support an inertial measurement unit, GNSS timing, Wi-Fi communication, storage and development access. Initial bring-up tests demonstrated stable RTOS execution at 100 hertz, UART communication, GNSS acquisition and functional Wi-Fi 6 tests.
+\slidetitle{12}{The current PCB is an embedded trust demonstrator}{75--90 seconds}
 
-This is important because the project is no longer limited to an offline simulation. There is a physical platform on which execution time, scheduling, sensor synchronization, communication delays and logging can be measured.
+The minimum sensing set for the current estimator is an IMU, GNSS position, precise one-pulse-per-second timing and selected vehicle kinematics. In a vehicle, many kinematic signals should come through the approved vehicle gateway rather than being duplicated by new sensors.
 
-At the same time, this board remains a research prototype. A production revision would require automotive-grade components where appropriate, protected power inputs, robust CAN or CAN-FD integration, secure key storage, manufacturing validation and automotive environmental and EMC qualification.
+The current board uses Wi-Fi for controlled V2V experiments. UART and USB support development and integration. Storage and synchronised logging preserve the evidence needed to understand trust decisions and rollback events.
 
-\transition{This distinction between a research prototype and a production product is also central to the standards positioning.}
+The runtime role is deliberately focused: estimate the vehicle state, evaluate source trust, repair recent contamination and export trusted states and health flags.
 
-\slidetitle{12}{Aligned with standards; not certified}{90--120 seconds}
+Several product functions are not yet present. These include automotive power protection, a production CAN or CAN-FD transceiver and diagnostics path, a C-V2X or NR-V2X radio, hardware-backed key storage, a sealed enclosure, manufacturing controls and automotive EMC and environmental qualification.
 
-This slide positions the prototype relative to automotive communication, cybersecurity and safety expectations.
+The board should therefore be described as an embedded trust demonstrator, not as a finished OBU.
 
-The expression ``aligned with standards, but not certified'' means that the architecture considers the relevant industrial requirements, but the board has not passed an official automotive certification, qualification or vehicle homologation process.
+\transition{Commercial onboard units help define what the surrounding product envelope looks like.}
 
-On the communication side, the current experiments use Wi-Fi because it is flexible and controllable. A production implementation would use or connect to a C-V2X or NR-V2X modem following 3GPP specifications. SAE J2735 and European C-ITS specifications concern the format and meaning of exchanged messages, such as position, speed and acceleration. They define the communication data, not the trust algorithm.
+\slidetitle{13}{Commercial OBUs define the target product envelope}{90--105 seconds}
 
-For connection to the vehicle electronics, the board would require a production CAN, CAN-FD or gateway interface, including diagnostics and appropriate electrical protection.
+These two products are useful references because they show what a deployable V2X onboard unit must provide around the application software. This is not a direct benchmark of performance and it is not a claim that the research PCB replaces either product.
 
-ISO/SAE 21434 concerns cybersecurity engineering across the product lifecycle. It leads to requirements such as threat analysis, secure boot, signed updates, cryptographic key management and protected logs. UNECE Regulation 155 concerns the vehicle manufacturer's cybersecurity management system and the complete vehicle, so the board alone cannot claim compliance with it.
+The official Cohda Wireless MK6 page lists concurrent DSRC and C-V2X capability, cellular 5G with fallback, Wi-Fi, Bluetooth and a broad set of certifications including OmniAir, FCC, CE and E1 R10 and R118.
 
-ISO 26262 becomes relevant when the board can influence control. A transition from cooperative CACC to local ACC must be treated as a defined and validated safe-degradation function.
+The official Commsignia OB4 page lists dual-mode DSRC and C-V2X, GNSS, WLAN and LTE, CAN and GPIO, onboard sensor inputs, an integrated hardware security module, secure boot and an automotive-grade design.
 
-The conclusion is that this is a research edge-estimation module positioned behind the V2X interface, not yet a certified production OBU or RSU.
+Together, these examples define the product envelope: multi-radio V2X, vehicle interfaces, precise positioning, secure key storage, protected power, enclosure, qualification and lifecycle tooling.
 
-\transition{With that maturity level clear, I will now explain where the project may create economic value.}
+The research contribution sits inside that envelope. Its role is the trust-aware estimation, source weighting, rollback and monitoring layer. A realistic route to a product could therefore use a commercial or production-like modem while the dedicated board hosts the resilience function.
 
-\slidetitle{13}{Value comes from portable resilience}{75--90 seconds}
+\transition{The next slide translates that product envelope into concrete requirements for the next revision.}
 
-The economic value is currently a hypothesis to validate through an industrial pilot, rather than a completed return-on-investment calculation.
+\slidetitle{14}{The next board revision closes four product gaps}{90--105 seconds}
 
-The first potential source of value is reuse. A dedicated edge node separates trust and estimation services from a particular vehicle computer or sensor configuration. If the interfaces are standardized, the same core service could be adapted across several platforms with less redevelopment.
+The first gap is power and packaging. A vehicle board needs protected 12- or 24-volt input, thermal design, appropriate automotive components, a robust enclosure and evidence from EMC and environmental tests.
 
-The second source of value is preserving cooperation. When one communication source becomes unreliable, the system can isolate that source while retaining local sensing and the contribution of reliable neighbors. This may avoid choosing between unsafe dependence on V2V data and complete loss of cooperative functionality.
+The second gap is vehicle and V2X integration. The board needs an approved CAN, CAN-FD or gateway path with diagnostics, plus an external or integrated C-V2X or NR-V2X modem representative of the target program.
 
-The third source of value is shorter evidence loops. Reusable digital-twin scenarios, configurable attacks and synchronized onboard logs can accelerate testing and root-cause analysis. This is especially useful when a problem depends on the interaction of sensing, networking, estimation and control.
+The third gap is sensing and timing. The minimum is an automotive IMU, GNSS and one-pulse-per-second timing, together with selected bus signals. Wheel speed, yaw rate or camera-derived pose may be useful, but these should normally arrive through the vehicle gateway if they already exist in the vehicle.
 
-To quantify the benefit, an industrial pilot would need vehicle-program data: integration effort, engineering time, false-positive cost, test duration and the operational impact of attack-induced degradation.
+The fourth gap is cybersecurity and lifecycle management: secure boot, signed updates, hardware-backed key storage, protected logs, key management and an update process.
 
-\transition{The final slide proposes a limited pilot designed to collect exactly that evidence.}
+The trust, rollback and logging software can be retained, but the hardware around it must be redesigned for the vehicle environment.
 
-\slidetitle{14}{A shadow-mode pilot is the next gate}{90--105 seconds}
+The deployment principle remains monitor-only first, behind a gateway, before any fallback request is authorised.
 
-The recommended continuation is a shadow-mode pilot. Shadow mode means that the board observes the vehicle and communication data, calculates trust and recovery decisions, and records the results, but it does not yet control the actuators.
+\transition{With the hardware path clear, I will separate the research result from the product evidence that remains.}
 
-The first step is to connect a production-like V2X modem and the target vehicle bus. The second step is to run in monitor-only mode and log trust changes, source rejection and recovery events.
+\slidetitle{15}{Research contribution and product readiness are different questions}{90--105 seconds}
 
-The third step is to measure the quantities needed for a go or no-go decision: execution time, processor and memory load, detection delay, false positives, packet-loss tolerance, communication dropout, stealth-attack coverage and recovery performance. The hardware evaluation should also include EMC behavior, power robustness and the effort required for vehicle integration.
+On the research side, the work demonstrates trust-adaptive V2V fusion instead of a fixed source-reliability assumption. It combines suppression with rollback and accepted anchoring, covers local and global channel attacks in a nonlinear two-dimensional platoon model, and exposes trusted estimates to a control-availability decision.
 
-Only after these gates are passed should a limited fallback function be considered, for example moving from cooperative CACC to local ACC under defined conditions. That step would require the vehicle controller, cybersecurity process and functional-safety concept to authorize the intervention.
+The correct claim is broader functional integration and hardware transfer. It is not universal superiority over every secure estimator, because other methods may provide stronger formal guarantees under different assumptions.
 
-My recommendation is therefore to pursue the monitor-only pilot when a vehicle program can provide bus access and a meaningful cooperative-driving use case. This provides useful evidence with limited operational risk and creates a clear basis for deciding whether further industrialization is justified.
+Product readiness requires separate evidence. ISO/SAE 21434 drives cybersecurity engineering across the lifecycle, including threat analysis, secure boot, signed updates, key management and protected logs. UNECE Regulation 155 applies at the vehicle-manufacturer and complete-vehicle level. ISO 26262 becomes relevant when the board can influence control and a transition from CACC to local ACC becomes a safety mechanism.
 
-Thank you. I am ready to discuss the algorithms, the experimental data, the board interfaces or the proposed pilot in more detail.
+The board also requires automotive interface validation, runtime timing evidence, EMC, environmental, manufacturing and complete-vehicle qualification.
 
-\transition{End of presentation. Invite questions and use the relevant slide for technical discussion.}
+The balanced position is therefore: research-validated and hardware-demonstrated, but not yet an automotive-qualified OBU or RSU.
+
+\transition{At that maturity level, the work can still create value as reusable engineering capability.}
+
+\slidetitle{16}{How SEGULA can reuse the work}{75--90 seconds}
+
+The first reusable element is the asset base: trust and rollback software, an embedded reference design, configurable attack scenarios, a digital-twin workflow and synchronised evidence logs.
+
+The second element is the client work package. These assets can support V2X-resilience studies, hardware and software integration, cybersecurity robustness campaigns, and safety, EMC or vehicle-validation work.
+
+The potential value is reuse and differentiation. Similar customer studies do not need to start from zero, and the work can create follow-on engineering from concept through integration and industrialisation even if the final customer product uses different hardware.
+
+This remains a commercial hypothesis. A pilot should measure customer demand, integration effort, reuse rate and engineering time saved before any return-on-investment claim is made.
+
+\transition{The final slide proposes the pilot that can collect both the technical and commercial evidence.}
+
+\slidetitle{17}{Decision requested: launch a monitor-only pilot}{90--105 seconds}
+
+The recommended next step is a monitor-only pilot. The board observes vehicle and V2V data, calculates trust and recovery decisions and records the results, but it does not command the actuators.
+
+Three conditions should be in place before the pilot starts. First, a target vehicle program provides bus access and a measurable cooperative-driving use case. Second, the platform uses a representative CAN or CAN-FD gateway and a production-like V2X modem. Third, hardware, software, cybersecurity and safety owners agree on the required evidence and the stop criteria.
+
+The pilot should measure false positives, detection delay, packet-loss tolerance, stealth-attack coverage, recovery performance, processor and memory load, and the effort required to integrate the system with the vehicle.
+
+If the evidence is positive, a later phase can consider a limited fallback request, such as moving from cooperative CACC toward local ACC under defined conditions. That step would require approval through the vehicle controller, cybersecurity process and functional-safety concept.
+
+My recommendation is therefore: observe first, measure, and then decide whether further industrialisation is justified.
+
+Thank you. I am ready to discuss the algorithms, the experimental results, the board interfaces, the commercial OBU references or the proposed pilot.
+
+\transition{End of presentation. Invite questions and return to the relevant slide for technical discussion.}
 
 \end{document}
