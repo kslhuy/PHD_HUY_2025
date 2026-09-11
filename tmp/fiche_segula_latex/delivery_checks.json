@@ -1,0 +1,19 @@
+{
+  "files": 30,
+  "zip_bytes": 5227900,
+  "pdf_pages": 32,
+  "new_presentation_figures": 8,
+  "sections_preserved": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8
+  ],
+  "compile_errors": 0,
+  "overfull_boxes": 0,
+  "figures_included": true,
+  "tex_sha256": "8eae5f04774b5fffd13e9d27a4923d11418602888238147689dab169ced0004a"
+}

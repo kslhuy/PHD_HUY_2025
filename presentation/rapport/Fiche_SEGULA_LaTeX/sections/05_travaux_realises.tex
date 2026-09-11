@@ -1,0 +1,428 @@
+\section{Description de la démarche suivie et des travaux réalisés}
+\label{sec:travaux}
+
+Les travaux relient la conception du capteur, son exécution sur microcontrôleur et l'exploitation de ses estimations pour la résilience du véhicule connecté. La carte assure l'acquisition, la fusion et la mise à disposition des données de navigation. Les algorithmes du support de thèse prolongent cette chaîne à deux niveaux : \strong{le Trust sélectionne les informations échangées entre véhicules}, tandis que \strong{Robust KalmanNet adapte la correction de l'estimation locale lorsque des mesures sont corrompues}. Le retour arrière traite le cas complémentaire d'une contamination détectée après son introduction dans l'observateur distribué.
+
+Le périmètre expérimental doit rester identifiable. La fiche décrit un EKF exécuté à 100~Hz sur une plateforme STM32 et une chaîne ESP32--ROS~2. Le support \emph{Final\_PHD\_these\_2026.pdf} présente les méthodes de confiance, le retour arrière et Robust KalmanNet, ainsi que leurs illustrations et résultats. Leur présentation ci-dessous distingue \emph{fonctionnement algorithmique}, \emph{résultats montrés dans le support} et \emph{modalités de transfert sur la carte}. Les numéros de pages cités désignent les 46~pages du PDF, dont les diapositives affichent les numéros 30 à 75.
+
+\subsection{Démarche expérimentale}
+
+La démarche a été construite pour isoler les causes de dysfonctionnement et permettre l'avancement du logiciel malgré les difficultés matérielles. Chaque capteur a d'abord été mis en service séparément ; l'observateur et la communication ont ensuite été intégrés, puis évalués sur la chaîne complète. Cette progression permet de distinguer une mesure incorrecte, une erreur de calcul, un problème de synchronisation et une perte de transmission.
+
+\subsubsection{Étude de la carte dédiée et analyse de l'existant}
+
+L'étude initiale porte sur la carte électronique CRAN--SEGULA. Son architecture comprend les fonctions de navigation et de communication, des capteurs inertiel et magnétique, un récepteur GNSS, des mémoires et des interfaces de programmation. La lecture des schémas et l'identification des connecteurs constituent une étape de développement à part entière : elles déterminent quelles mesures sont accessibles, à quelle cadence, et avec quelles contraintes de bus et de partage de ressources.
+
+\boardfig{carte_dediee.jpg}{.42}{Carte électronique dédiée du projet, étudiée avant la mise en place de la plateforme de développement}{fig:carte-dediee}
+\boardfig{architecture_carte.png}{1}{Architecture matérielle de la carte dédiée, reprise de la fiche initiale. Les bus indiqués dans ce schéma concernent cette carte et doivent être distingués du câblage de la plateforme de développement}{fig:architecture-carte}
+
+Deux difficultés bloquantes sont rapportées : le microcontrôleur de navigation n'était plus détecté par l'outil de programmation et la fonction de communication sans fil présentait un dysfonctionnement. Une plateforme intermédiaire a donc été utilisée pour développer et valider la chaîne de traitement. \strong{Une validation sur cette plateforme ne remplace pas la qualification de la carte dédiée} : le transfert final comprend les affectations de broches, les horloges, les interruptions, les interfaces électriques et le comportement temporel.
+\FloatBarrier
+
+\subsubsection{Plateforme de développement et environnement}
+
+La plateforme de substitution s'appuie sur une carte STM32H745-DISCO, désignée ainsi dans le schéma de la fiche, et sur des modules capteurs. Elle permet d'exécuter les pilotes, l'EKF et la supervision sur un microcontrôleur à deux cœurs. Cette organisation doit être distinguée de la carte dédiée à deux microcontrôleurs. Le terme \emph{carte} désigne ci-après la cible de développement lorsqu'il est question du démonstrateur exécuté.
+
+\boardfig{carte_stm32.jpg}{.35}{Carte de développement utilisée pour le firmware et l'estimation}{fig:stm32}
+\boardfig{chaine_complete.jpg}{1}{Chaîne fonctionnelle du démonstrateur, des capteurs au calculateur ROS~2 par la carte STM32 et la passerelle ESP32}{fig:chaine}
+
+L'environnement comprend la chaîne de compilation, la sonde de programmation et de débogage, le terminal série et les outils de configuration GNSS. La séparation entre pilotes, traitement et transport facilite la réutilisation du code. Pour reproduire une expérience, il faut conserver ensemble la version du firmware, la configuration des broches, les calibrations, les paramètres de l'estimateur et les journaux horodatés.
+\FloatBarrier
+
+\subsubsection{Plan de validation}
+
+Trois niveaux de validation sont retenus. Le premier utilise un simulateur de trames pour éprouver le décodage, le comptage des pertes et la publication ROS~2. Le deuxième couvre la chaîne matérielle complète en statique, avec vérification des mesures et des cadences. Le troisième évalue le capteur sur le véhicule en mouvement. Les extensions Trust et Robust KalmanNet ajoutent un quatrième niveau : le rejeu de scénarios identiques sur la cible, puis leur reproduction sur véhicule, afin de relier le gain algorithmique à son coût matériel.
+
+La référence de chaque essai doit être précisée. Une comparaison à une vitesse commandée, à une odométrie, à un système de positionnement indépendant ou à un EKF de référence ne mesure pas exactement la même erreur. Cette distinction est essentielle pour interpréter les résultats de la fiche et ceux du support de thèse.
+
+\subsection{Travaux et résultats de l'opération de R\&D}
+
+\subsubsection{Architecture du capteur embarqué}
+
+L'architecture répartit l'acquisition, le calcul de navigation et la communication. Le cœur secondaire acquiert les capteurs ; le cœur principal exécute l'EKF, prépare les sorties et assure l'affichage. Une zone de mémoire partagée véhicule les données entre cœurs. L'ESP32 prend en charge le relais réseau vers le véhicule. L'objectif de cette répartition est de protéger la régularité du calcul d'état contre les variations de charge du transport et de l'affichage.
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|L{3.5cm}|Y|L{3.5cm}|}\hline
+\rowcolor{TableHead}\textbf{Fonction} & \textbf{Élément du démonstrateur} & \textbf{Interface}\\\hline
+Acquisition & Cœur secondaire du STM32 ; pilotes inertiel, magnétomètre et GNSS & SPI, I²C, UART\\\hline
+Estimation et supervision & Cœur principal ; EKF, résidus, état de validité & Mémoire partagée\\\hline
+Transport & Passerelle ESP32 & UART puis WiFi/UDP\\\hline
+Exploitation véhicule & Calculateur AgileX LIMO & Nœud de réception ROS~2\\\hline
+\end{tabularx}
+\caption{Répartition fonctionnelle sur la plateforme de développement.}
+\end{table}
+
+Cette séparation réduit les interactions entre fonctions, sans garantir à elle seule le déterminisme. Le calcul de navigation ne doit pas attendre une émission réseau ; les sections critiques et les files de messages doivent rester bornées. La disponibilité de deux cœurs ne dispense pas de mesurer les contentions d'accès à la mémoire et les retards dus aux interruptions.
+
+\subsubsection{Firmware temps réel et pilotes de capteurs}
+
+Le firmware est organisé en tâches périodiques. La base de temps de l'estimateur est de 10~ms. Les capteurs plus lents alimentent des corrections déclenchées à l'arrivée d'une mesure nouvelle. L'affichage et la télémétrie utilisent une copie de l'état estimé afin de limiter leur influence sur le calcul.
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|L{3.5cm}|L{2.0cm}|L{3.0cm}|Y|}\hline
+\rowcolor{TableHead}\textbf{Tâche} & \textbf{Priorité} & \textbf{Période rapportée} & \textbf{Traitement}\\\hline
+Acquisition inertielle & Haute & 10~ms / 100~Hz & Accélérations et vitesses angulaires\\\hline
+Observateur EKF & Haute & 10~ms / 100~Hz & Prédiction et corrections disponibles\\\hline
+Magnétomètre & Moyenne & 20~ms / 50~Hz & Champ magnétique et cap\\\hline
+Traitement GNSS & Basse & 100~ms / 10~Hz & Décodage des trames et validité\\\hline
+Transmission & Moyenne & 100~ms / 10~Hz & Préparation et émission de la télémétrie\\\hline
+Affichage & Basse & 200~ms / 5~Hz & Navigation et état du filtre\\\hline
+\end{tabularx}
+\caption{Découpage temporel décrit dans la fiche initiale.}
+\end{table}
+
+La temporisation à référence absolue évite d'ajouter le temps de calcul à chaque nouvelle période. Elle limite la dérive de cadence, mais ne prouve pas que toutes les échéances sont respectées. La validation doit mesurer le temps d'exécution des tâches, la gigue de réveil et le nombre de dépassements de 10~ms, notamment lorsque l'ensemble des corrections est disponible dans le même cycle.
+
+\paragraph{Mesures horodatées et fusion à plusieurs cadences}
+La consolidation du firmware doit associer à chaque mesure une date d'acquisition, un compteur et un indicateur de validité. L'estimateur consomme un instantané cohérent des capteurs. Une donnée GNSS acquise à 10~Hz ne doit pas être appliquée dix fois comme dix mesures indépendantes dans l'EKF à 100~Hz. Entre deux corrections, la prédiction propage l'état et l'incertitude. Les journaux distinguent une donnée absente, une donnée rejetée et une trame perdue sur le réseau.
+
+\paragraph{Échanges entre cœurs}
+Une structure partagée de taille fixe doit être publiée selon un protocole empêchant une lecture partielle. Un double tampon ou un mécanisme de versionnement constitue une possibilité de mise en œuvre, à qualifier sur la cible. Les mesures, leurs dates et leurs indicateurs doivent appartenir à la même version. Les allocations dynamiques dans la boucle critique, les attentes de durée indéfinie sur les bus et les écritures concurrentes non protégées sont à exclure de la spécification du portage.
+\FloatBarrier
+
+\subsubsection{Observateur d'état embarqué EKF}
+
+Le capteur met en œuvre un EKF de navigation à six états :
+\begin{equation}
+\boldsymbol{x}^{\mathrm{EKF}}_k=
+\begin{bmatrix}p_N&p_E&v_N&v_E&\psi&b_g\end{bmatrix}^{\!T}.
+\end{equation}
+Les composantes représentent les positions et vitesses Nord/Est, le cap et le biais du gyromètre. La prédiction utilise les mesures inertielles ; la vitesse de lacet est corrigée du biais estimé. Les corrections successives exploitent la position et la vitesse GNSS, l'odométrie lorsqu'elle est disponible, le cap magnétique et les phases d'immobilité.
+
+Pour une mesure scalaire, l'étape de correction s'écrit sous la forme :
+\begin{align}
+r_k &= z_k-h(\widehat{\boldsymbol{x}}^-_k),&
+S_k &= H_kP^-_kH_k^T+R_k,\\
+K_k &= P^-_kH_k^T/S_k,&
+\widehat{\boldsymbol{x}}^+_k &= \widehat{\boldsymbol{x}}^-_k+K_kr_k.
+\end{align}
+La correction scalaire réduit la taille des opérations, sous réserve de traiter correctement les corrélations entre mesures. La covariance $P_k$ est une matrice $6\times6$ ; sa propagation, les matrices temporaires et les gardes numériques doivent être incluses dans le profilage.
+
+\boardfig{cycle_ekf.png}{.95}{Cycle de l'EKF présenté dans la fiche initiale. Le franchissement d'un seuil de résidu indique une anomalie à analyser ; il n'identifie pas automatiquement une cyberattaque}{fig:cycle-ekf}
+
+La robustesse rapportée repose sur une calibration initiale, l'estimation du biais gyroscopique, une garde d'innovation magnétique de 45°, la correction à vitesse nulle et un état de confiance de l'estimation. Sur la carte, les contrôles doivent également couvrir les valeurs non finies, une variance d'innovation strictement positive, la cohérence de la covariance et le repli angulaire du cap. Une comparaison à une implémentation de référence est nécessaire avant de réduire la précision numérique ou de modifier l'ordre des opérations.
+\FloatBarrier
+
+\subsubsection{Chaîne de communication et intégration ROS 2}
+
+La carte transmet les estimations à 10~Hz par une liaison série vers l'ESP32, qui les relaie en WiFi/UDP. Le nœud de réception sur le LIMO décode les trames et publie la position dans ROS~2. Le compteur de séquence permet de mesurer les pertes et de vérifier l'ordre d'arrivée. Il faut toutefois distinguer la fréquence de publication, la latence de transport et l'âge de l'estimation : une publication à 10~Hz ne démontre pas une latence inférieure à 100~ms.
+
+\pairfig{ros_topics.jpg}{ros_gnss.jpg}{Intégration ROS~2 décrite dans la fiche : topics du véhicule et publication de la position estimée}{fig:ros}
+
+Pour accueillir le Trust, la trame devra transporter les informations nécessaires à la comparaison : identifiant de source, date, compteur, état local, validité et incertitude. Les estimations du convoi et les scores de confiance pourront être ajoutés dans un message distinct afin de ne pas alourdir la voie de navigation. Un compteur UDP ou une somme de contrôle ne constitue pas une preuve d'authenticité ; cette vérification exige un mécanisme dédié et une gestion explicite des identités.
+\FloatBarrier
+
+\subsubsection{Difficultés techniques levées}
+
+Les essais ont révélé un conflit entre une broche utilisée pour la télémétrie et la ligne d'émission GNSS. La salve observée au démarrage provenait de la configuration du récepteur ; la liaison a été réaffectée après analyse de l'usage de cette broche. Un second défaut de communication résultait d'un connecteur partagé par pont de soudure avec une ligne de bus synchrone. L'identification du signal réel a conduit à choisir un autre périphérique série accessible.
+
+Enfin, les changements d'adresses attribuées dynamiquement perturbaient les échanges réseau. L'émission en diffusion sur le sous-réseau a facilité les essais de réception. Ces résolutions conduisent à des règles de transfert concrètes : contrôler les fonctions alternatives des broches, les ponts de soudure, la configuration des périphériques et la stratégie d'adressage avant d'attribuer un défaut à l'observateur.
+
+\subsubsection{Campagne de validation et résultats quantitatifs}
+
+\paragraph{Validation du transport et de la chaîne matérielle}
+Le simulateur de trames a été utilisé en fonctionnement nominal, avec pertes injectées à 10\%, en mode dégradé et en endurance courte. La fiche rapporte ensuite une cadence de dix trames par seconde et des pertes de l'ordre de 2\% sur la chaîne réelle. Ces mesures caractérisent le transport ; elles doivent être accompagnées d'une durée, du nombre de trames et des conditions radio pour devenir comparables entre campagnes.
+
+\pairfig{test_flux.jpg}{test_pertes.jpg}{Validation du flux et comptage des pertes par identifiants de séquence}{fig:transport}
+
+Les essais extérieurs décrits comprennent le suivi du mouvement, la suppression d'une vitesse parasite à l'arrêt et la réception de cinq à huit satellites. Un écart-type de cap inférieur à 0,2° est rapporté après calibration du magnétomètre. Cette dispersion mesure une stabilité dans les conditions de l'essai ; elle ne se confond pas avec une erreur absolue de cap par rapport à une référence indépendante.
+
+\pairfig{vehicule_capteur.jpg}{ecran_capteur.jpg}{Capteur monté sur le véhicule et écran de navigation de la carte de développement}{fig:essais-vehicule}
+
+\paragraph{Caractérisation de l'estimateur}
+La fiche contient une séquence de 20~s à 100~Hz avec accélérations, décélérations, freinage avec glissement, biais gyroscopique injecté de 12~mrad/s et perturbations magnétiques. Les valeurs suivantes sont celles rapportées pour cette séquence. Leur attribution à une exécution matérielle précise nécessite de conserver les journaux correspondants et la définition des références.
+
+\boardfig{resultats_ekf.png}{.95}{Suivi de vitesse et erreur sur la séquence de 20~s reprise de la fiche. Le RMSE est une mesure moyenne, pas une borne de l'erreur instantanée}{fig:resultats-ekf}
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|Y|L{3.0cm}|}\hline
+\rowcolor{TableHead}\textbf{Indicateur rapporté sur 20~s} & \textbf{Valeur}\\\hline
+RMSE de vitesse & 0,011~m/s\\\hline
+MAE de vitesse & 0,007~m/s\\\hline
+Erreur maximale de vitesse & 0,063~m/s\\\hline
+Erreur relative moyenne de vitesse & 0,63\%\\\hline
+Coefficient de détermination $R^2$ & 0,99904\\\hline
+RMSE de cap & 0,43°\\\hline
+RMSE de position horizontale & 0,39~m\\\hline
+Délai de passage à la pleine confiance & 2,4~s\\\hline
+\end{tabularx}
+\caption{Performances de référence conservées depuis la fiche initiale.}
+\end{table}
+
+Les mécanismes de robustesse sont associés à un écart final au biais injecté de 0,055~mrad/s, 23~rejets de mesures magnétiques, six activations de la correction à vitesse nulle et 196~corrections GNSS. Le nombre de corrections GNSS correspond à environ 9,8~corrections/s ; les horodatages permettent de vérifier sa cohérence avec la cadence nominale de 10~Hz. Pour établir la contribution propre de chaque mécanisme, il faut rejouer la même séquence avec et sans ce mécanisme, en conservant les autres paramètres.
+\FloatBarrier
+
+\subsubsection{Vers la détection de défauts et de cyberattaques}
+
+La fiche rapporte un maximum de résidu normalisé égal à 2,12 et aucune fausse alerte sur la séquence étudiée. Ce maximum décrit l'amplitude observée ; il ne constitue ni un seuil universel ni une estimation statistique suffisante du taux de fausses alertes. Une anomalie de résidu peut provenir d'une attaque, mais également d'un défaut, d'une perturbation magnétique, d'un retard ou d'un écart entre modèle et véhicule.
+
+Le résidu standardisé $r_k/\sqrt{S_k}$ doit être distingué de l'innovation quadratique normalisée, ou NIS :
+\begin{equation}
+\operatorname{NIS}_k=\boldsymbol{r}_k^T S_k^{-1}\boldsymbol{r}_k.
+\end{equation}
+Un seuil statistique exige de préciser cette définition, la dimension de la mesure et les hypothèses sur les erreurs. La décision embarquée peut combiner amplitude, persistance et cohérence entre capteurs. Cette information locale constitue une entrée du système de confiance, sans se substituer à la vérification des échanges entre véhicules.
+
+\pairfig{platoon_1.jpg}{platoon_2.jpg}{Contexte de conduite en convoi sur les véhicules d'expérimentation du laboratoire}{fig:platoon}
+\FloatBarrier
+
+% Les développements suivants et leurs huit figures du support sont nouveaux.
+\subsubsection{Trust et estimation distribuée résiliente}
+\label{sec:trust}
+
+\paragraph{Finalité et articulation avec le capteur}
+Le \emph{Trust} représente une confiance quantitative dans les informations utilisées pour l'estimation du convoi. Un véhicule peut recevoir un message récent et authentique dont les valeurs sont pourtant erronées, parce que le capteur de l'émetteur est défaillant ou que son estimation a été contaminée. La méthode confronte donc les messages à la physique du mouvement, aux mesures locales et aux estimations disponibles avant de déterminer leur contribution au consensus.
+
+La figure~\ref{fig:trust-architecture}, extraite de la présentation, décrit quatre étapes : calcul de la confiance locale, calcul de la confiance distribuée, combinaison en une confiance véhicule, puis construction d'un vecteur de confiance portant sur les membres du convoi. \strong{La carte fournit le point d'ancrage local de cette architecture} : état estimé, qualité des mesures, dates et résidus. Si ce point d'ancrage se dégrade, il faut en tenir compte dans l'interprétation des désaccords avec les voisins.
+
+\sourcefig{trust_architecture.pdf}{Architecture du Trust entre deux véhicules, avec estimation locale, estimation distribuée et agrégation des opinions}{9}{fig:trust-architecture}
+
+\paragraph{Observateurs local et distribué}
+Le modèle du convoi présenté dans le support emploie l'état
+\begin{equation}
+\boldsymbol{x}^{\mathrm{conv}}_i=
+\begin{bmatrix}s_x&s_y&v&a&\theta\end{bmatrix}^{T}.
+\end{equation}
+L'observateur local corrige la prédiction à partir des mesures du véhicule. Chaque hôte $i$ maintient aussi une estimation $\widehat{\boldsymbol{x}}_i^{(j)}$ du véhicule $j$. L'observateur distribué combine cette estimation propre, les contributions des voisins $\widehat{\boldsymbol{x}}_\ell^{(j)}$ et, lorsqu'elle est admissible, l'estimation locale $\widehat{\boldsymbol{x}}_0^{(j)}$. Sous une notation compacte, la mise à jour du support s'écrit
+\begin{equation}
+\widehat{\boldsymbol{x}}_i^{(j)}(k+1)=
+A_b\!\left(w_{ii}^{(j)}\widehat{\boldsymbol{x}}_i^{(j)}
++w_{i0}^{(j)}\widehat{\boldsymbol{x}}_0^{(j)}
++\sum_{\ell\in\mathcal{N}_i}w_{i\ell}^{(j)}\widehat{\boldsymbol{x}}_\ell^{(j)}\right)
++B_bu_j(k).
+\end{equation}
+Les termes entre parenthèses sont évalués au même pas $k$. Les poids sont non négatifs et le poids propre complète leur somme à un. L'utilité du Trust est d'agir sur l'admissibilité des contributions, puis sur ces poids, afin qu'une information reconnue comme incohérente cesse d'entraîner les estimations des autres véhicules. La validité de ce fonctionnement reste liée au modèle, à la connectivité et à la qualité de la détection ; la pondération ne constitue pas une garantie universelle contre toute attaque.
+
+\paragraph{Validité des messages et confiance locale LT}
+Le support introduit un indicateur $\delta_{i\ell}(k)$ égal à un si le message reçu du véhicule $\ell$ est authentifié et suffisamment récent, et nul sinon. Seuls les messages valides alimentent les nouveaux tests de cohérence. En l'absence de données valides, la confiance historique décroît au lieu de rester indéfiniment figée à sa dernière valeur.
+
+La confiance locale $LT_{i\ell}$ compare les grandeurs physiques : vitesse, distance, accélération et cap. Un désaccord doit être évalué dans son contexte. Une différence de vitesse entre deux véhicules en phase transitoire peut être normale ; une distance doit être comparée à une mesure relative ou à une relation géométrique cohérente. Les écarts de cap doivent être repliés angulairement. Les normalisations doivent également éviter une division par une vitesse presque nulle.
+
+Pour le portage, chaque indicateur doit donc avoir une unité, une référence et une tolérance explicites. Une écriture normalisée possible est $s_q=\max(0,1-|e_q|/\varepsilon_q)$, où $e_q$ est l'écart associé à la grandeur $q$ et $\varepsilon_q>0$ sa tolérance. \emph{Cette écriture est une proposition de réalisation des scores élémentaires ; elle ne remplace pas sans validation les fonctions choisies dans le support.} Les seuils seront calibrés sur les données du véhicule et sur ses incertitudes, puis conservés dans une configuration versionnée.
+
+\paragraph{Confiance distribuée DT}
+La confiance distribuée évalue la cohérence d'une estimation reçue à l'échelle du convoi. Le support distingue trois facteurs : l'accord avec l'estimation globale de l'hôte, l'accord avec les mesures relatives locales et la cohérence interne de l'estimation de l'hôte. Leur combinaison est multiplicative :
+\begin{equation}
+DT_{i\ell}=\gamma_{i\ell}^{\mathrm{host}}
+\gamma_{i\ell}^{\mathrm{local}}
+\gamma_{i\ell}^{\mathrm{self}}.
+\end{equation}
+Un facteur faible réduit ainsi la confiance globale, même si les autres critères sont favorables. L'écart à l'hôte peut être normalisé par une distance quadratique de type Mahalanobis :
+\begin{align}
+D_{i\ell}&=\sum_j
+\bigl(\widehat{\boldsymbol{x}}_\ell^{(j)}-
+\widehat{\boldsymbol{x}}_i^{(j)}\bigr)^T\Sigma^{-1}
+\bigl(\widehat{\boldsymbol{x}}_\ell^{(j)}-
+\widehat{\boldsymbol{x}}_i^{(j)}\bigr),\\
+\gamma_{i\ell}^{\mathrm{host}}&=\exp(-D_{i\ell}).
+\end{align}
+La matrice de normalisation $\Sigma$ évite de mélanger sans pondération des positions, vitesses et angles. Les deux autres facteurs utilisent la compatibilité des positions ou vitesses relatives avec les mesures locales. \strong{Sans mesure relative disponible sur le véhicule, ces contrôles ne peuvent pas être considérés comme exécutés.} Les observations partagées entre estimateurs peuvent aussi créer des corrélations : le réglage de $\Sigma$ doit en tenir compte plutôt que supposer automatiquement des sources indépendantes.
+
+\paragraph{Confiance véhicule et vecteur de confiance}
+La confiance instantanée combine les deux niveaux :
+\begin{equation}
+T_{i\ell}(k)=LT_{i\ell}(k)\,DT_{i\ell}(k).
+\end{equation}
+Le support lisse ensuite la confiance à partir d'un historique réparti sur cinq niveaux, de non fiable à excellent. Si $S_{i\ell}(b)$ désigne la distribution sur ces cinq niveaux, la confiance lissée s'exprime comme une espérance
+\begin{equation}
+VT_{i\ell}=\sum_{b=1}^{5}\frac{b-1}{4}S_{i\ell}(b).
+\end{equation}
+L'exemple de la page~22 du PDF donne une valeur d'environ 0,49. Il illustre le calcul du score et ne constitue pas une mesure du prototype. Le lissage limite les variations dues au bruit ou à une brève perte de paquet, mais introduit un retard de réaction. Ce compromis doit être réglé en temps physique : un historique mis à jour à 10~Hz n'a pas la même dynamique que le même historique mis à jour à 100~Hz.
+
+Le vecteur $O_i(j)$ rassemble ensuite l'opinion de l'hôte sur chaque véhicule. Il utilise la confiance directe pour les voisins connus et une propagation à un saut pour les autres, avec une agrégation par médiane pondérée lorsque les opinions requises sont disponibles et une règle de repli en cas d'information manquante. Ces règles doivent être implémentées avec un nombre maximal de voisins et une politique de péremption des opinions.
+
+\paragraph{Utilisation du Trust dans les poids de consensus}
+Un seuil de confiance définit l'ensemble des contributions admissibles $\mathcal{L}_i^{(j)}(k)$. Dans la règle illustrée dans le support, une contribution admise reçoit un poids
+\begin{equation}
+w_{i\ell}^{(j)}(k)=\frac{1}{|\mathcal{L}_i^{(j)}(k)|+1},
+\qquad \ell\in\mathcal{L}_i^{(j)}(k),
+\end{equation}
+et une contribution exclue reçoit un poids nul. Le poids propre correspond à la part restante. La contribution locale peut elle aussi être soumise à un critère d'admission. \strong{La sortie utile pour la carte n'est donc pas seulement un score affiché : c'est un ensemble de décisions et de poids effectivement utilisés par l'observateur.}
+
+\sourcefig{trust_poids.pdf}{Sélection des contributions et construction des poids de l'observateur à partir du Trust}{25}{fig:trust-poids}
+
+\paragraph{Résultats présentés et limites de comparaison}
+Le scénario de simulation de la page~26 comprend quatre véhicules, avec le véhicule~1 comme source des données falsifiées entre 10 et 15~s. Les cas comprennent un biais de position de $-5$~m, un biais de vitesse de $-2$~m/s, des perturbations intermittentes et des pertes de messages de probabilité 0,5. La figure~\ref{fig:trust-resultats} compare les cas pour les véhicules~2 à~4.
+
+\sourcefig{trust_simulation.pdf}{Matrice de résultats des six cas d'attaque. Les annotations représentent les valeurs brutes indiquées dans le support ; la couleur correspond à un score d'impact normalisé}{27}{fig:trust-resultats}
+
+Les valeurs annotées sont comprises entre 0,139 et 0,159. La figure ne suffit pas à identifier leur unité ni à les assimiler à une RMSE de position ; elle ne fournit pas non plus une comparaison sans Trust pour calculer un pourcentage d'amélioration. Elle documente une comparaison entre cas, à compléter par la définition de la métrique et les données de référence. La page~28 associe par ailleurs des courbes de supervision à une vue de la plateforme d'essai, sans donner le profil processeur ou la consommation mémoire du STM32.
+
+\paragraph{Implantation envisagée sur la carte}
+Une première implantation peut faire calculer les scores à 10~Hz, en cohérence avec les messages disponibles, pendant que la navigation locale reste à 100~Hz. Le module conserve, pour chaque voisin, l'état daté, les indicateurs de validité, les facteurs LT et DT, l'historique et les poids. Les décisions sont transmises à l'observateur par une structure de taille fixe. La validation commencera en mode d'observation : les nouveaux scores sont calculés et enregistrés sans modifier l'estimation utilisée par le véhicule. Le couplage sera ensuite testé sur des scénarios rejouables avec mesure du retard de détection, des faux rejets et du temps de calcul.
+\FloatBarrier
+
+\subsubsection{Retour arrière après détection tardive}
+\label{sec:rollback}
+
+Un véhicule honnête peut transmettre une estimation déjà contaminée par une donnée reçue en amont. L'exclusion de l'attaquant empêche de nouvelles contributions directes, mais ne supprime pas nécessairement l'erreur déjà présente dans l'état estimé. Le retour arrière, ou \emph{rollback}, vise à reconstruire une base de prédiction cohérente après une détection tardive.
+
+Le mécanisme présenté aux pages~29 à~32 sauvegarde l'état, les entrées, les contributions reçues, les poids et les durées d'échantillonnage avant les mises à jour. Après détection, il choisit un instant antérieur $k_0$ et rejoue les étapes jusqu'au temps courant en excluant les sources reconnues comme compromises. L'état reconstruit remplace ensuite l'état courant de l'observateur.
+
+\sourcefig{rollback.pdf}{Retour arrière du support : sauvegarde, sélection d'un état antérieur, rejeu sans les contributions exclues et remplacement de l'estimation courante}{32}{fig:rollback}
+
+\paragraph{Traduction en mémoire et en ordonnancement}
+Sur la carte, cette fonction nécessite un tampon circulaire de profondeur bornée. La durée couverte par l'historique doit dépasser le retard de détection que l'on veut corriger. Le rejeu peut s'exécuter sur une copie de l'état, avec un quota de mises à jour par cycle pour ne pas bloquer la navigation à 100~Hz. Le remplacement doit être atomique et concerner un état rattrapé jusqu'à la date courante, pas un état reconstruit mais encore ancien.
+
+Deux limites conditionnent le résultat. D'une part, si l'état sauvegardé est déjà contaminé, repartir de cet état ne rétablit pas une référence saine. D'autre part, une contribution d'un voisin honnête peut encore contenir l'effet d'une source exclue. La politique de rejeu doit donc préciser quelles contributions sont réutilisables et quand préférer un repli vers l'estimation locale indépendante. Le caractère incohérent d'un relais ne prouve pas que ce relais est lui-même malveillant.
+
+La comparaison avec et sans retour arrière doit mesurer l'erreur restante après l'alerte, le temps de récupération, le nombre d'étapes rejouées et la charge supplémentaire. Ces indicateurs relient directement le bénéfice de réparation au dimensionnement de la mémoire et au budget temps réel de la carte.
+\FloatBarrier
+
+\subsubsection{Robust KalmanNet State Estimation}
+\label{sec:rknet}
+
+\paragraph{Principe et objectif de robustesse}
+Robust KalmanNet, noté RKNet dans le support, traite les perturbations au niveau de la fusion locale. Sa structure associe une prédiction cinématique et une correction apprise. Le modèle physique fournit l'évolution attendue du véhicule ; le réseau adapte l'utilisation des mesures lorsque celles-ci deviennent incohérentes. Les perturbations considérées portent principalement sur la position GNSS et la vitesse.
+
+\sourcefig{rknet_principe.pdf}{Robust KalmanNet State Estimation : association d'un modèle physique et d'une adaptation apprise de la correction}{34}{fig:rknet-principe}
+
+Le rôle du modèle est de conserver une dynamique de prédiction explicite. Le rôle du réseau est d'estimer un masque de fiabilité et un gain de correction à partir des informations disponibles. La présence du modèle physique et la limitation numérique du gain ne constituent toutefois pas, à elles seules, une preuve de stabilité du système complet. Cette propriété doit être étudiée avec la boucle récurrente et ses conditions d'utilisation.
+
+\sourcefig{rknet_chaine.pdf}{Chaîne de RKNet : commandes, prédiction cinématique, correction apprise et état corrigé}{36}{fig:rknet-chaine}
+
+\paragraph{États et signaux nécessaires}
+Le vecteur de mesure présenté est
+\begin{equation}
+\boldsymbol{z}_k=
+\begin{bmatrix}x_{\mathrm{GNSS}}&y_{\mathrm{GNSS}}&\psi&v\end{bmatrix}^{T}.
+\end{equation}
+La correction porte sur les quatre grandeurs de navigation correspondantes, notées $\boldsymbol{\xi}_k=[p_x,p_y,\psi,v]^T$. La prédiction utilise le mouvement de type bicyclette, la commande d'accélération ou son modèle et le braquage, avec les paramètres du véhicule. Le support distingue ainsi la prédiction $\widehat{\boldsymbol{\xi}}^-_k$ de l'état corrigé $\widehat{\boldsymbol{\xi}}^+_k$ :
+\begin{equation}
+\widehat{\boldsymbol{\xi}}^-_k=
+f_{\mathrm{bic}}\bigl(\widehat{\boldsymbol{\xi}}^+_{k-1},u_k,\delta_k,\Delta t_k\bigr).
+\end{equation}
+Le portage doit préciser comment les commandes et le braquage sont fournis, comment les coordonnées GNSS sont converties et comment les paramètres sont identifiés. L'empattement et la dynamique longitudinale d'un véhicule d'essai ne peuvent pas être transférés automatiquement à une autre plateforme.
+
+\paragraph{Innovation et caractéristiques du réseau}
+Le réseau reçoit des informations sur le désaccord actuel et sur l'évolution récente de l'estimation et des mesures :
+\begin{align}
+\boldsymbol{r}_k &=\boldsymbol{z}_k-H\widehat{\boldsymbol{\xi}}^-_k,\\
+\Delta\boldsymbol{\xi}_k&=\widehat{\boldsymbol{\xi}}^-_k-\widehat{\boldsymbol{\xi}}^+_{k-1},
+&\Delta\boldsymbol{z}_k&=\boldsymbol{z}_k-\boldsymbol{z}_{k-1},\\
+\boldsymbol{f}_k&=\operatorname{concat}
+\bigl(\Delta\boldsymbol{\xi}_k,\boldsymbol{r}_k,
+\Delta\boldsymbol{z}_k,\boldsymbol{a}^{\mathrm{disp}}_k\bigr).
+\end{align}
+Le vecteur $\boldsymbol{a}^{\mathrm{disp}}_k$ indique la disponibilité des voies de mesure ; il est distinct de l'accélération. Sur la carte, les différences angulaires doivent être repliées, les absences traitées explicitement et les normalisations identiques à celles employées pendant l'apprentissage. Une mesure indisponible ne doit pas être remplacée par zéro sans indicateur, car zéro peut être une valeur physique valide.
+
+\paragraph{Masque de fiabilité et gain appris}
+Un premier réseau produit un masque de mesure, avec une composante comprise entre zéro et un pour chaque voie :
+\begin{equation}
+\boldsymbol{m}^z_k=\sigma\!\left(\operatorname{MLP}_m(\boldsymbol{f}_k)\right).
+\end{equation}
+Une structure récurrente GRU exploite les caractéristiques et leur fiabilité pour mettre à jour un état interne $\boldsymbol{h}_k$. Un autre bloc produit le gain appris $K_k$ ; le support utilise une sortie de type tangente hyperbolique. La correction finale est
+\begin{align}
+\widetilde{\boldsymbol{r}}_k&=\boldsymbol{m}^z_k\odot\boldsymbol{r}_k,\\
+\widehat{\boldsymbol{\xi}}^+_k&=
+\widehat{\boldsymbol{\xi}}^-_k+K_k\widetilde{\boldsymbol{r}}_k.
+\end{align}
+Le masque réduit directement l'innovation transmise au correcteur ; le gain module ensuite son effet sur l'état. Ces deux mécanismes se complètent. Un masque faible n'est pas nécessairement une probabilité d'attaque calibrée : il représente la décision apprise d'atténuer une voie de mesure.
+
+Pour l'implémentation, les dimensions doivent être explicites. Le masque des quatre mesures et le vecteur concaténé de caractéristiques n'ont pas nécessairement la même taille. Le masquage des entrées de la GRU nécessite donc une correspondance définie entre voies et blocs de caractéristiques. Cette correspondance, les paramètres du réseau et l'état récurrent doivent être figés et testés lors de l'export du modèle.
+
+\paragraph{Apprentissage et séparation des essais}
+La présentation décrit une première phase d'apprentissage du correcteur à partir d'un état antérieur de bonne qualité, puis un ajustement de bout en bout où le réseau réutilise sa propre sortie. La seconde phase confronte l'apprentissage aux erreurs qui se propagent dans la boucle récurrente. Les 20\% finaux de la séquence sont réservés à la validation dans le protocole présenté.
+
+Les labels d'attaque supervisent le masque : une voie saine a une cible de masque égale à un, une voie attaquée une cible égale à zéro. La fonction de coût combine l'erreur d'estimation, l'erreur du masque et des pénalisations sur l'amplitude ou les variations du gain et du masque. Ces dernières limitent les corrections excessives et les variations rapides de pondération. Le protocole présenté constitue une base ; la validation du transfert doit également couvrir des trajets, intensités et combinaisons d'attaques absents de l'apprentissage.
+
+\strong{L'apprentissage reste hors carte.} Le microcontrôleur exécute uniquement l'inférence : préparation des caractéristiques, calcul du masque, mise à jour de l'état récurrent, calcul du gain et correction. Le fichier de poids doit être livré avec la définition des entrées, les paramètres de normalisation et les conditions d'initialisation.
+
+\paragraph{Analyse des résultats présentés}
+La figure~\ref{fig:rknet-resultats} compare la trajectoire et les erreurs absolues d'une estimation robuste et d'un EKF, relativement à la référence appelée \emph{Clean Ref EKF}. Dans les fenêtres de perturbation montrées, les pics d'erreur de l'EKF sont plus prononcés, notamment en position et en vitesse. La correction robuste reste généralement plus proche de cette référence pendant ces épisodes. En dehors des attaques, les écarts du réseau doivent aussi être examinés : une amélioration sous perturbation ne prouve pas une supériorité pour chaque instant et chaque condition.
+
+\sourcefig{rknet_resultats.pdf}{Résultats RKNet sur la trajectoire et les erreurs de position, cap et vitesse. Les courbes sont comparées à l'estimateur « Clean Ref EKF »}{45}{fig:rknet-resultats}
+
+La référence \emph{Clean Ref EKF} est un estimateur de comparaison, pas une vérité terrain indépendante. Les courbes permettent de constater un comportement relatif, mais ne suffisent pas à calculer une précision absolue ou une réduction de RMSE sans les séries numériques et la définition des fenêtres d'évaluation. Elles ne doivent pas non plus être comparées directement aux RMSE de la séquence embarquée de 20~s, qui relève d'un autre protocole.
+
+La figure~\ref{fig:rknet-masques} explique le mécanisme observé. Pendant les sauts GNSS, les composantes de masque et de gain associées à la position diminuent. Pendant les perturbations de vitesse, la pondération de cette voie s'adapte également. La baisse ne concerne pas indistinctement toutes les composantes : elle dépend de la voie, de l'épisode et de l'état interne du réseau. \strong{L'enregistrement simultané des masques, gains et erreurs est donc utile pour diagnostiquer le comportement sur la carte.}
+
+\sourcefig{rknet_masques_gains.pdf}{Évolution des gains de l'EKF et de RKNet et des masques de mesure pendant les perturbations GNSS et de vitesse}{46}{fig:rknet-masques}
+\FloatBarrier
+
+\paragraph{Portage et validation sur STM32}
+Le déploiement doit commencer par un rejeu d'entrées identiques dans l'environnement de référence et sur la carte, avec comparaison des masques, gains et états corrigés. Les poids et buffers sont préalloués ; les dimensions et l'ordre des opérations sont contrôlés. Le coût de l'inférence comprend les couches denses, la récurrence, les activations et les conversions de données, pas seulement la multiplication finale par le gain.
+
+Le passage de l'EKF à six états vers RKNet à quatre grandeurs demande un adaptateur. La vitesse scalaire doit être construite avec une convention de signe cohérente ; le cap et les coordonnées doivent utiliser le même repère. L'estimation du biais gyroscopique, présente dans l'EKF, ne disparaît pas sans conséquence : elle doit être conservée dans une fonction séparée ou intégrée dans une extension explicitement validée du modèle appris.
+
+La précision simple, la quantification et la réduction de taille du réseau sont des choix d'optimisation à évaluer, pas des gains déjà mesurés. Le firmware doit prévoir une réinitialisation contrôlée de l'état récurrent et un repli vers l'EKF de référence en cas de dépassement de délai ou de valeur non finie. L'activation dans la boucle de navigation est conditionnée par la concordance numérique, la tenue du budget temporel et une comparaison indépendante sous attaque et hors attaque.
+\FloatBarrier
+
+\subsubsection{Synthèse du couplage des algorithmes avec la carte}
+
+Les trois représentations d'état ne sont pas interchangeables. Leur raccordement doit être réalisé par une interface documentée, avant de comparer les algorithmes ou de modifier la boucle embarquée.
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|L{3.0cm}|L{4.8cm}|Y|}\hline
+\rowcolor{TableHead}\textbf{Brique} & \textbf{État ou information} & \textbf{Exigence d'intégration}\\\hline
+EKF de la carte & $p_N,p_E,v_N,v_E,\psi,b_g$ & Navigation locale, biais et covariance\\\hline
+Modèle du convoi & $s_x,s_y,v,a,\theta$ & Vitesse scalaire, accélération, repères et dates cohérents\\\hline
+Robust KalmanNet & $p_x,p_y,\psi,v$ et état récurrent & Normalisations, commandes, masque, gain et gestion du biais\\\hline
+Trust & Validité, LT, DT, VT et poids & Identité, fraîcheur, mesures relatives et historique par voisin\\\hline
+Retour arrière & États et contributions sauvegardés & Profondeur mémoire, sélection des sources et rattrapage temporel\\\hline
+\end{tabularx}
+\caption{Interfaces à définir entre les fonctions d'estimation et de résilience.}
+\end{table}
+
+Une architecture de transfert peut maintenir l'acquisition et l'EKF à 100~Hz, calculer le Trust à la cadence des informations reçues, puis exécuter RKNet en parallèle de référence avant tout remplacement. Le retour arrière est déclenché par une décision de supervision et dispose d'un quota de calcul. Cette répartition est une \emph{proposition de portage} ; l'affectation définitive des tâches dépendra du profilage des deux cœurs et des accès mémoire.
+
+\paragraph{Dimensionnement mémoire}
+Le vecteur d'état et la covariance de l'EKF représentent $6+36=42$~nombres, soit 168~octets en précision simple sur 32~bits. Ce calcul ne comprend ni les matrices temporaires, ni les piles, ni les pilotes. Pour RKNet, la mémoire des seuls poids est $4P$~octets en précision simple si $P$ désigne le nombre de paramètres ; il faut ajouter les activations, les buffers et l'état de la GRU. Le support ne donne pas les dimensions nécessaires pour annoncer une empreinte totale.
+
+\strong{Exemple de dimensionnement, et non mesure de la carte.} Un historique de 200~instants à 100~Hz couvre 2~s. Si chaque enregistrement occupe 256~octets, le tampon nécessite $200\times256=51\,200$~octets, soit 50~Kio. La taille de 256~octets est une hypothèse illustrative : l'historique réel dépend du nombre de véhicules, des états et des contributions à rejouer.
+
+\paragraph{Budget temporel}
+À 100~Hz, une période vaut 10~ms. La condition à vérifier porte sur la somme du calcul, des interruptions, des attentes bornées et des contentions sur le chemin critique :
+\begin{equation}
+C_{\mathrm{calcul}}+C_{\mathrm{interruptions}}+
+C_{\mathrm{attentes}}+C_{\mathrm{contentions}}<10~\mathrm{ms}.
+\end{equation}
+\strong{À titre illustratif}, une enveloppe de 2~ms pour l'acquisition consolidée, l'EKF et la supervision occuperait 20\% de la période et laisserait 8~ms avant prise en compte des autres charges. Ce budget n'est pas un résultat de profilage ; RKNet et le rejeu devront y être ajoutés ou planifiés séparément. Le maximum observé pendant des essais ne constitue pas, à lui seul, une borne théorique du pire cas.
+
+\paragraph{Mesures matérielles à associer aux résultats}
+Les journaux doivent fournir le temps moyen, le 99e centile et le maximum observé, la gigue, les échéances dépassées, les pertes de buffers, la RAM, la Flash et la marge de pile. La latence de bout en bout et l'âge des mesures doivent être mesurés séparément. La consommation moyenne et les pointes de courant peuvent compléter le bilan de la carte. Ces indicateurs rendent les résultats exploitables pour choisir entre EKF seul, supervision Trust et correction RKNet.
+\FloatBarrier
+
+\subsubsection{Validation comparative des extensions sur la carte}
+
+La comparaison doit utiliser les mêmes entrées, les mêmes repères et la même référence. Elle sépare le fonctionnement nominal, l'attaque et la récupération. Les pertes ou perturbations aléatoires sont répétées avec des graines consignées. Le tableau suivant reprend des paramètres d'attaque du support et les relie aux observations nécessaires sur le démonstrateur ; il constitue un plan d'essais, pas une liste de résultats déjà obtenus.
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|L{4.0cm}|L{4.6cm}|Y|}\hline
+\rowcolor{TableHead}\textbf{Scénario} & \textbf{Comparaison} & \textbf{Indicateurs à produire}\\\hline
+Nominal et charge maximale & EKF seul puis fonctions ajoutées & Erreur nominale, latence, gigue, mémoire\\\hline
+Biais de position $-5$~m de 10 à 15~s & Avec et sans Trust pour le cas V2V ; EKF/RKNet pour le cas capteur & Délai de réaction, erreur maximale, récupération\\\hline
+Biais de vitesse $-2$~m/s & Correction standard puis robuste & Erreur de vitesse et effet sur la position\\\hline
+Pertes de messages à 50\% & Gestion des absences et décroissance du Trust & Continuité de navigation, reprise, âge des données\\\hline
+Propagation et détection tardive & Avec et sans retour arrière & Erreur après alerte, temps et profondeur de rejeu\\\hline
+Sauts GNSS et corruption de vitesse du protocole RKNet & EKF, RKNet et référence indépendante si disponible & RMSE par voie et période, masque, gain, faux rejets\\\hline
+Communication et affichage fortement sollicités & Exécution nominale et charge maximale & Dépassements de 10~ms, files et pertes de buffers\\\hline
+\end{tabularx}
+\caption{Campagne proposée pour relier résilience, implémentation et performances matérielles.}
+\end{table}
+
+Les attaques au niveau du capteur et celles au niveau V2V doivent être injectées à des interfaces distinctes. Un même biais de position n'éprouve pas le même mécanisme s'il modifie la mesure GNSS locale ou seulement le message transmis à un voisin. L'emplacement de l'injection fait donc partie du protocole, au même titre que l'amplitude et la durée.
+
+Un essai de rejeu sur microcontrôleur établit la concordance numérique et le coût matériel de l'algorithme. L'essai sur véhicule complète cette information par les effets des capteurs, des vibrations, de l'environnement radio et du positionnement satellitaire. Pour annoncer un gain, il faut publier les valeurs de référence et celles de la méthode évaluée sur le même jeu de données, plutôt que rapprocher les chiffres de deux séquences différentes.
+\FloatBarrier
+
+\subsection{Bilan des travaux}
+
+La réalisation du capteur constitue le socle matériel de l'opération : étude de la carte dédiée, développement sur une plateforme STM32, pilotes, EKF périodique, mécanismes de robustesse, affichage et liaison vers ROS~2. La fiche rapporte une validation du transport et des résultats de navigation sur une séquence dynamique. Ces éléments établissent une base de comparaison pour les extensions de résilience.
+
+L'apport du support de thèse est désormais relié à des fonctions logicielles identifiables. Le Trust transforme des tests de cohérence en décisions d'admission et en poids de consensus. Le retour arrière reconstruit un état après détection tardive, sous réserve d'un historique et de contributions exploitables. Robust KalmanNet apprend à atténuer les innovations corrompues au moyen d'un masque et d'un gain adaptatifs. Les figures du support illustrent ces principes et les comportements observés dans les protocoles présentés.
+
+\begin{table}[!htbp]\centering\small
+\begin{tabularx}{\linewidth}{|L{4.4cm}|Y|}\hline
+\rowcolor{TableHead}\textbf{Élément} & \textbf{Niveau établi dans les documents et suite sur carte}\\\hline
+Pilotes et EKF à 100~Hz & Implantation décrite sur la plateforme de développement ; profilage détaillé à compléter\\\hline
+Chaîne ESP32 et ROS~2 & Fonctionnement et pertes rapportés ; latence et durée des campagnes à préciser\\\hline
+Trust et consensus & Méthodes et résultats présentés dans le support ; transfert et validation embarquée à caractériser\\\hline
+Retour arrière & Mécanisme de réparation présenté ; mémoire, sources rejouables et coût temporel à qualifier\\\hline
+Robust KalmanNet & Comparaisons et adaptation des masques et gains présentées ; inférence STM32 à valider\\\hline
+Carte dédiée & Remise en service et transfert nécessitant une nouvelle qualification matérielle et temporelle\\\hline
+\end{tabularx}
+\caption{Bilan distinguant réalisation du démonstrateur et extensions issues de la thèse.}
+\end{table}
+
+La prochaine démonstration attendue est celle du compromis complet sur cible : réduction des erreurs sous attaque, limitation des fausses alertes, maintien de l'estimation en mode dégradé et respect des ressources disponibles. Elle permettra de passer de la faisabilité algorithmique à une spécification de capteur résilient mesurable et reproductible.
+\FloatBarrier

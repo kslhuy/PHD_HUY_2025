@@ -1,0 +1,1213 @@
+=== PDF PAGE 1 ===
+Projets de Recherche et Innovation
+Fiche de synthèse
+Capteur embarqué intelligent pour véhicules autonomes
+connectés
+Implémentation temps réel d’un observateur d’état et validation sur cible
+matérielle réelle
+Projet VEHALSECU
+SEGULA T echnologies et CRAN
+=== PDF PAGE 2 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Domaines de recherche principaux, sous-domaines associés et mots clés si nécessaire :
+A lister par ordre d’importance, à compléter ci-après voir annexe « nomenclature … »
+A1a, A2b, A3d
+Mots-clés : capteur embarqué intelligent ; observateur d’état temps réel (filtre de Kalman étendu) ;
+fusion inertiel/GNSS/magnétomètre ; détection de défauts et de cyberattaques par surveillance
+du résidu ; temps réel embarqué ; ROS 2.
+Volume horaire déclaré au CIR pour l’opération, par année (si pluriannuelle) :
+Ne rien saisir
+VEHALSECU 1
+=== PDF PAGE 3 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Table des matières
+1 Opération de R&D dans le cadre de l’activité de l’entreprise 3
+2 Indicateurs externes de recherche 3
+3 Objet de l’opération de R&D 3
+3.1 Objectifs et problématique . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+3.2 Démarche scientifique . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3.3 État de l’art . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3.3.1 Travaux de recherche antérieurs et rappel des indicateurs antérieurs . . . . . . . . . 4
+3.3.2 Recherche bibliographique / Etat des techniques existantes . . . . . . . . . . . . . . 5
+3.3.3 Etat des systèmes existants . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+3.3.4 Références Bibliographiques . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+3.3.5 Bilan critique . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+3.4 Aléa et verrou . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+4 Contribution scientifique, technique ou technologique 7
+4.1 Nouvelles connaissances acquises . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+4.2 Perspectives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+4.3 Transférabilité / Reproductibilité des résultats . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+5 Description de la démarche suivie et des travaux réalisés 9
+5.1 Démarche expérimentale . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+5.1.1 Étude de la carte dédiée et analyse de l’existant . . . . . . . . . . . . . . . . . . . . 9
+5.1.2 Plateforme de développement et environnement . . . . . . . . . . . . . . . . . . . . 11
+5.1.3 Plan de validation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+5.2 Travaux et résultats de l’opération de R&D . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+5.2.1 Architecture du capteur embarqué . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+5.2.2 Firmware temps réel et pilotes de capteurs . . . . . . . . . . . . . . . . . . . . . . . 12
+5.2.3 Observateur d’état embarqué EKF . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+5.2.4 Chaîne de communication et intégration ROS 2 . . . . . . . . . . . . . . . . . . . . . 14
+5.2.5 Difficultés techniques levées . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+5.2.6 Campagne de validation et résultats quantitatifs . . . . . . . . . . . . . . . . . . . . 15
+5.2.7 Vers la détection de défauts et de cyberattaques . . . . . . . . . . . . . . . . . . . . 17
+5.2.8 Trust et estimation distribuée résiliente . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+5.2.9 Retour arrière après détection tardive . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+5.2.10 Robust KalmanNet State Estimation . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+5.2.11 Synthèse du couplage des algorithmes avec la carte . . . . . . . . . . . . . . . . . . 26
+5.2.12 Validation comparative des extensions sur la carte . . . . . . . . . . . . . . . . . . . 27
+5.3 Bilan des travaux . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+6 Ressources humaines 29
+7 Partenariat scientifique et recherche confiée 29
+8 Annexes livrables (Dossier pré-économique) 30
+8.1 T ableau synthétique de l’Opération . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+VEHALSECU 2
+=== PDF PAGE 4 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+1 Opération de R&D dans le cadre de l’activité de l’entreprise
+Les véhicules autonomes et connectés (VAC) reposent sur la connaissance, en temps réel, de
+nombreuses variables dynamiques — position, vitesse, cap, distance inter-véhicules — indis-
+pensables à la commande et à la sûreté de fonctionnement. Ces grandeurs ne sont pas toutes
+directement mesurables, et les capteurs qui les fournissent sont exposés aussi bien aux défauts
+matériels qu’aux cyberattaques, en particulier lorsque les véhicules échangent des informations
+par voie sans fil (V2V / V2X).
+Le projet VEHALSECU de SEGULA T echnologies vise à répondre à cette problématique par des
+observateurs d’état capables à la fois d’estimer les variables non mesurées et de détecter les in-
+cohérences révélatrices d’une attaque ou d’une défaillance. Les travaux antérieurs de l’opération
+ont porté sur la modélisation, la synthèse d’observateurs et leur évaluation en simulation, ainsi
+que sur la conception d’une carte électronique embarquée dédiée.
+La présente opération porte sur un verrou spécifique et structurant du projet : le passage de
+ces méthodes, développées et validées en simulation, à une implémentation embarquée temps
+réel, éprouvée sur cible matérielle réelle et intégrée à un véhicule d’expérimentation. Elle couvre
+l’ensemble du parcours, depuis l’étude de la carte électronique dédiée jusqu’à la validation dy-
+namique du capteur sur véhicule en conditions réelles, et fournit le socle expérimental sur lequel
+les mécanismes de détection de cyberattaques du projet pourront être éprouvés.
+2 Indicateurs externes de recherche
+Ces travaux s’inscrivent dans le cadre de la thèse CIFRE VEHALSECU, débutée le 01/06/2023
+avec M. NGUYEN Quang Huy (ANRT 2022/1732), « Développement d’une carte électronique
+embarquée basée sur des algorithmes d’estimation avancés pour l’amélioration de la résilience
+du véhicule autonome et connecté », menée en collaboration avec le Centre de Recherche en
+Automatique de Nancy (CRAN, UMR 7039 CNRS / Université de Lorraine).
+Les travaux de l’opération ont donné lieu aux publications suivantes :
+— (Diouf et al., 2023) : M. Diouf, A. Zemouche et M. Haddad, « Finite-Time and Exact Cyber-
+Attack Estimation for Connected Autonomous Vehicles », SAGIP , 2023.
+— (Nguyen et al., 2024) : Q. H. Nguyen, O. Sadki, H. Rafaralahy, M. Haddad et A. Zemouche,
+« Cyberattack Detection by Using a Discrete-Time Model-Based Unknown Input Observer »,
+2024.
+— (Sadki et al., 2025) : O. Sadki, Q. H. Nguyen, H. Rafaralahy, M. Haddad et A. Zemouche,
+travaux 2025 sur les observateurs résilients et le système de confiance distribué.
+La présente phase a par ailleurs mobilisé un stage de fin d’études de niveau Master 2 (Université
+de Strasbourg, Faculté de Physique et Ingénierie, parcours SEME), encadré conjointement par
+le CRAN et SEGULA T echnologies.
+3 Objet de l’opération de R&D
+3.1 Objectifs et problématique
+L’objectif de l’opération est de concevoir, implémenter et valider un capteur embarqué intelligent
+capable d’estimer en temps réel l’état dynamique d’un véhicule autonome connecté — position,
+VEHALSECU 3
+=== PDF PAGE 5 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+vitesse et cap — et de fournir le fondement quantitatif de la détection de défauts et de cyberat-
+taques par surveillance du résidu de l’observateur.
+La problématique centrale est celle de l’embarquabilité : un observateur formulé en temps continu,
+validé en simulation sur calculateur non contraint, doit être discrétisé puis exécuté sur un micro-
+contrôleur aux ressources limitées, à cadence élevée et sous contrainte temps réel dure, tout en
+s’intégrant à l’architecture de communication du véhicule. Cette transposition soulève des ques-
+tions qui n’apparaissent pas en simulation : déterminisme de l’ordonnancement, latence des bus
+capteurs, dérive des périodes d’échantillonnage, robustesse aux mesures aberrantes et tenue
+de la liaison sans fil.
+Les objectifs opérationnels retenus sont les suivants :
+— définir l’architecture matérielle et logicielle du capteur embarqué ;
+— développer le firmware temps réel et les pilotes des capteurs (inertiel, magnétomètre, récep-
+teur GNSS) ;
+— implémenter un observateur d’état discret exécuté en temps réel et exploiter son résidu ;
+— réaliser la chaîne complète, de l’acquisition capteur jusqu’à l’export des estimations vers le
+calculateur du véhicule ;
+— valider expérimentalement le système en environnement contrôlé puis en conditions réelles,
+et caractériser quantitativement ses performances.
+3.2 Démarche scientifique
+La démarche adoptée est incrémentale et traçable : chaque capteur est mis en service isolément
+et validé sur banc, la chaîne de communication est éprouvée par simulation d’un flux de trames
+avant tout essai réel, puis l’ensemble est assemblé et validé en conditions réelles sur véhicule.
+Cette progression, plus lente qu’une intégration directe, présente un avantage décisif dans un
+contexte où plusieurs aléas matériels étaient à craindre : elle permet d’attribuer sans ambiguïté
+toute anomalie observée à sa cause, en réduisant à chaque étape le nombre de variables sus-
+ceptibles d’expliquer un dysfonctionnement.
+Elle s’est déroulée en quatre temps : analyse de l’existant et étude de la carte dédiée ; construction
+d’une plateforme de développement équivalente et développement du firmware et des pilotes ;
+portage et validation de l’observateur temps réel ; enfin campagne de validation quantitative, du
+banc contrôlé aux essais dynamiques extérieurs.
+3.3 État de l’art
+3.3.1 Travaux de recherche antérieurs et rappel des indicateurs antérieurs
+Les phases antérieures du projet VEHALSECU ont établi le cadre théorique de l’opération : syn-
+thèse d’observateurs pour systèmes non linéaires fondée sur le théorème de la moyenne, ob-
+servateurs à entrées inconnues pour la détection de cyberattaques, observateurs distribués et
+système de confiance pour la conduite en convoi, ainsi que la conception d’une carte électro-
+nique embarquée dédiée. Ces travaux ont été validés en simulation et par co-simulation, et ont
+donné lieu aux publications rappelées au chapitre 2. La présente opération prolonge ces acquis
+en les confrontant à une cible matérielle réelle.
+VEHALSECU 4
+=== PDF PAGE 6 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+3.3.2 Recherche bibliographique / Etat des techniques existantes
+Estimation d’état et fusion de capteurs L’estimation de l’état d’un véhicule par fusion de cap-
+teurs inertiels et de positionnement satellitaire constitue un domaine mature, largement dominé
+par les approches de type filtre de Kalman. Le filtre de Kalman étendu (EKF) demeure la mé-
+thode de référence pour la fusion GNSS/IMU : il propage un modèle de mouvement alimenté
+par les mesures inertielles à haute fréquence, puis recale l’estimation à l’aide des mesures de
+positionnement, moins fréquentes [8], [11]. Les travaux récents confirment sa pertinence pour la
+localisation de véhicules terrestres tout en soulignant ses limites, notamment l’erreur de linéari-
+sation, que des variantes comme le filtre de Kalman à état d’erreur (ESKF) cherchent à réduire
+[12].
+Trois enseignements convergents se dégagent de la littérature et recoupent les choix de l’opéra-
+tion. La répartition typique des cadences associe une centrale inertielle à une centaine de hertz
+et un récepteur satellitaire à quelques hertz, ce qui correspond exactement à l’architecture rete-
+nue. La qualité du positionnement satellitaire se dégrade fortement en environnement contraint
+— l’erreur pouvant atteindre plusieurs mètres — ce qui justifie une pondération dynamique des
+mesures selon leur fiabilité. Enfin, plusieurs études recommandent l’ajout de mesures complé-
+mentaires, telles que l’odométrie des roues ou un magnétomètre, pour maintenir la robustesse
+en cas de perte du signal satellitaire [12], [13].
+Observateurs pour la détection de défauts et de cyberattaques La détection de cyberat-
+taques sur les véhicules connectés s’appuie fréquemment sur la notion de résidu d’un observa-
+teur, c’est-à-dire l’écart entre une mesure et sa valeur prédite par le modèle. Issue de la théorie
+du diagnostic des systèmes, cette approche est aujourd’hui appliquée à la sécurité : un résidu
+anormalement élevé trahit une incohérence, qu’elle provienne d’un défaut matériel ou d’une injec-
+tion de fausses données [5], [6]. Les travaux du CRAN ont développé des méthodes de synthèse
+d’observateurs pour systèmes non linéaires offrant des garanties de convergence directement
+exploitables pour cette surveillance [3], [4].
+La littérature distingue plusieurs familles d’attaques : le leurrage du récepteur satellitaire (spoo-
+fing), l’injection de fausses données sur les bus de communication internes ou les liaisons V2V, et
+les attaques par rejeu. Deux principes de défense reviennent systématiquement : la surveillance
+statistique du résidu, souvent formalisée par un test du khi-deux sur les résidus normalisés, et la
+redondance des sources de mesure, qui permet d’isoler le capteur compromis et de maintenir un
+mode dégradé sécurisé [7].
+3.3.3 Etat des systèmes existants
+Les solutions industrielles de localisation embarquée disponibles sur étagère (modules de fusion
+GNSS/INS propriétaires) fournissent une estimation de position performante mais restent des
+boîtes noires : le résidu interne n’est pas exposé, ce qui interdit précisément l’usage visé ici — le
+diagnostic et la détection d’attaque. Les plateformes de recherche à base d’intergiciels robotiques
+offrent quant à elles une grande souplesse mais s’exécutent sur calculateur non contraint, sans
+garantie temps réel dure au niveau capteur. L’espace laissé libre est celui d’un capteur embarqué
+ouvert, déterministe, exposant son estimation et son résidu à l’écosystème du véhicule : c’est
+l’objet de la présente opération.
+VEHALSECU 5
+=== PDF PAGE 7 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+3.3.4 Références Bibliographiques
+[3] H. Nguyen, Observateurs et capteurs logiciels résilients pour l’estimation d’état et la détection
+de cyberattaques dans les véhicules autonomes connectés, thèse de doctorat, Université de
+Lorraine, CRAN, 2026.
+[4] A. Zemouche, M. Boutayeb et G. Bara, « Observer design for nonlinear systems : An approach
+based on the differential mean value theorem », Proc. 44th IEEE Conference on Decision and
+Control, 2005, pp. 6353–6358.
+[5] Z. Wang, Y . Gao, C. Fang et al., « Fuzzy Unknown Input Observer for Estimating Sensor
+and Actuator Cyber-Attacks in Intelligent Connected Vehicles », Automotive Innovation, Springer,
+2023.
+[6] V. K. Yadav et al., « A Cyberattack Detection-Isolation Algorithm for Connected Autonomous
+Vehicles Under Changing Driving Environment », IEEE Transactions on Intelligent Transportation
+Systems, 2024.
+[7] M. Pham et K. Xiong, « A survey on security attacks and defense techniques for connected
+and autonomous vehicles », Computers & Security, vol. 109, p. 102269, 2021.
+[8] P . Bernard, Observer Design for Nonlinear Systems, Springer, LNCIS, vol. 479, 2019.
+[9] STMicroelectronics, UM2488 — Discovery kit with STM32H745XI MCU, User Manual, 2019.
+[10] Open Robotics, ROS 2 Documentation — Robot Operating System, https ://docs.ros.org.
+[11] u-blox, NEO-M9N / SAM-M8Q — GNSS modules, Data Sheet and Protocol Specification,
+u-blox AG.
+[12] J. Kim, S. Lee et al., « Sensor Fusion of GNSS and IMU Data for Robust Localization via
+Smoothed Error State Kalman Filter », Sensors (MDPI), vol. 23, 2023.
+[13] T . S. T eoh, P . P . Em et N. A. Ab Aziz, « Vehicle Localization Based on IMU, OBD2 and GNSS
+Sensor Fusion Using Extended Kalman Filter », International Journal of T echnology, vol. 14, n°
+6, pp. 1237–1246, 2023.
+3.3.5 Bilan critique
+L’état de l’art valide les briques retenues — filtre de Kalman étendu, fusion multi-capteurs, exploi-
+tation du résidu — mais met en évidence que la très grande majorité des travaux publiés s’arrête
+au stade de la simulation ou de la validation sur calculateur non contraint. Le verrou adressé ici,
+à savoir la mise en œuvre embarquée temps réel de ces principes, éprouvée sur véhicule réel
+et caractérisée quantitativement, reste peu documenté. La contribution de l’opération ne réside
+donc pas dans la proposition d’un nouvel algorithme théorique, mais dans la démonstration ex-
+périmentale de son embarquabilité et dans l’établissement des indicateurs qui conditionnent le
+dimensionnement futur de la détection.
+3.4 Aléa et verrou
+Le verrou principal est l’embarquabilité de l’observateur : garantir une exécution à cadence fixe
+et à latence bornée sur microcontrôleur, sans dérive de la période d’échantillonnage, tout en
+assurant la robustesse de l’estimation aux mesures aberrantes et aux ruptures de la liaison sans
+fil.
+À ce verrou scientifique se sont ajoutés des aléas matériels majeurs, réellement rencontrés au
+cours de l’opération et non anticipables :
+VEHALSECU 6
+=== PDF PAGE 8 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+— défaillance du microcontrôleur de navigation de la carte électronique dédiée, non détecté par
+l’outil de programmation, et dysfonctionnement de son module de communication sans fil ;
+— conflit d’affectation de broche entre la liaison de télémétrie et la ligne d’émission du récepteur
+GNSS ;
+— broche de connecteur d’extension physiquement partagée entre deux signaux par pont de
+soudure, transportant en réalité un bus série synchrone ;
+— instabilité des adresses réseau attribuées dynamiquement, rompant la liaison sans fil d’une
+session à l’autre.
+La résolution méthodique de ces aléas, documentée au chapitre 5, constitue en soi un apport
+de l’opération : elle a produit un ensemble de règles de conception et de diagnostic réutilisables
+pour le portage sur la carte de production.
+4 Contribution scientifique, technique ou technologique
+4.1 Nouvelles connaissances acquises
+L’opération a conduit à la première validation embarquée temps réel de l’observateur du projet,
+exécuté sur cible matérielle réelle et intégré à un véhicule d’expérimentation. Les contributions
+principales sont les suivantes :
+— Portage et validation d’un observateur de type EKF à six états (position et vitesse Nord/Est,
+cap, biais gyroscopique) exécuté à 100 Hz sous système d’exploitation temps réel sur micro-
+contrôleur double cœur, avec estimation en ligne du biais de gyromètre.
+— Réalisation d’une chaîne de communication complète du capteur au calculateur ROS 2 par
+passerelle sans fil, la position étant publiée au format standard de positionnement par satellite,
+immédiatement exploitable par l’écosystème du véhicule.
+— Caractérisation quantitative des performances de l’estimateur sur séquence dynamique : es-
+timation de vitesse au centimètre par seconde, cap au demi-degré, position horizontale sous
+quarante centimètres.
+— Établissement du plancher de bruit du résidu normalisé en fonctionnement sain (maximum
+de 2,12, aucune fausse alarme), préalable indispensable au dimensionnement du seuil de
+détection d’une cyberattaque.
+— Démonstration de l’efficacité des mécanismes de robustesse embarqués (calibration hard/soft
+iron du magnétomètre, garde d’innovation magnétique à 45°, correction à vitesse nulle, garde-
+fou de vitesse) en conditions dynamiques réelles.
+4.2 Perspectives
+— Validation quantitative de la détection sous attaque (leurrage GNSS, injection de fausses don-
+nées) : mesure du temps de détection et du taux de fausses alertes.
+— Formalisation statistique du seuil d’alarme par test du khi-deux sur les résidus normalisés, en
+s’appuyant sur le plancher de bruit établi.
+— Couplage serré des mesures GNSS et exploitation renforcée de l’odométrie et de l’inertiel
+pour la tenue en mode dégradé lors des masquages transitoires.
+— Intégration au système de confiance distribué du projet et extension au suivi coopératif (pla-
+tooning) avec échange de données de navigation vérifiées.
+— Portage du firmware sur la carte de production dédiée, la logique applicative étant réutilisable
+sans modification.
+VEHALSECU 7
+=== PDF PAGE 9 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+4.3 Transférabilité / Reproductibilité des résultats
+Le firmware et les pilotes de capteurs ont été développés de manière modulaire et indépendante
+du matériel : les composants capteurs de la plateforme de développement étant identiques à
+ceux de la carte dédiée, le portage vers la carte de production se limite à une reconfiguration des
+affectations de broches, sans réécriture de la logique applicative. La chaîne repose par ailleurs
+sur des standards ouverts — intergiciel ROS 2, format normalisé de publication de position, pro-
+tocoles série et réseau usuels, trames de télémétrie en format texte structuré — ce qui garantit
+la reproductibilité des essais et l’interopérabilité avec d’autres véhicules d’expérimentation. Le
+plan de tests, ses jeux de données et ses critères d’acceptation sont documentés et rejouables
+à l’identique.
+VEHALSECU 8
+=== PDF PAGE 10 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+5 Description de la démarche suivie et des travaux réalisés
+Les travaux relient la conception du capteur, son exécution sur microcontrôleur et l’exploitation
+de ses estimations pour la résilience du véhicule connecté. La carte assure l’acquisition, la fu-
+sion et la mise à disposition des données de navigation. Les algorithmes du support de thèse
+prolongent cette chaîne à deux niveaux : le Trust sélectionne les informations échangées
+entre véhicules , tandis que Robust KalmanNet adapte la correction de l’estimation locale
+lorsque des mesures sont corrompues . Le retour arrière traite le cas complémentaire d’une
+contamination détectée après son introduction dans l’observateur distribué.
+Le périmètre expérimental doit rester identifiable. La fiche décrit un EKF exécuté à 100 Hz sur
+une plateforme STM32 et une chaîne ESP32–ROS 2. Le support Final_PHD_these_2026.pdf
+présente les méthodes de confiance, le retour arrière et Robust KalmanNet, ainsi que leurs illus-
+trations et résultats. Leur présentation ci-dessous distingue fonctionnement algorithmique, résul-
+tats montrés dans le support et modalités de transfert sur la carte . Les numéros de pages cités
+désignent les 46 pages du PDF , dont les diapositives affichent les numéros 30 à 75.
+5.1 Démarche expérimentale
+La démarche a été construite pour isoler les causes de dysfonctionnement et permettre l’avan-
+cement du logiciel malgré les difficultés matérielles. Chaque capteur a d’abord été mis en ser-
+vice séparément ; l’observateur et la communication ont ensuite été intégrés, puis évalués sur la
+chaîne complète. Cette progression permet de distinguer une mesure incorrecte, une erreur de
+calcul, un problème de synchronisation et une perte de transmission.
+5.1.1 Étude de la carte dédiée et analyse de l’existant
+L’étude initiale porte sur la carte électronique CRAN–SEGULA. Son architecture comprend les
+fonctions de navigation et de communication, des capteurs inertiel et magnétique, un récepteur
+GNSS, des mémoires et des interfaces de programmation. La lecture des schémas et l’identifica-
+tion des connecteurs constituent une étape de développement à part entière : elles déterminent
+quelles mesures sont accessibles, à quelle cadence, et avec quelles contraintes de bus et de
+partage de ressources.
+Deux difficultés bloquantes sont rapportées : le microcontrôleur de navigation n’était plus détecté
+par l’outil de programmation et la fonction de communication sans fil présentait un dysfonction-
+nement. Une plateforme intermédiaire a donc été utilisée pour développer et valider la chaîne de
+traitement. Une validation sur cette plateforme ne remplace pas la qualification de la carte
+dédiée : le transfert final comprend les affectations de broches, les horloges, les interruptions,
+les interfaces électriques et le comportement temporel.
+VEHALSECU 9
+=== PDF PAGE 11 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+FIGURE 1 – Carte électronique dédiée du projet, étudiée avant la mise en place de la plateforme de déve-
+loppement
+FIGURE 2 – Architecture matérielle de la carte dédiée, reprise de la fiche initiale. Les bus indiqués dans ce
+schéma concernent cette carte et doivent être distingués du câblage de la plateforme de développement
+VEHALSECU 10
+=== PDF PAGE 12 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+5.1.2 Plateforme de développement et environnement
+La plateforme de substitution s’appuie sur une carte STM32H745-DISCO, désignée ainsi dans
+le schéma de la fiche, et sur des modules capteurs. Elle permet d’exécuter les pilotes, l’EKF et
+la supervision sur un microcontrôleur à deux cœurs. Cette organisation doit être distinguée de la
+carte dédiée à deux microcontrôleurs. Le terme carte désigne ci-après la cible de développement
+lorsqu’il est question du démonstrateur exécuté.
+FIGURE 3 – Carte de développement utilisée pour le firmware et l’estimation
+FIGURE 4 – Chaîne fonctionnelle du démonstrateur, des capteurs au calculateur ROS 2 par la carte STM32
+et la passerelle ESP32
+L’environnement comprend la chaîne de compilation, la sonde de programmation et de débo-
+gage, le terminal série et les outils de configuration GNSS. La séparation entre pilotes, traitement
+et transport facilite la réutilisation du code. Pour reproduire une expérience, il faut conserver en-
+semble la version du firmware, la configuration des broches, les calibrations, les paramètres de
+l’estimateur et les journaux horodatés.
+5.1.3 Plan de validation
+Trois niveaux de validation sont retenus. Le premier utilise un simulateur de trames pour éprouver
+le décodage, le comptage des pertes et la publication ROS 2. Le deuxième couvre la chaîne
+matérielle complète en statique, avec vérification des mesures et des cadences. Le troisième
+évalue le capteur sur le véhicule en mouvement. Les extensions Trust et Robust KalmanNet
+ajoutent un quatrième niveau : le rejeu de scénarios identiques sur la cible, puis leur reproduction
+sur véhicule, afin de relier le gain algorithmique à son coût matériel.
+VEHALSECU 11
+=== PDF PAGE 13 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+La référence de chaque essai doit être précisée. Une comparaison à une vitesse commandée, à
+une odométrie, à un système de positionnement indépendant ou à un EKF de référence ne me-
+sure pas exactement la même erreur. Cette distinction est essentielle pour interpréter les résultats
+de la fiche et ceux du support de thèse.
+5.2 Travaux et résultats de l’opération de R&D
+5.2.1 Architecture du capteur embarqué
+L’architecture répartit l’acquisition, le calcul de navigation et la communication. Le cœur secon-
+daire acquiert les capteurs ; le cœur principal exécute l’EKF , prépare les sorties et assure l’af-
+fichage. Une zone de mémoire partagée véhicule les données entre cœurs. L’ESP32 prend en
+charge le relais réseau vers le véhicule. L’objectif de cette répartition est de protéger la régularité
+du calcul d’état contre les variations de charge du transport et de l’affichage.
+Fonction Élément du démonstrateur Interface
+Acquisition Cœur secondaire du STM32 ; pilotes inertiel,
+magnétomètre et GNSS
+SPI, I²C, UART
+Estimation et
+supervision
+Cœur principal ; EKF , résidus, état de validité Mémoire partagée
+Transport Passerelle ESP32 UART puis WiFi/UDP
+Exploitation véhicule Calculateur AgileX LIMO Nœud de réception
+ROS 2
+TABLE 1 – Répartition fonctionnelle sur la plateforme de développement.
+Cette séparation réduit les interactions entre fonctions, sans garantir à elle seule le déterminisme.
+Le calcul de navigation ne doit pas attendre une émission réseau ; les sections critiques et les
+files de messages doivent rester bornées. La disponibilité de deux cœurs ne dispense pas de
+mesurer les contentions d’accès à la mémoire et les retards dus aux interruptions.
+5.2.2 Firmware temps réel et pilotes de capteurs
+Le firmware est organisé en tâches périodiques. La base de temps de l’estimateur est de 10 ms.
+Les capteurs plus lents alimentent des corrections déclenchées à l’arrivée d’une mesure nouvelle.
+L’affichage et la télémétrie utilisent une copie de l’état estimé afin de limiter leur influence sur le
+calcul.
+Tâche Priorité Période rapportée Traitement
+Acquisition inertielle Haute 10 ms / 100 Hz Accélérations et vitesses angulaires
+Observateur EKF Haute 10 ms / 100 Hz Prédiction et corrections disponibles
+Magnétomètre Moyenne 20 ms / 50 Hz Champ magnétique et cap
+Traitement GNSS Basse 100 ms / 10 Hz Décodage des trames et validité
+Transmission Moyenne 100 ms / 10 Hz Préparation et émission de la télémétrie
+Affichage Basse 200 ms / 5 Hz Navigation et état du filtre
+TABLE 2 – Découpage temporel décrit dans la fiche initiale.
+La temporisation à référence absolue évite d’ajouter le temps de calcul à chaque nouvelle période.
+Elle limite la dérive de cadence, mais ne prouve pas que toutes les échéances sont respectées.
+La validation doit mesurer le temps d’exécution des tâches, la gigue de réveil et le nombre de
+VEHALSECU 12
+=== PDF PAGE 14 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+dépassements de 10 ms, notamment lorsque l’ensemble des corrections est disponible dans le
+même cycle.
+Mesures horodatées et fusion à plusieurs cadences La consolidation du firmware doit as-
+socier à chaque mesure une date d’acquisition, un compteur et un indicateur de validité. L’esti-
+mateur consomme un instantané cohérent des capteurs. Une donnée GNSS acquise à 10 Hz ne
+doit pas être appliquée dix fois comme dix mesures indépendantes dans l’EKF à 100 Hz. Entre
+deux corrections, la prédiction propage l’état et l’incertitude. Les journaux distinguent une donnée
+absente, une donnée rejetée et une trame perdue sur le réseau.
+Échanges entre cœurs Une structure partagée de taille fixe doit être publiée selon un protocole
+empêchant une lecture partielle. Un double tampon ou un mécanisme de versionnement consti-
+tue une possibilité de mise en œuvre, à qualifier sur la cible. Les mesures, leurs dates et leurs
+indicateurs doivent appartenir à la même version. Les allocations dynamiques dans la boucle
+critique, les attentes de durée indéfinie sur les bus et les écritures concurrentes non protégées
+sont à exclure de la spécification du portage.
+5.2.3 Observateur d’état embarqué EKF
+Le capteur met en œuvre un EKF de navigation à six états :
+xEKF
+k =
+h
+pN pE vN vE ψ b g
+iT
+. (1)
+Les composantes représentent les positions et vitesses Nord/Est, le cap et le biais du gyromètre.
+La prédiction utilise les mesures inertielles ; la vitesse de lacet est corrigée du biais estimé. Les
+corrections successives exploitent la position et la vitesse GNSS, l’odométrie lorsqu’elle est dis-
+ponible, le cap magnétique et les phases d’immobilité.
+Pour une mesure scalaire, l’étape de correction s’écrit sous la forme :
+rk = zk − h(bx−
+k ), Sk = HkP −
+k H T
+k + Rk, (2)
+Kk = P −
+k H T
+k /Sk, bx+
+k = bx−
+k + Kkrk. (3)
+La correction scalaire réduit la taille des opérations, sous réserve de traiter correctement les
+corrélations entre mesures. La covariance Pk est une matrice 6 × 6 ; sa propagation, les matrices
+temporaires et les gardes numériques doivent être incluses dans le profilage.
+La robustesse rapportée repose sur une calibration initiale, l’estimation du biais gyroscopique,
+une garde d’innovation magnétique de 45°, la correction à vitesse nulle et un état de confiance
+de l’estimation. Sur la carte, les contrôles doivent également couvrir les valeurs non finies, une
+variance d’innovation strictement positive, la cohérence de la covariance et le repli angulaire du
+cap. Une comparaison à une implémentation de référence est nécessaire avant de réduire la
+précision numérique ou de modifier l’ordre des opérations.
+VEHALSECU 13
+=== PDF PAGE 15 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+FIGURE 5 – Cycle de l’EKF présenté dans la fiche initiale. Le franchissement d’un seuil de résidu indique
+une anomalie à analyser ; il n’identifie pas automatiquement une cyberattaque
+5.2.4 Chaîne de communication et intégration ROS 2
+La carte transmet les estimations à 10 Hz par une liaison série vers l’ESP32, qui les relaie en
+WiFi/UDP . Le nœud de réception sur le LIMO décode les trames et publie la position dans ROS 2.
+Le compteur de séquence permet de mesurer les pertes et de vérifier l’ordre d’arrivée. Il faut
+toutefois distinguer la fréquence de publication, la latence de transport et l’âge de l’estimation :
+une publication à 10 Hz ne démontre pas une latence inférieure à 100 ms.
+FIGURE 6 – Intégration ROS 2 décrite dans la fiche : topics du véhicule et publication de la position estimée
+Pour accueillir le Trust, la trame devra transporter les informations nécessaires à la comparaison :
+identifiant de source, date, compteur, état local, validité et incertitude. Les estimations du convoi
+et les scores de confiance pourront être ajoutés dans un message distinct afin de ne pas alourdir
+la voie de navigation. Un compteur UDP ou une somme de contrôle ne constitue pas une preuve
+d’authenticité ; cette vérification exige un mécanisme dédié et une gestion explicite des identités.
+VEHALSECU 14
+=== PDF PAGE 16 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+5.2.5 Difficultés techniques levées
+Les essais ont révélé un conflit entre une broche utilisée pour la télémétrie et la ligne d’émission
+GNSS. La salve observée au démarrage provenait de la configuration du récepteur ; la liaison a
+été réaffectée après analyse de l’usage de cette broche. Un second défaut de communication
+résultait d’un connecteur partagé par pont de soudure avec une ligne de bus synchrone. L’iden-
+tification du signal réel a conduit à choisir un autre périphérique série accessible.
+Enfin, les changements d’adresses attribuées dynamiquement perturbaient les échanges réseau.
+L’émission en diffusion sur le sous-réseau a facilité les essais de réception. Ces résolutions
+conduisent à des règles de transfert concrètes : contrôler les fonctions alternatives des broches,
+les ponts de soudure, la configuration des périphériques et la stratégie d’adressage avant d’attri-
+buer un défaut à l’observateur.
+5.2.6 Campagne de validation et résultats quantitatifs
+Validation du transport et de la chaîne matérielle Le simulateur de trames a été utilisé en
+fonctionnement nominal, avec pertes injectées à 10%, en mode dégradé et en endurance courte.
+La fiche rapporte ensuite une cadence de dix trames par seconde et des pertes de l’ordre de 2%
+sur la chaîne réelle. Ces mesures caractérisent le transport ; elles doivent être accompagnées
+d’une durée, du nombre de trames et des conditions radio pour devenir comparables entre cam-
+pagnes.
+FIGURE 7 – Validation du flux et comptage des pertes par identifiants de séquence
+Les essais extérieurs décrits comprennent le suivi du mouvement, la suppression d’une vitesse
+parasite à l’arrêt et la réception de cinq à huit satellites. Un écart-type de cap inférieur à 0,2°
+est rapporté après calibration du magnétomètre. Cette dispersion mesure une stabilité dans les
+conditions de l’essai ; elle ne se confond pas avec une erreur absolue de cap par rapport à une
+référence indépendante.
+Caractérisation de l’estimateur La fiche contient une séquence de 20 s à 100 Hz avec ac-
+célérations, décélérations, freinage avec glissement, biais gyroscopique injecté de 12 mrad/s et
+perturbations magnétiques. Les valeurs suivantes sont celles rapportées pour cette séquence.
+Leur attribution à une exécution matérielle précise nécessite de conserver les journaux corres-
+pondants et la définition des références.
+Les mécanismes de robustesse sont associés à un écart final au biais injecté de 0,055 mrad/s,
+23 rejets de mesures magnétiques, six activations de la correction à vitesse nulle et 196 cor-
+rections GNSS. Le nombre de corrections GNSS correspond à environ 9,8 corrections/s ; les
+horodatages permettent de vérifier sa cohérence avec la cadence nominale de 10 Hz. Pour éta-
+blir la contribution propre de chaque mécanisme, il faut rejouer la même séquence avec et sans
+ce mécanisme, en conservant les autres paramètres.
+VEHALSECU 15
+=== PDF PAGE 17 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+FIGURE 8 – Capteur monté sur le véhicule et écran de navigation de la carte de développement
+FIGURE 9 – Suivi de vitesse et erreur sur la séquence de 20 s reprise de la fiche. Le RMSE est une mesure
+moyenne, pas une borne de l’erreur instantanée
+Indicateur rapporté sur 20 s Valeur
+RMSE de vitesse 0,011 m/s
+MAE de vitesse 0,007 m/s
+Erreur maximale de vitesse 0,063 m/s
+Erreur relative moyenne de vitesse 0,63%
+Coefficient de détermination R2 0,99904
+RMSE de cap 0,43°
+RMSE de position horizontale 0,39 m
+Délai de passage à la pleine confiance 2,4 s
+TABLE 3 – Performances de référence conservées depuis la fiche initiale.
+VEHALSECU 16
+=== PDF PAGE 18 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+5.2.7 Vers la détection de défauts et de cyberattaques
+La fiche rapporte un maximum de résidu normalisé égal à 2,12 et aucune fausse alerte sur la
+séquence étudiée. Ce maximum décrit l’amplitude observée ; il ne constitue ni un seuil universel
+ni une estimation statistique suffisante du taux de fausses alertes. Une anomalie de résidu peut
+provenir d’une attaque, mais également d’un défaut, d’une perturbation magnétique, d’un retard
+ou d’un écart entre modèle et véhicule.
+Le résidu standardisé rk/√Sk doit être distingué de l’innovation quadratique normalisée, ou NIS :
+NISk = rT
+k S−1
+k rk. (4)
+Un seuil statistique exige de préciser cette définition, la dimension de la mesure et les hypothèses
+sur les erreurs. La décision embarquée peut combiner amplitude, persistance et cohérence entre
+capteurs. Cette information locale constitue une entrée du système de confiance, sans se sub-
+stituer à la vérification des échanges entre véhicules.
+FIGURE 10 – Contexte de conduite en convoi sur les véhicules d’expérimentation du laboratoire
+5.2.8 Trust et estimation distribuée résiliente
+Finalité et articulation avec le capteur Le Trust représente une confiance quantitative dans les
+informations utilisées pour l’estimation du convoi. Un véhicule peut recevoir un message récent
+et authentique dont les valeurs sont pourtant erronées, parce que le capteur de l’émetteur est
+défaillant ou que son estimation a été contaminée. La méthode confronte donc les messages à la
+physique du mouvement, aux mesures locales et aux estimations disponibles avant de déterminer
+leur contribution au consensus.
+La figure 11, extraite de la présentation, décrit quatre étapes : calcul de la confiance locale, calcul
+de la confiance distribuée, combinaison en une confiance véhicule, puis construction d’un vecteur
+de confiance portant sur les membres du convoi. La carte fournit le point d’ancrage local de
+cette architecture : état estimé, qualité des mesures, dates et résidus. Si ce point d’ancrage se
+dégrade, il faut en tenir compte dans l’interprétation des désaccords avec les voisins.
+Observateurs local et distribué Le modèle du convoi présenté dans le support emploie l’état
+xconv
+i =
+h
+sx sy v a θ
+iT
+. (5)
+VEHALSECU 17
+=== PDF PAGE 19 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust for 
+all vehicles
+Global 
+estimate data
+Local 
+estimate data
+Vehicle j
+Target vehicle
+Communication
+Trust 
+aggeration
+1 2
+3
+4
+38
+0
+FIGURE 11 – Architecture du Trust entre deux véhicules, avec estimation locale, estimation distribuée et
+agrégation des opinions. Source : support de thèse, p. PDF 9.
+L’observateur local corrige la prédiction à partir des mesures du véhicule. Chaque hôte i maintient
+aussi une estimation bx(j)
+i du véhicule j. L’observateur distribué combine cette estimation propre,
+les contributions des voisins bx(j)
+ℓ et, lorsqu’elle est admissible, l’estimation locale bx(j)
+0 . Sous une
+notation compacte, la mise à jour du support s’écrit
+bx(j)
+i (k + 1) = Ab
+0
+@w(j)
+ii bx(j)
+i + w(j)
+i0 bx(j)
+0 +
+X
+ℓ∈Ni
+w(j)
+iℓ bx(j)
+ℓ
+1
+A + Bbuj(k). (6)
+Les termes entre parenthèses sont évalués au même pas k. Les poids sont non négatifs et le
+poids propre complète leur somme à un. L’utilité du Trust est d’agir sur l’admissibilité des contribu-
+tions, puis sur ces poids, afin qu’une information reconnue comme incohérente cesse d’entraîner
+les estimations des autres véhicules. La validité de ce fonctionnement reste liée au modèle, à la
+connectivité et à la qualité de la détection ; la pondération ne constitue pas une garantie univer-
+selle contre toute attaque.
+Validité des messages et confiance locale LT Le support introduit un indicateur δiℓ(k) égal à
+un si le message reçu du véhicule ℓ est authentifié et suffisamment récent, et nul sinon. Seuls les
+messages valides alimentent les nouveaux tests de cohérence. En l’absence de données valides,
+la confiance historique décroît au lieu de rester indéfiniment figée à sa dernière valeur.
+La confiance locale LTiℓ compare les grandeurs physiques : vitesse, distance, accélération et cap.
+Un désaccord doit être évalué dans son contexte. Une différence de vitesse entre deux véhicules
+en phase transitoire peut être normale ; une distance doit être comparée à une mesure relative
+ou à une relation géométrique cohérente. Les écarts de cap doivent être repliés angulairement.
+Les normalisations doivent également éviter une division par une vitesse presque nulle.
+Pour le portage, chaque indicateur doit donc avoir une unité, une référence et une tolérance
+explicites. Une écriture normalisée possible est sq = max(0, 1 − |eq|/εq), où eq est l’écart associé
+à la grandeur q et εq > 0 sa tolérance. Cette écriture est une proposition de réalisation des scores
+VEHALSECU 18
+=== PDF PAGE 20 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+élémentaires ; elle ne remplace pas sans validation les fonctions choisies dans le support. Les
+seuils seront calibrés sur les données du véhicule et sur ses incertitudes, puis conservés dans
+une configuration versionnée.
+Confiance distribuée DT La confiance distribuée évalue la cohérence d’une estimation reçue
+à l’échelle du convoi. Le support distingue trois facteurs : l’accord avec l’estimation globale de
+l’hôte, l’accord avec les mesures relatives locales et la cohérence interne de l’estimation de l’hôte.
+Leur combinaison est multiplicative :
+DTiℓ = γhost
+iℓ γlocal
+iℓ γself
+iℓ . (7)
+Un facteur faible réduit ainsi la confiance globale, même si les autres critères sont favorables.
+L’écart à l’hôte peut être normalisé par une distance quadratique de type Mahalanobis :
+Diℓ =
+X
+j
+ bx(j)
+ℓ − bx(j)
+i
+T Σ−1 bx(j)
+ℓ − bx(j)
+i
+
+, (8)
+γhost
+iℓ = exp(−Diℓ). (9)
+La matrice de normalisation Σ évite de mélanger sans pondération des positions, vitesses et
+angles. Les deux autres facteurs utilisent la compatibilité des positions ou vitesses relatives
+avec les mesures locales. Sans mesure relative disponible sur le véhicule, ces contrôles ne
+peuvent pas être considérés comme exécutés. Les observations partagées entre estimateurs
+peuvent aussi créer des corrélations : le réglage de Σ doit en tenir compte plutôt que supposer
+automatiquement des sources indépendantes.
+Confiance véhicule et vecteur de confiance La confiance instantanée combine les deux ni-
+veaux :
+Tiℓ(k) = LTiℓ(k) DTiℓ(k). (10)
+Le support lisse ensuite la confiance à partir d’un historique réparti sur cinq niveaux, de non fiable
+à excellent. Si Siℓ(b) désigne la distribution sur ces cinq niveaux, la confiance lissée s’exprime
+comme une espérance
+V Tiℓ =
+5X
+b=1
+b − 1
+4 Siℓ(b). (11)
+L’exemple de la page 22 du PDF donne une valeur d’environ 0,49. Il illustre le calcul du score
+et ne constitue pas une mesure du prototype. Le lissage limite les variations dues au bruit ou à
+une brève perte de paquet, mais introduit un retard de réaction. Ce compromis doit être réglé
+en temps physique : un historique mis à jour à 10 Hz n’a pas la même dynamique que le même
+historique mis à jour à 100 Hz.
+Le vecteur Oi(j) rassemble ensuite l’opinion de l’hôte sur chaque véhicule. Il utilise la confiance
+directe pour les voisins connus et une propagation à un saut pour les autres, avec une agrégation
+par médiane pondérée lorsque les opinions requises sont disponibles et une règle de repli en cas
+d’information manquante. Ces règles doivent être implémentées avec un nombre maximal de
+voisins et une politique de péremption des opinions.
+Utilisation du Trust dans les poids de consensus Un seuil de confiance définit l’ensemble
+des contributions admissibles L(j)
+i (k). Dans la règle illustrée dans le support, une contribution
+admise reçoit un poids
+w(j)
+iℓ (k) = 1
+|L(j)
+i (k)| + 1
+, ℓ ∈ L (j)
+i (k), (12)
+VEHALSECU 19
+=== PDF PAGE 21 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+et une contribution exclue reçoit un poids nul. Le poids propre correspond à la part restante. La
+contribution locale peut elle aussi être soumise à un critère d’admission. La sortie utile pour la
+carte n’est donc pas seulement un score affiché : c’est un ensemble de décisions et de
+poids effectivement utilisés par l’observateur.
+The weight matrix that priority the local estimation term is defined as 
+54
+Using Trust for Weight Design in the Observer
+ 
+Ensures resilient estimation  
+  
+Isolates malicious vehicles
+FIGURE 12 – Sélection des contributions et construction des poids de l’observateur à partir du Trust.
+Source : support de thèse, p. PDF 25.
+Résultats présentés et limites de comparaison Le scénario de simulation de la page 26
+comprend quatre véhicules, avec le véhicule 1 comme source des données falsifiées entre 10
+et 15 s. Les cas comprennent un biais de position de −5 m, un biais de vitesse de −2 m/s, des
+perturbations intermittentes et des pertes de messages de probabilité 0,5. La figure 13 compare
+les cas pour les véhicules 2 à 4.
+Les valeurs annotées sont comprises entre 0,139 et 0,159. La figure ne suffit pas à identifier leur
+unité ni à les assimiler à une RMSE de position ; elle ne fournit pas non plus une comparaison
+sans Trust pour calculer un pourcentage d’amélioration. Elle documente une comparaison entre
+cas, à compléter par la définition de la métrique et les données de référence. La page 28 associe
+par ailleurs des courbes de supervision à une vue de la plateforme d’essai, sans donner le profil
+processeur ou la consommation mémoire du STM32.
+Implantation envisagée sur la carte Une première implantation peut faire calculer les scores
+à 10 Hz, en cohérence avec les messages disponibles, pendant que la navigation locale reste
+à 100 Hz. Le module conserve, pour chaque voisin, l’état daté, les indicateurs de validité, les
+facteurs LT et DT , l’historique et les poids. Les décisions sont transmises à l’observateur par une
+structure de taille fixe. La validation commencera en mode d’observation : les nouveaux scores
+sont calculés et enregistrés sans modifier l’estimation utilisée par le véhicule. Le couplage sera
+ensuite testé sur des scénarios rejouables avec mesure du retard de détection, des faux rejets
+et du temps de calcul.
+VEHALSECU 20
+=== PDF PAGE 22 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+56
+FIGURE 13 – Matrice de résultats des six cas d’attaque. Les annotations représentent les valeurs brutes
+indiquées dans le support ; la couleur correspond à un score d’impact normalisé. Source : support de thèse,
+p. PDF 27.
+5.2.9 Retour arrière après détection tardive
+Un véhicule honnête peut transmettre une estimation déjà contaminée par une donnée reçue en
+amont. L’exclusion de l’attaquant empêche de nouvelles contributions directes, mais ne supprime
+pas nécessairement l’erreur déjà présente dans l’état estimé. Le retour arrière, ou rollback, vise
+à reconstruire une base de prédiction cohérente après une détection tardive.
+Le mécanisme présenté aux pages 29 à 32 sauvegarde l’état, les entrées, les contributions re-
+çues, les poids et les durées d’échantillonnage avant les mises à jour. Après détection, il choisit
+un instant antérieur k0 et rejoue les étapes jusqu’au temps courant en excluant les sources recon-
+nues comme compromises. L’état reconstruit remplace ensuite l’état courant de l’observateur.
+Traduction en mémoire et en ordonnancement Sur la carte, cette fonction nécessite un tam-
+pon circulaire de profondeur bornée. La durée couverte par l’historique doit dépasser le retard de
+détection que l’on veut corriger. Le rejeu peut s’exécuter sur une copie de l’état, avec un quota
+de mises à jour par cycle pour ne pas bloquer la navigation à 100 Hz. Le remplacement doit
+être atomique et concerner un état rattrapé jusqu’à la date courante, pas un état reconstruit mais
+encore ancien.
+Deux limites conditionnent le résultat. D’une part, si l’état sauvegardé est déjà contaminé, repartir
+de cet état ne rétablit pas une référence saine. D’autre part, une contribution d’un voisin honnête
+peut encore contenir l’effet d’une source exclue. La politique de rejeu doit donc préciser quelles
+contributions sont réutilisables et quand préférer un repli vers l’estimation locale indépendante.
+Le caractère incohérent d’un relais ne prouve pas que ce relais est lui-même malveillant.
+La comparaison avec et sans retour arrière doit mesurer l’erreur restante après l’alerte, le temps
+de récupération, le nombre d’étapes rejouées et la charge supplémentaire. Ces indicateurs relient
+directement le bénéfice de réparation au dimensionnement de la mémoire et au budget temps
+réel de la carte.
+VEHALSECU 21
+=== PDF PAGE 23 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+61
+Roll back
+ Repair step after the trust detector has already found bad contributors
+Final replacement:
+At every time step 𝑘
+, before the observer update is finalized, we save the information needed to 
+replay the update later.
+FIGURE 14 – Retour arrière du support : sauvegarde, sélection d’un état antérieur, rejeu sans les contribu-
+tions exclues et remplacement de l’estimation courante. Source : support de thèse, p. PDF 32.
+5.2.10 Robust KalmanNet State Estimation
+Principe et objectif de robustesse Robust KalmanNet, noté RKNet dans le support, traite les
+perturbations au niveau de la fusion locale. Sa structure associe une prédiction cinématique et une
+correction apprise. Le modèle physique fournit l’évolution attendue du véhicule ; le réseau adapte
+l’utilisation des mesures lorsque celles-ci deviennent incohérentes. Les perturbations considé-
+rées portent principalement sur la position GNSS et la vitesse.
+63
+Robust KalmanNet State Estimation
+Neural 
+Network
+Model based 
+physics 
+Mixer
+Stability 
+Adaptability 
+Sensors
+FIGURE 15 – Robust KalmanNet State Estimation : association d’un modèle physique et d’une adaptation
+apprise de la correction. Source : support de thèse, p. PDF 34.
+VEHALSECU 22
+=== PDF PAGE 24 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Le rôle du modèle est de conserver une dynamique de prédiction explicite. Le rôle du réseau est
+d’estimer un masque de fiabilité et un gain de correction à partir des informations disponibles. La
+présence du modèle physique et la limitation numérique du gain ne constituent toutefois pas, à
+elles seules, une preuve de stabilité du système complet. Cette propriété doit être étudiée avec
+la boucle récurrente et ses conditions d’utilisation.
+65
+Controller Kinematic 
+predictor prior state
+Learned Kalman 
+updateMeasurement corrected state
+• Prediction is physics-based.
+• Update learns measurement reliability mask and Kalman gain.
+• Main robustness target: GPS position and velocity corruption.
+RKNet Concept Design
+FIGURE 16 – Chaîne de RKNet : commandes, prédiction cinématique, correction apprise et état corrigé.
+Source : support de thèse, p. PDF 36.
+États et signaux nécessaires Le vecteur de mesure présenté est
+zk =
+h
+xGNSS yGNSS ψ v
+iT
+. (13)
+La correction porte sur les quatre grandeurs de navigation correspondantes, notées ξk =
+[px, py, ψ, v]T . La prédiction utilise le mouvement de type bicyclette, la commande d’accélération
+ou son modèle et le braquage, avec les paramètres du véhicule. Le support distingue ainsi la
+prédiction bξ
+−
+k de l’état corrigé bξ
++
+k :
+bξ
+−
+k = fbic
+ bξ
++
+k−1, uk, δk, ∆tk
+
+. (14)
+Le portage doit préciser comment les commandes et le braquage sont fournis, comment les co-
+ordonnées GNSS sont converties et comment les paramètres sont identifiés. L’empattement et la
+dynamique longitudinale d’un véhicule d’essai ne peuvent pas être transférés automatiquement
+à une autre plateforme.
+Innovation et caractéristiques du réseau Le réseau reçoit des informations sur le désaccord
+actuel et sur l’évolution récente de l’estimation et des mesures :
+rk = zk − Hbξ
+−
+k , (15)
+∆ξk = bξ
+−
+k − bξ
++
+k−1, ∆zk = zk − zk−1, (16)
+f k = concat
+ 
+∆ξk, rk, ∆zk, adisp
+k
+
+. (17)
+VEHALSECU 23
+=== PDF PAGE 25 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Le vecteur adisp
+k indique la disponibilité des voies de mesure ; il est distinct de l’accélération. Sur la
+carte, les différences angulaires doivent être repliées, les absences traitées explicitement et les
+normalisations identiques à celles employées pendant l’apprentissage. Une mesure indisponible
+ne doit pas être remplacée par zéro sans indicateur, car zéro peut être une valeur physique valide.
+Masque de fiabilité et gain appris Un premier réseau produit un masque de mesure, avec
+une composante comprise entre zéro et un pour chaque voie :
+mz
+k = σ(MLPm(f k)) . (18)
+Une structure récurrente GRU exploite les caractéristiques et leur fiabilité pour mettre à jour un
+état interne hk. Un autre bloc produit le gain appris Kk ; le support utilise une sortie de type
+tangente hyperbolique. La correction finale est
+erk = mz
+k ⊙ rk, (19)
+bξ
++
+k = bξ
+−
+k + Kkerk. (20)
+Le masque réduit directement l’innovation transmise au correcteur ; le gain module ensuite son
+effet sur l’état. Ces deux mécanismes se complètent. Un masque faible n’est pas nécessaire-
+ment une probabilité d’attaque calibrée : il représente la décision apprise d’atténuer une voie de
+mesure.
+Pour l’implémentation, les dimensions doivent être explicites. Le masque des quatre mesures et
+le vecteur concaténé de caractéristiques n’ont pas nécessairement la même taille. Le masquage
+des entrées de la GRU nécessite donc une correspondance définie entre voies et blocs de carac-
+téristiques. Cette correspondance, les paramètres du réseau et l’état récurrent doivent être figés
+et testés lors de l’export du modèle.
+Apprentissage et séparation des essais La présentation décrit une première phase d’appren-
+tissage du correcteur à partir d’un état antérieur de bonne qualité, puis un ajustement de bout en
+bout où le réseau réutilise sa propre sortie. La seconde phase confronte l’apprentissage aux er-
+reurs qui se propagent dans la boucle récurrente. Les 20% finaux de la séquence sont réservés
+à la validation dans le protocole présenté.
+Les labels d’attaque supervisent le masque : une voie saine a une cible de masque égale à
+un, une voie attaquée une cible égale à zéro. La fonction de coût combine l’erreur d’estimation,
+l’erreur du masque et des pénalisations sur l’amplitude ou les variations du gain et du masque.
+Ces dernières limitent les corrections excessives et les variations rapides de pondération. Le
+protocole présenté constitue une base ; la validation du transfert doit également couvrir des trajets,
+intensités et combinaisons d’attaques absents de l’apprentissage.
+L’apprentissage reste hors carte. Le microcontrôleur exécute uniquement l’inférence : prépa-
+ration des caractéristiques, calcul du masque, mise à jour de l’état récurrent, calcul du gain et
+correction. Le fichier de poids doit être livré avec la définition des entrées, les paramètres de
+normalisation et les conditions d’initialisation.
+Analyse des résultats présentés La figure 17 compare la trajectoire et les erreurs absolues
+d’une estimation robuste et d’un EKF , relativement à la référence appelée Clean Ref EKF . Dans
+les fenêtres de perturbation montrées, les pics d’erreur de l’EKF sont plus prononcés, notamment
+en position et en vitesse. La correction robuste reste généralement plus proche de cette référence
+pendant ces épisodes. En dehors des attaques, les écarts du réseau doivent aussi être examinés :
+une amélioration sous perturbation ne prouve pas une supériorité pour chaque instant et chaque
+condition.
+VEHALSECU 24
+=== PDF PAGE 26 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+74
+Testing, Diagnostics, and Result
+FIGURE 17 – Résultats RKNet sur la trajectoire et les erreurs de position, cap et vitesse. Les courbes sont
+comparées à l’estimateur « Clean Ref EKF ». Source : support de thèse, p. PDF 45.
+La référence Clean Ref EKF est un estimateur de comparaison, pas une vérité terrain indépen-
+dante. Les courbes permettent de constater un comportement relatif, mais ne suffisent pas à
+calculer une précision absolue ou une réduction de RMSE sans les séries numériques et la dé-
+finition des fenêtres d’évaluation. Elles ne doivent pas non plus être comparées directement aux
+RMSE de la séquence embarquée de 20 s, qui relève d’un autre protocole.
+La figure 18 explique le mécanisme observé. Pendant les sauts GNSS, les composantes de
+masque et de gain associées à la position diminuent. Pendant les perturbations de vitesse, la
+pondération de cette voie s’adapte également. La baisse ne concerne pas indistinctement toutes
+les composantes : elle dépend de la voie, de l’épisode et de l’état interne du réseau. L’enre-
+gistrement simultané des masques, gains et erreurs est donc utile pour diagnostiquer le
+comportement sur la carte.
+VEHALSECU 25
+=== PDF PAGE 27 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+75
+Mask and Gain RKNet go down  
+So less depend on the measurement , 
+more robust
+FIGURE 18 – Évolution des gains de l’EKF et de RKNet et des masques de mesure pendant les perturba-
+tions GNSS et de vitesse. Source : support de thèse, p. PDF 46.
+Portage et validation sur STM32 Le déploiement doit commencer par un rejeu d’entrées iden-
+tiques dans l’environnement de référence et sur la carte, avec comparaison des masques, gains
+et états corrigés. Les poids et buffers sont préalloués ; les dimensions et l’ordre des opérations
+sont contrôlés. Le coût de l’inférence comprend les couches denses, la récurrence, les activations
+et les conversions de données, pas seulement la multiplication finale par le gain.
+Le passage de l’EKF à six états vers RKNet à quatre grandeurs demande un adaptateur. La
+vitesse scalaire doit être construite avec une convention de signe cohérente ; le cap et les co-
+ordonnées doivent utiliser le même repère. L’estimation du biais gyroscopique, présente dans
+l’EKF , ne disparaît pas sans conséquence : elle doit être conservée dans une fonction séparée
+ou intégrée dans une extension explicitement validée du modèle appris.
+La précision simple, la quantification et la réduction de taille du réseau sont des choix d’optimisa-
+tion à évaluer, pas des gains déjà mesurés. Le firmware doit prévoir une réinitialisation contrôlée
+de l’état récurrent et un repli vers l’EKF de référence en cas de dépassement de délai ou de
+valeur non finie. L’activation dans la boucle de navigation est conditionnée par la concordance
+numérique, la tenue du budget temporel et une comparaison indépendante sous attaque et hors
+attaque.
+5.2.11 Synthèse du couplage des algorithmes avec la carte
+Les trois représentations d’état ne sont pas interchangeables. Leur raccordement doit être réa-
+lisé par une interface documentée, avant de comparer les algorithmes ou de modifier la boucle
+embarquée.
+Une architecture de transfert peut maintenir l’acquisition et l’EKF à 100 Hz, calculer le Trust à
+la cadence des informations reçues, puis exécuter RKNet en parallèle de référence avant tout
+remplacement. Le retour arrière est déclenché par une décision de supervision et dispose d’un
+quota de calcul. Cette répartition est une proposition de portage ; l’affectation définitive des tâches
+dépendra du profilage des deux cœurs et des accès mémoire.
+VEHALSECU 26
+=== PDF PAGE 28 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Brique État ou information Exigence d’intégration
+EKF de la carte pN , pE, vN , vE, ψ, bg Navigation locale, biais et covariance
+Modèle du convoi sx, sy, v, a, θ Vitesse scalaire, accélération, repères et dates
+cohérents
+Robust KalmanNet px, py, ψ, v et état récurrent Normalisations, commandes, masque, gain et
+gestion du biais
+Trust Validité, LT , DT , VT et poids Identité, fraîcheur, mesures relatives et
+historique par voisin
+Retour arrière États et contributions
+sauvegardés
+Profondeur mémoire, sélection des sources et
+rattrapage temporel
+TABLE 4 – Interfaces à définir entre les fonctions d’estimation et de résilience.
+Dimensionnement mémoire Le vecteur d’état et la covariance de l’EKF représentent 6 + 36 =
+42 nombres, soit 168 octets en précision simple sur 32 bits. Ce calcul ne comprend ni les matrices
+temporaires, ni les piles, ni les pilotes. Pour RKNet, la mémoire des seuls poids est 4P octets en
+précision simple si P désigne le nombre de paramètres ; il faut ajouter les activations, les buffers
+et l’état de la GRU. Le support ne donne pas les dimensions nécessaires pour annoncer une
+empreinte totale.
+Exemple de dimensionnement, et non mesure de la carte. Un historique de 200 instants à
+100 Hz couvre 2 s. Si chaque enregistrement occupe 256 octets, le tampon nécessite 200×256 =
+51 200 octets, soit 50 Kio. La taille de 256 octets est une hypothèse illustrative : l’historique réel
+dépend du nombre de véhicules, des états et des contributions à rejouer.
+Budget temporel À 100 Hz, une période vaut 10 ms. La condition à vérifier porte sur la somme
+du calcul, des interruptions, des attentes bornées et des contentions sur le chemin critique :
+Ccalcul + Cinterruptions + Cattentes + Ccontentions < 10 ms. (21)
+À titre illustratif , une enveloppe de 2 ms pour l’acquisition consolidée, l’EKF et la supervision
+occuperait 20% de la période et laisserait 8 ms avant prise en compte des autres charges. Ce
+budget n’est pas un résultat de profilage ; RKNet et le rejeu devront y être ajoutés ou planifiés
+séparément. Le maximum observé pendant des essais ne constitue pas, à lui seul, une borne
+théorique du pire cas.
+Mesures matérielles à associer aux résultats Les journaux doivent fournir le temps moyen,
+le 99e centile et le maximum observé, la gigue, les échéances dépassées, les pertes de buffers,
+la RAM, la Flash et la marge de pile. La latence de bout en bout et l’âge des mesures doivent être
+mesurés séparément. La consommation moyenne et les pointes de courant peuvent compléter
+le bilan de la carte. Ces indicateurs rendent les résultats exploitables pour choisir entre EKF seul,
+supervision Trust et correction RKNet.
+5.2.12 Validation comparative des extensions sur la carte
+La comparaison doit utiliser les mêmes entrées, les mêmes repères et la même référence. Elle
+sépare le fonctionnement nominal, l’attaque et la récupération. Les pertes ou perturbations aléa-
+toires sont répétées avec des graines consignées. Le tableau suivant reprend des paramètres
+d’attaque du support et les relie aux observations nécessaires sur le démonstrateur ; il constitue
+un plan d’essais, pas une liste de résultats déjà obtenus.
+VEHALSECU 27
+=== PDF PAGE 29 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Scénario Comparaison Indicateurs à produire
+Nominal et charge
+maximale
+EKF seul puis fonctions
+ajoutées
+Erreur nominale, latence, gigue, mémoire
+Biais de position −5 m de
+10 à 15 s
+Avec et sans Trust pour le
+cas V2V ; EKF/RKNet pour le
+cas capteur
+Délai de réaction, erreur maximale,
+récupération
+Biais de vitesse −2 m/s Correction standard puis
+robuste
+Erreur de vitesse et effet sur la position
+Pertes de messages à
+50%
+Gestion des absences et
+décroissance du Trust
+Continuité de navigation, reprise, âge des
+données
+Propagation et détection
+tardive
+Avec et sans retour arrière Erreur après alerte, temps et profondeur
+de rejeu
+Sauts GNSS et
+corruption de vitesse du
+protocole RKNet
+EKF , RKNet et référence
+indépendante si disponible
+RMSE par voie et période, masque, gain,
+faux rejets
+Communication et
+affichage fortement
+sollicités
+Exécution nominale et
+charge maximale
+Dépassements de 10 ms, files et pertes
+de buffers
+TABLE 5 – Campagne proposée pour relier résilience, implémentation et performances matérielles.
+Les attaques au niveau du capteur et celles au niveau V2V doivent être injectées à des interfaces
+distinctes. Un même biais de position n’éprouve pas le même mécanisme s’il modifie la mesure
+GNSS locale ou seulement le message transmis à un voisin. L’emplacement de l’injection fait
+donc partie du protocole, au même titre que l’amplitude et la durée.
+Un essai de rejeu sur microcontrôleur établit la concordance numérique et le coût matériel de
+l’algorithme. L’essai sur véhicule complète cette information par les effets des capteurs, des vi-
+brations, de l’environnement radio et du positionnement satellitaire. Pour annoncer un gain, il faut
+publier les valeurs de référence et celles de la méthode évaluée sur le même jeu de données,
+plutôt que rapprocher les chiffres de deux séquences différentes.
+5.3 Bilan des travaux
+La réalisation du capteur constitue le socle matériel de l’opération : étude de la carte dédiée,
+développement sur une plateforme STM32, pilotes, EKF périodique, mécanismes de robustesse,
+affichage et liaison vers ROS 2. La fiche rapporte une validation du transport et des résultats de
+navigation sur une séquence dynamique. Ces éléments établissent une base de comparaison
+pour les extensions de résilience.
+L’apport du support de thèse est désormais relié à des fonctions logicielles identifiables. Le Trust
+transforme des tests de cohérence en décisions d’admission et en poids de consensus. Le retour
+arrière reconstruit un état après détection tardive, sous réserve d’un historique et de contributions
+exploitables. Robust KalmanNet apprend à atténuer les innovations corrompues au moyen d’un
+masque et d’un gain adaptatifs. Les figures du support illustrent ces principes et les comporte-
+ments observés dans les protocoles présentés.
+La prochaine démonstration attendue est celle du compromis complet sur cible : réduction des
+erreurs sous attaque, limitation des fausses alertes, maintien de l’estimation en mode dégradé
+et respect des ressources disponibles. Elle permettra de passer de la faisabilité algorithmique à
+une spécification de capteur résilient mesurable et reproductible.
+VEHALSECU 28
+=== PDF PAGE 30 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Élément Niveau établi dans les documents et suite sur carte
+Pilotes et EKF à 100 Hz Implantation décrite sur la plateforme de développement ; profilage
+détaillé à compléter
+Chaîne ESP32 et ROS 2 Fonctionnement et pertes rapportés ; latence et durée des campagnes à
+préciser
+Trust et consensus Méthodes et résultats présentés dans le support ; transfert et validation
+embarquée à caractériser
+Retour arrière Mécanisme de réparation présenté ; mémoire, sources rejouables et
+coût temporel à qualifier
+Robust KalmanNet Comparaisons et adaptation des masques et gains présentées ;
+inférence STM32 à valider
+Carte dédiée Remise en service et transfert nécessitant une nouvelle qualification
+matérielle et temporelle
+TABLE 6 – Bilan distinguant réalisation du démonstrateur et extensions issues de la thèse.
+6 Ressources humaines
+Cf. documents économiques
+7 Partenariat scientifique et recherche confiée
+Ce projet s’inscrit pour partie dans une collaboration avec le Centre de Recherche en Automa-
+tique de Nancy (CRAN) et bénéficie d’une thèse CIFRE de NGUYEN Quang Huy. Le laboratoire
+apporte son expertise dans les domaines de l’électronique et le développement d’observateurs
+et contrôleurs. Il met à disposition aussi sa plateforme de test pour la validation des modèles.
+VEHALSECU 29
+=== PDF PAGE 31 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+8 Annexes livrables (Dossier pré-économique)
+8.1 Tableau synthétique de l’Opération
+Les annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externe.
+Classification
+de l’Opération
+R&D
+Domaines de Recherche
+/Mots-clés
+Présentation synthétique Indicateurs de recherche Observations Présence de
+Thèse
+Si collab avec
+le ministère de
+la Défense
+(DGA) ou de
+l’Intérieur,
+préciser la
+classification :
+SD : Secret
+Défense
+CD :
+Confidentiel
+Défense
+DR : Diffusion
+Restreinte
+NA : Non
+Applicable
+Identifier précisément les
+domaines scientifiques
+(principal et sous-domaines) :
+utiliser la nomenclature figurant
+en annexe et compléter avec
+des mots-clés libres afin de
+guider le ministère dans le choix
+d’un expert scientifique
+Si Mots-Clés : Indiquer
+précisément « mots-clés : … »
+Résumer l’opération de R&D (en 4 à 5 phrases maximum), en
+exposant les objectifs des travaux et leurs résultats et
+contributions scientifiques, techniques ou technologiques.
+Lister les indicateurs : publications scientifiques et
+communications en congrès international,
+collaborations académiques, universitaires avec
+des organismes publics (CNRS, INSERM, INRA,
+CEA…), thèse, contrat CIFRE, projet coopératif
+subventionné par la France ou l’Union
+Européenne FUI, ANR…), dépôt de brevet, etc.
+Oui / Non
+VEHALSECU 30
+=== PDF PAGE 32 ===
+SEGULA TECHNOLOGIES CAPTEUR EMBARQUÉ POUR VAC
+Classification
+de l’Opération
+R&D
+Domaines de Recherche
+/Mots-clés
+Présentation synthétique Indicateurs de recherche Observations Présence de
+Thèse
+NA Domaine : A1a, A2b, A3d
+Mots-clés : capteur embarqué
+intelligent ; observateur d’état
+temps réel (filtre de Kalman
+étendu) ; fusion inertiel / GNSS /
+magnétomètre ; détection de
+défauts et de cyberattaques par
+surveillance du résidu ;
+systèmes temps réel
+embarqués (RTOS,
+microcontrôleur double cœur) ;
+intégration ROS 2 ; véhicules
+autonomes et connectés.
+L’opération porte sur le passage à l’embarqué temps réel des
+observateurs d’état du projet VEHALSECU, jusqu’ici validés
+en simulation. Un capteur embarqué intelligent a été conçu,
+développé et validé : firmware temps réel multitâche sur
+microcontrôleur double cœur, pilotes des capteurs inertiel,
+magnétomètre et GNSS, et observateur de type filtre de
+Kalman étendu à six états exécuté à 100 Hz avec estimation
+en ligne du biais gyroscopique.
+Une chaîne de communication complète a été réalisée, du
+capteur au calculateur ROS 2 du véhicule d’expérimentation
+via une passerelle sans fil, la position étant publiée au format
+normalisé de positionnement par satellite.
+Le système a été validé en environnement contrôlé puis en
+conditions réelles sur véhicule : RMSE de vitesse de 0,011
+m/s (R 2 = 0,99904), RMSE de cap de 0,43°, RMSE de
+position de 0,39 m, cap stabilisé sous 0,2° d’écart-type après
+calibration du magnétomètre.
+Le résidu normalisé de l’observateur a été caractérisé en
+fonctionnement sain (maximum de 2,12, aucune fausse
+alarme) : ce plancher de bruit conditionne le
+dimensionnement du seuil de détection des cyberattaques,
+dont la validation sous attaque constitue la suite immédiate.
+Ces travaux bénéficient de la thèse CIFRE
+VEHALSECU lancée le 01/06/2023 avec M.
+NGUYEN Quang Huy (ANRT 2022/1732), en
+collaboration avec le CRAN (UMR 7039 CNRS /
+Université de Lorraine).
+Publications : (Diouf et al., SAGIP 2023) ;
+(Nguyen et al., 2024) « Cyberattack Detection by
+Using a Discrete-Time Model-Based Unknown
+Input Observer » ; (Sadki et al., 2025).
+Encadrement d’un stage de fin d’études Master 2
+(Université de Strasbourg, parcours SEME)
+co-encadré CRAN / SEGULA T echnologies.
+Oui
+VEHALSECU 31

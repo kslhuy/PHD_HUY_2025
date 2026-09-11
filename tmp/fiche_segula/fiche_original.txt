@@ -1,0 +1,384 @@
+﻿
+
+
+
+
+
+
+
+
+Projets de Recherche et Innovation
+
+
+
+
+
+
+
+
+
+
+
+Fiche de synthèse
+
+
+Capteur embarqué intelligent pour véhicules autonomes connectés : implémentation temps réel d'un observateur d'état et validation sur cible matérielle réelle
+
+
+Domaines de recherche principaux, sous-domaines associés et mots clés si nécessaire: 
+A lister par ordre d’importance, à compléter ci-après voir annexe « nomenclature … »
+A1a, A2b, A3d
+Mots-clés : capteur embarqué intelligent ; observateur d'état temps réel (filtre de Kalman étendu) ; fusion inertiel/GNSS/magnétomètre ; détection de défauts et de cyberattaques par surveillance du résidu ; temps réel embarqué ; ROS 2.
+Volume horaire déclaré au CIR pour l’opération, par année (si pluriannuelle) : 
+Ne rien saisir
+
+Sommaire
+1Opération de R&D dans le cadre de l’activité de l’entreprise3
+2Indicateurs externes de recherche3
+3Objet de l’opération de R&D4
+3.1Objectifs et problématique4
+3.2Démarche scientifique4
+3.3État de l’art4
+3.3.1Travaux de recherche antérieurs et rappel des indicateurs antérieurs4
+3.3.2Recherche bibliographique / Etat des techniques existantes5
+3.3.3Etat des systèmes existants5
+3.3.4Références Bibliographiques6
+3.3.5Bilan critique6
+3.4Aléa et verrou6
+4Contribution scientifique, technique ou technologique6
+4.1Nouvelles connaissances acquises7
+4.2Perspectives7
+4.3Transférabilité / Reproductibilité des résultats8
+5Description de la démarche suivie et des travaux réalisés8
+5.1Démarche expérimentale8
+5.1.1Étude de la carte dédiée et analyse de l’existant8
+5.1.2Plateforme de développement et environnement9
+5.1.3Plan de validation10
+5.2Travaux & résultats de l’opération de R&D10
+5.2.1Architecture du capteur embarqué10
+5.2.2Firmware temps réel et pilotes de capteurs11
+5.2.3Observateur d’état embarqué (EKF)12
+5.2.4Chaîne de communication et intégration ROS 212
+5.2.5Difficultés techniques levées13
+5.2.6Campagne de validation et résultats quantitatifs13
+5.2.7Vers la détection de défauts et de cyberattaques16
+5.3Bilan des travaux17
+6Ressources humaines17
+7Partenariat scientifique et recherche confiée17
+8Annexes livrables (Dossier pré-économique)20
+8.1Tableau synthétique de l’Opération20
+
+
+
+Opération de R&D dans le cadre de l’activité de l’entreprise
+Les véhicules autonomes et connectés (VAC) reposent sur la connaissance, en temps réel, de nombreuses variables dynamiques — position, vitesse, cap, distance inter-véhicules — indispensables à la commande et à la sûreté de fonctionnement. Ces grandeurs ne sont pas toutes directement mesurables, et les capteurs qui les fournissent sont exposés aussi bien aux défauts matériels qu’aux cyberattaques, en particulier lorsque les véhicules échangent des informations par voie sans fil (V2V / V2X).
+Le projet VEHALSECU de SEGULA Technologies vise à répondre à cette problématique par des observateurs d’état capables à la fois d’estimer les variables non mesurées et de détecter les incohérences révélatrices d’une attaque ou d’une défaillance. Les travaux antérieurs de l’opération ont porté sur la modélisation, la synthèse d’observateurs et leur évaluation en simulation, ainsi que sur la conception d’une carte électronique embarquée dédiée.
+La présente opération porte sur un verrou spécifique et structurant du projet : le passage de ces méthodes, développées et validées en simulation, à uneimplémentation embarquée temps réel, éprouvée sur cible matérielle réelle et intégrée à un véhicule d’expérimentation. Elle couvre l’ensemble du parcours, depuis l’étude de la carte électronique dédiée jusqu’à la validation dynamique du capteur sur véhicule en conditions réelles, et fournit le socle expérimental sur lequel les mécanismes de détection de cyberattaques du projet pourront être éprouvés.
+Indicateurs externes de recherche
+Ces travaux s’inscrivent dans le cadre de la thèse CIFRE VEHALSECU, débutée le 01/06/2023 avec M. NGUYEN Quang Huy (ANRT 2022/1732), « Développement d’une carte électronique embarquée basée sur des algorithmes d’estimation avancés pour l’amélioration de la résilience du véhicule autonome et connecté », menée en collaboration avec le Centre de Recherche en Automatique de Nancy (CRAN, UMR 7039 CNRS / Université de Lorraine).
+Les travaux de l’opération ont donné lieu aux publications suivantes :
+(Diouf et al., 2023) : M. Diouf, A. Zemouche et M. Haddad, « Finite-Time and Exact Cyber-Attack Estimation for Connected Autonomous Vehicles », SAGIP, 2023.
+(Nguyen et al., 2024) : Q. H. Nguyen, O. Sadki, H. Rafaralahy, M. Haddad et A. Zemouche, « Cyberattack Detection by Using a Discrete-Time Model-Based Unknown Input Observer », 2024.
+(Sadki et al., 2025) : O. Sadki, Q. H. Nguyen, H. Rafaralahy, M. Haddad et A. Zemouche, travaux 2025 sur les observateurs résilients et le système de confiance distribué.
+La présente phase a par ailleurs mobilisé un stage de fin d’études de niveau Master 2 (Université de Strasbourg, Faculté de Physique et Ingénierie, parcours SEME), encadré conjointement par le CRAN et SEGULA Technologies.
+Objet de l’opération de R&D
+Objectifs et problématique
+L’objectif de l’opération est de concevoir, implémenter et valider uncapteur embarqué intelligentcapable d’estimer en temps réel l’état dynamique d’un véhicule autonome connecté — position, vitesse et cap — et de fournir le fondement quantitatif de la détection de défauts et de cyberattaques par surveillance du résidu de l’observateur.
+La problématique centrale est celle de l’embarquabilité: un observateur formulé en temps continu, validé en simulation sur calculateur non contraint, doit être discrétisé puis exécuté sur un microcontrôleur aux ressources limitées, à cadence élevée et sous contrainte temps réel dure, tout en s’intégrant à l’architecture de communication du véhicule. Cette transposition soulève des questions qui n’apparaissent pas en simulation : déterminisme de l’ordonnancement, latence des bus capteurs, dérive des périodes d’échantillonnage, robustesse aux mesures aberrantes et tenue de la liaison sans fil.
+Les objectifs opérationnels retenus sont les suivants :
+définir l’architecture matérielle et logicielle du capteur embarqué ;
+développer le firmware temps réel et les pilotes des capteurs (inertiel, magnétomètre, récepteur GNSS) ;
+implémenter un observateur d’état discret exécuté en temps réel et exploiter son résidu ;
+réaliser la chaîne complète, de l’acquisition capteur jusqu’à l’export des estimations vers le calculateur du véhicule ;
+valider expérimentalement le système en environnement contrôlé puis en conditions réelles, et caractériser quantitativement ses performances.
+Démarche scientifique
+La démarche adoptée estincrémentale et traçable: chaque capteur est mis en service isolément et validé sur banc, la chaîne de communication est éprouvée par simulation d’un flux de trames avant tout essai réel, puis l’ensemble est assemblé et validé en conditions réelles sur véhicule. Cette progression, plus lente qu’une intégration directe, présente un avantage décisif dans un contexte où plusieurs aléas matériels étaient à craindre : elle permet d’attribuer sans ambiguïté toute anomalie observée à sa cause, en réduisant à chaque étape le nombre de variables susceptibles d’expliquer un dysfonctionnement.
+Elle s’est déroulée en quatre temps : analyse de l’existant et étude de la carte dédiée ; construction d’une plateforme de développement équivalente et développement du firmware et des pilotes ; portage et validation de l’observateur temps réel ; enfin campagne de validation quantitative, du banc contrôlé aux essais dynamiques extérieurs.
+État de l’art
+Travaux de recherche antérieurs et rappel des indicateurs antérieurs
+Les phases antérieures du projet VEHALSECU ont établi le cadre théorique de l’opération : synthèse d’observateurs pour systèmes non linéaires fondée sur le théorème de la moyenne, observateurs à entrées inconnues pour la détection de cyberattaques, observateurs distribués et système de confiance pour la conduite en convoi, ainsi que la conception d’une carte électronique embarquée dédiée. Ces travaux ont été validés en simulation et par co-simulation, et ont donné lieu aux publications rappelées au chapitre 2. La présente opération prolonge ces acquis en les confrontant à une cible matérielle réelle.
+Recherche bibliographique / Etat des techniques existantes
+Estimation d’état et fusion de capteurs
+L’estimation de l’état d’un véhicule par fusion de capteurs inertiels et de positionnement satellitaire constitue un domaine mature, largement dominé par les approches de type filtre de Kalman. Le filtre de Kalman étendu (EKF) demeure la méthode de référence pour la fusion GNSS/IMU : il propage un modèle de mouvement alimenté par les mesures inertielles à haute fréquence, puis recale l’estimation à l’aide des mesures de positionnement, moins fréquentes [8], [11]. Les travaux récents confirment sa pertinence pour la localisation de véhicules terrestres tout en soulignant ses limites, notamment l’erreur de linéarisation, que des variantes comme le filtre de Kalman à état d’erreur (ESKF) cherchent à réduire [12].
+Trois enseignements convergents se dégagent de la littérature et recoupent les choix de l’opération. La répartition typique des cadences associe une centrale inertielle à une centaine de hertz et un récepteur satellitaire à quelques hertz, ce qui correspond exactement à l’architecture retenue. La qualité du positionnement satellitaire se dégrade fortement en environnement contraint — l’erreur pouvant atteindre plusieurs mètres — ce qui justifie une pondération dynamique des mesures selon leur fiabilité. Enfin, plusieurs études recommandent l’ajout de mesures complémentaires, telles que l’odométrie des roues ou un magnétomètre, pour maintenir la robustesse en cas de perte du signal satellitaire [12], [13].
+Observateurs pour la détection de défauts et de cyberattaques
+La détection de cyberattaques sur les véhicules connectés s’appuie fréquemment sur la notion derésidud’un observateur, c’est-à-dire l’écart entre une mesure et sa valeur prédite par le modèle. Issue de la théorie du diagnostic des systèmes, cette approche est aujourd’hui appliquée à la sécurité : un résidu anormalement élevé trahit une incohérence, qu’elle provienne d’un défaut matériel ou d’une injection de fausses données [5], [6]. Les travaux du CRAN ont développé des méthodes de synthèse d’observateurs pour systèmes non linéaires offrant des garanties de convergence directement exploitables pour cette surveillance [3], [4].
+La littérature distingue plusieurs familles d’attaques : le leurrage du récepteur satellitaire (spoofing), l’injection de fausses données sur les bus de communication internes ou les liaisons V2V, et les attaques par rejeu. Deux principes de défense reviennent systématiquement : la surveillance statistique du résidu, souvent formalisée par un test du khi-deux sur les résidus normalisés, et la redondance des sources de mesure, qui permet d’isoler le capteur compromis et de maintenir un mode dégradé sécurisé [7].
+Etat des systèmes existants
+Les solutions industrielles de localisation embarquée disponibles sur étagère (modules de fusion GNSS/INS propriétaires) fournissent une estimation de position performante mais restent des boîtes noires : le résidu interne n’est pas exposé, ce qui interdit précisément l’usage visé ici — le diagnostic et la détection d’attaque. Les plateformes de recherche à base d’intergiciels robotiques offrent quant à elles une grande souplesse mais s’exécutent sur calculateur non contraint, sans garantie temps réel dure au niveau capteur. L’espace laissé libre est celui d’un capteur embarqué ouvert, déterministe, exposant son estimationetson résidu à l’écosystème du véhicule : c’est l’objet de la présente opération.
+Références Bibliographiques
+[3] H. Nguyen,Observateurs et capteurs logiciels résilients pour l’estimation d’état et la détection de cyberattaques dans les véhicules autonomes connectés, thèse de doctorat, Université de Lorraine, CRAN, 2026.
+[4] A. Zemouche, M. Boutayeb et G. Bara, « Observer design for nonlinear systems: An approach based on the differential mean value theorem »,Proc. 44th IEEE Conference on Decision and Control, 2005, pp. 6353–6358.
+[5] Z. Wang, Y. Gao, C. Fang et al., « Fuzzy Unknown Input Observer for Estimating Sensor and Actuator Cyber-Attacks in Intelligent Connected Vehicles »,Automotive Innovation, Springer, 2023.
+[6] V. K. Yadav et al., « A Cyberattack Detection-Isolation Algorithm for Connected Autonomous Vehicles Under Changing Driving Environment »,IEEE Transactions on Intelligent Transportation Systems, 2024.
+[7] M. Pham et K. Xiong, « A survey on security attacks and defense techniques for connected and autonomous vehicles »,Computers & Security, vol. 109, p. 102269, 2021.
+[8] P. Bernard,Observer Design for Nonlinear Systems, Springer, LNCIS, vol. 479, 2019.
+[9] STMicroelectronics,UM2488 — Discovery kit with STM32H745XI MCU, User Manual, 2019.
+[10] Open Robotics,ROS 2 Documentation — Robot Operating System, https://docs.ros.org.
+[11] u-blox,NEO-M9N / SAM-M8Q — GNSS modules, Data Sheet and Protocol Specification, u-blox AG.
+[12] J. Kim, S. Lee et al., « Sensor Fusion of GNSS and IMU Data for Robust Localization via Smoothed Error State Kalman Filter »,Sensors (MDPI), vol. 23, 2023.
+[13] T. S. Teoh, P. P. Em et N. A. Ab Aziz, « Vehicle Localization Based on IMU, OBD2 and GNSS Sensor Fusion Using Extended Kalman Filter »,International Journal of Technology, vol. 14, n° 6, pp. 1237–1246, 2023.
+Bilan critique
+L’état de l’art valide les briques retenues — filtre de Kalman étendu, fusion multi-capteurs, exploitation du résidu — mais met en évidence que la très grande majorité des travaux publiés s’arrête au stade de la simulation ou de la validation sur calculateur non contraint. Le verrou adressé ici, à savoir la mise en œuvre embarquée temps réel de ces principes, éprouvée sur véhicule réel et caractérisée quantitativement, reste peu documenté. La contribution de l’opération ne réside donc pas dans la proposition d’un nouvel algorithme théorique, mais dans la démonstration expérimentale de son embarquabilité et dans l’établissement des indicateurs qui conditionnent le dimensionnement futur de la détection.
+Aléa et verrou
+Le verrou principal est l’embarquabilité de l’observateur: garantir une exécution à cadence fixe et à latence bornée sur microcontrôleur, sans dérive de la période d’échantillonnage, tout en assurant la robustesse de l’estimation aux mesures aberrantes et aux ruptures de la liaison sans fil.
+À ce verrou scientifique se sont ajoutés des aléas matériels majeurs, réellement rencontrés au cours de l’opération et non anticipables :
+défaillance du microcontrôleur de navigation de la carte électronique dédiée, non détecté par l’outil de programmation, et dysfonctionnement de son module de communication sans fil ;
+conflit d’affectation de broche entre la liaison de télémétrie et la ligne d’émission du récepteur GNSS ;
+broche de connecteur d’extension physiquement partagée entre deux signaux par pont de soudure, transportant en réalité un bus série synchrone ;
+instabilité des adresses réseau attribuées dynamiquement, rompant la liaison sans fil d’une session à l’autre.
+La résolution méthodique de ces aléas, documentée au chapitre 5, constitue en soi un apport de l’opération : elle a produit un ensemble de règles de conception et de diagnostic réutilisables pour le portage sur la carte de production.
+Contribution scientifique, technique ou technologique
+Nouvelles connaissances acquises
+L’opération a conduit à lapremière validation embarquée temps réel de l’observateur du projet, exécuté sur cible matérielle réelle et intégré à un véhicule d’expérimentation. Les contributions principales sont les suivantes :
+Portage et validation d’un observateur de type EKF à six états (position et vitesse Nord/Est, cap, biais gyroscopique) exécuté à 100 Hz sous système d’exploitation temps réel sur microcontrôleur double cœur, avec estimation en ligne du biais de gyromètre.
+Réalisation d’une chaîne de communication complète du capteur au calculateur ROS 2 par passerelle sans fil, la position étant publiée au format standard de positionnement par satellite, immédiatement exploitable par l’écosystème du véhicule.
+Caractérisation quantitative des performances de l’estimateur sur séquence dynamique : estimation de vitesse au centimètre par seconde, cap au demi-degré, position horizontale sous quarante centimètres.
+Établissement duplancher de bruit du résidu normalisé en fonctionnement sain(maximum de 2,12, aucune fausse alarme), préalable indispensable au dimensionnement du seuil de détection d’une cyberattaque.
+Démonstration de l’efficacité des mécanismes de robustesse embarqués (calibration hard/soft iron du magnétomètre, garde d’innovation magnétique à 45°, correction à vitesse nulle, garde-fou de vitesse) en conditions dynamiques réelles.
+Perspectives
+Validation quantitative de la détection sous attaque (leurrage GNSS, injection de fausses données) : mesure du temps de détection et du taux de fausses alertes.
+Formalisation statistique du seuil d’alarme par test du khi-deux sur les résidus normalisés, en s’appuyant sur le plancher de bruit établi.
+Couplage serré des mesures GNSS et exploitation renforcée de l’odométrie et de l’inertiel pour la tenue en mode dégradé lors des masquages transitoires.
+Intégration au système de confiance distribué du projet et extension au suivi coopératif (platooning) avec échange de données de navigation vérifiées.
+Portage du firmware sur la carte de production dédiée, la logique applicative étant réutilisable sans modification.
+Transférabilité / Reproductibilité des résultats
+Le firmware et les pilotes de capteurs ont été développés de manière modulaire et indépendante du matériel : les composants capteurs de la plateforme de développement étant identiques à ceux de la carte dédiée, le portage vers la carte de production se limite à une reconfiguration des affectations de broches, sans réécriture de la logique applicative. La chaîne repose par ailleurs sur des standards ouverts — intergiciel ROS 2, format normalisé de publication de position, protocoles série et réseau usuels, trames de télémétrie en format texte structuré — ce qui garantit la reproductibilité des essais et l’interopérabilité avec d’autres véhicules d’expérimentation. Le plan de tests, ses jeux de données et ses critères d’acceptation sont documentés et rejouables à l’identique.
+Description de la démarche suivie et des travaux réalisés
+Démarche expérimentale
+La démarche expérimentale a été construite pour découpler l’avancement logiciel des aléas matériels et pour valider chaque brique avant intégration.
+Étude de la carte dédiée et analyse de l’existant
+Les premiers travaux ont porté sur l’étude de la carte électronique dédiée développée en amont du projet (conception CRAN / SEGULA) : carte à double microcontrôleur intégrant les deux cœurs — navigation et communication — les capteurs inertiel, magnétomètre et GNSS, et un module de communication sans fil. L’analyse des fichiers de conception a permis d’identifier l’architecture, les références des composants, les bus employés (SPI, I²C, UART) et l’ensemble des connecteurs.
+
+Figure 1 : carte électronique dédiée du projet (double microcontrôleur, capteurs, GNSS, communication)
+
+Figure 2 : schéma bloc de la carte électronique dédiée — cœurs navigation et communication, capteurs (IMU, magnétomètre, GNSS), mémoires, liaisons sans fil et interfaces de programmation
+Cette phase a révélé deux difficultés matérielles bloquantes : le microcontrôleur de navigation n’était plus détecté par l’outil de programmation, et le module de communication sans fil présentait un dysfonctionnement. Ces constats ont motivé la mise en place d’une plateforme de substitution afin de ne pas immobiliser l’opération.
+Plateforme de développement et environnement
+Une carte d’évaluation à double cœur a été retenue, associée à des modules capteurs du commerce embarquant exactement les mêmes composants que la carte dédiée. Les pilotes développés sur cette plateforme sont ainsi directement réutilisables, le portage ultérieur se limitant à une reconfiguration des broches. Cette stratégie de développement sur cible intermédiaire réduit le risque projet.
+
+
+Figure 3 : plateforme de développement — carte d’évaluation double cœur (haut) et architecture en blocs de la chaîne d’acquisition, d’estimation et de communication (bas)
+L’environnement de développement, de programmation et de diagnostic (chaîne de compilation, sonde de débogage intégrée, terminal série, outil de configuration GNSS du fabricant) a été mis en place, ainsi que l’intergiciel ROS 2 côté véhicule.
+Plan de validation
+Le plan de validation a été défini en trois niveaux, du plus contrôlé au plus représentatif : validation de la chaîne de réception et de publication à l’aide d’un simulateur de trames (scénarios nominal, pertes injectées, mode dégradé, endurance) ; validation de la chaîne complète réelle en statique ; puis essais dynamiques en extérieur, système monté sur le véhicule. Chaque niveau est associé à des critères d’acceptation quantitatifs (cadence, taux de pertes, cohérence des estimations, écart-type du cap).
+Travaux & résultats de l’opération de R&D
+Architecture du capteur embarqué
+Le système repose sur une architecture à deux microcontrôleurs, chacun dédié à une fonction distincte, selon le principe de ségrégation des fonctions par criticité temporelle : isoler l’acquisition et l’estimation des tâches de communication garantit que les aléas de la liaison sans fil — latences, reconnexions, retransmissions — ne peuvent jamais perturber la régularité de l’estimateur.
+Fonction
+Composant
+Interface
+Navigation / estimation
+Microcontrôleur STM32 (cœur principal)
+—
+Communication
+Microcontrôleur STM32 (second cœur)
+—
+Inertiel (6 axes)
+Centrale inertielle
+SPI
+Cap
+Magnétomètre 3 axes
+I²C
+Position
+Récepteur GNSS u-blox
+UART (NMEA)
+Liaison sans fil
+Passerelle ESP32
+WiFi / UDP
+Tableau 1 : répartition fonctionnelle de l’architecture matérielle du capteur
+Le choix des bus découle des caractéristiques de chaque capteur : bus série synchrone rapide pour la centrale inertielle, dont la cadence élevée exige une lecture sans latence ; bus à deux fils pour le magnétomètre, dont les mesures évoluent lentement ; liaison série asynchrone et protocole textuel normalisé pour le récepteur satellitaire, garantissant l’interopérabilité.
+Firmware temps réel et pilotes de capteurs
+Le firmware a été organisé en architecture multitâche sous système d’exploitation temps réel, réparti entre les deux cœurs : acquisition des capteurs sur le cœur secondaire, estimation, affichage et transmission sur le cœur principal, les deux communiquant par une zone de mémoire partagée protégée contre les accès concurrents.
+Tâche
+Priorité
+Période
+Rôle
+Acquisition inertielle
+Haute
+10 ms (100 Hz)
+Lecture des accélérations et vitesses angulaires
+Estimation (observateur)
+Haute
+10 ms (100 Hz)
+Prédiction et correction de l’état estimé
+Lecture magnétomètre
+Moyenne
+20 ms (50 Hz)
+Mesure du champ magnétique, calcul du cap
+Traitement GNSS
+Basse
+100 ms (10 Hz)
+Décodage des trames de positionnement
+Transmission
+Moyenne
+100 ms (10 Hz)
+Émission de la trame vers la passerelle
+Affichage
+Basse
+200 ms (5 Hz)
+Mise à jour de l’écran de navigation
+Tableau 2 : découpage du firmware en tâches temps réel
+La périodicité stricte est garantie par une temporisation à référence absolue : chaque réveil est calculé par rapport à un instant de référence incrémenté de la période, ce qui évite la dérive de cadence qu’introduirait une temporisation relative. Chaque capteur a fait l’objet d’un pilote dédié : lecture en rafale de la centrale inertielle en SPI avec vérification d’identité du composant, réception par interruption des trames GNSS avec analyse des trames normalisées, lecture du magnétomètre en I²C. Un afficheur embarqué restitue en temps réel les grandeurs estimées et l’état de l’estimateur.
+Observateur d’état embarqué (EKF)
+L’observateur est un filtre de Kalman étendu à six états — position et vitesse Nord/Est, cap et biais du gyromètre — exécuté à 100 Hz. L’étape de prédiction propage l’état à partir des mesures inertielles (accélérations projetées selon le cap, vitesse de lacet corrigée du biais estimé). L’étape de correction applique des mises à jour scalaires successives : position et vitesse issues du récepteur satellitaire, vitesse issue de l’odométrie des roues, cap magnétique avec rejet des innovations supérieures à 45°, et correction à vitesse nulle lors des phases d’immobilité.
+
+Figure 4 : cycle de l’observateur embarqué — prédiction, corrections successives et surveillance du résidu
+Plusieurs mécanismes de robustesse complètent le filtre : calibration initiale à l’arrêt, estimation en ligne du biais gyroscopique, garde sur l’innovation magnétique, garde-fou de vitesse et gestion d’un indicateur de confiance de l’estimation. Le résidu normalisé de chaque voie de mesure est calculé et surveillé en continu : c’est cette grandeur qui porte l’information de diagnostic exploitée pour la détection.
+Chaîne de communication et intégration ROS 2
+Les estimations sont émises sur liaison série sous forme de trames textuelles structurées, à 10 Hz, vers une passerelle bâtie autour d’un module ESP32 qui les relaie en WiFi/UDP vers le calculateur du véhicule d’expérimentation (robot mobile AgileX LIMO exécutant ROS 2). Le protocole UDP a été préféré à TCP : pour une télémétrie périodique, la faible latence prime sur la garantie de livraison. Un identifiant séquentiel inséré dans chaque trame permet de mesurer le taux de pertes côté réception.
+
+Figure 5 : intégration ROS 2 — topics natifs du véhicule (gauche) et position publiée au format normalisé (droite)
+Côté calculateur, un nœud dédié décode les trames et publie la position au format standard de positionnement par satellite, aux côtés des topics natifs du robot (odométrie, LiDAR). Le capteur s’intègre ainsi à l’écosystème du véhicule sans modification de son logiciel, en lui apportant une source d’information dont il ne dispose pas nativement : un positionnement absolu accompagné de son indicateur de confiance.
+Difficultés techniques levées
+La mise en service de la liaison entre le microcontrôleur et la passerelle a fait apparaître trois difficultés, résolues par une démarche de diagnostic méthodique appuyée sur la documentation matérielle et la mesure :
+Conflit d’affectation de broche avec le récepteur GNSS.Une brève salve de données au démarrage, puis un silence complet, ont orienté le diagnostic vers un conflit d’usage : la broche câblée pour la télémétrie était déjà affectée à la ligne d’émission vers le récepteur satellitaire, les octets captés correspondant à sa trame de configuration initiale. Le récepteur n’étant piloté qu’en réception en fonctionnement nominal, cette ligne a pu être libérée et réaffectée.
+Broche de connecteur physiquement partagée.Un flux continu mais incohérent a conduit à la consultation du manuel matériel détaillé de la carte : la broche visée, exposée sur un connecteur d’extension, est partagée entre deux signaux par un pont de soudure et transportait en réalité une ligne du bus série synchrone de la centrale inertielle. La liaison a été réaffectée, côté logiciel, à un autre périphérique série accessible et sans conflit.
+Instabilité des adresses réseau.Les adresses attribuées dynamiquement à la passerelle et au calculateur changeant d’une session à l’autre, l’émission point à point a été complétée par une émission en diffusion sur le sous-réseau local, rendant la liaison robuste aux réattributions d’adresses pour une charge réseau négligeable.
+Ces trois résolutions ont produit des règles de conception directement réutilisables lors du portage sur la carte de production : vérifier l’affectation complète des ressources du microcontrôleur avant tout ajout de fonction, contrôler l’état des ponts de soudure du connecteur avant câblage, et concevoir la liaison sans fil pour tolérer l’incertitude de la configuration réseau.
+Campagne de validation et résultats quantitatifs
+Validation en environnement contrôlé.La chaîne de réception et de publication a d’abord été validée à l’aide d’un simulateur reproduisant les trames du capteur, sur quatre scénarios : nominal, pertes injectées à 10 %, mode dégradé et endurance courte. Les quatre scénarios sont conformes aux critères d’acceptation. La détection des pertes par identifiant séquentiel a été vérifiée : le taux mesuré converge vers le taux injecté.
+
+Figure 6 : validation en environnement contrôlé — flux simulé avec pertes injectées (gauche) et détection des pertes par identifiant séquentiel (droite)
+Validation de la chaîne complète et essais extérieurs.La chaîne réelle complète a ensuite été mesurée à 10 trames par seconde avec un taux de pertes de l’ordre de 2 %. Des essais dynamiques ont été menés en extérieur, le système monté sur le véhicule : suppression de la vitesse parasite à l’arrêt, suivi fidèle du mouvement, réception de 5 à 8 satellites, et stabilisation du cap sous 0,2° d’écart-type après calibration hard/soft iron du magnétomètre.
+
+Figure 7 : essais dynamiques en extérieur — système monté sur le véhicule (gauche) et écran de navigation embarqué (droite)
+Caractérisation quantitative de l’estimateur.L’estimateur a été caractérisé sur une séquence dynamique de vingt secondes échantillonnée à 100 Hz, enchaînant accélérations, décélérations, freinage brusque avec glissement de roue et oscillations de vitesse, avec injection volontaire d’un biais gyroscopique de 12 mrad/s et de deux perturbations magnétiques ponctuelles.
+
+Figure 8 : suivi de la vitesse par l’observateur — estimation comparée à la référence (haut) et erreur bornée par le RMSE (bas)
+Indicateur
+Valeur
+Unité
+Erreur quadratique moyenne (RMSE) de vitesse
+0,011
+m/s
+Erreur absolue moyenne (MAE) de vitesse
+0,007
+m/s
+Erreur maximale (au freinage, t = 11,9 s)
+0,063
+m/s
+Erreur relative moyenne de vitesse
+0,63
+%
+Coefficient de détermination R²
+0,99904
+—
+RMSE de cap
+0,43
+°
+RMSE de position horizontale
+0,39
+m
+Délai de passage à l’état de pleine confiance
+2,4
+s
+Tableau 3 : indicateurs de performance de l’observateur sur la séquence dynamique
+Mécanisme de robustesse
+Comportement observé sur la séquence
+Estimation du biais gyroscopique
+Convergence vers la valeur injectée (écart de 0,055 mrad/s)
+Rejet des mesures magnétiques (> 45°)
+23 mesures aberrantes rejetées, erreur de cap sous 1,2°
+Correction à vitesse nulle (ZUPT)
+6 activations, toutes en phase d’immobilité
+Corrections de position satellitaire
+196 corrections appliquées sur la séquence
+Surveillance du résidu normalisé
+Maximum de 2,12, sous le seuil d’alarme : aucune fausse alerte
+Tableau 4 : comportement des mécanismes de robustesse en conditions dynamiques
+Ces résultats traduisent une estimation de vitesse d’excellente qualité — une erreur quadratique moyenne de onze millimètres par seconde, soit moins de 1 % de la vitesse moyenne, et un coefficient de détermination pratiquement égal à l’unité — un cap estimé à moins d’un demi-degré et une position horizontale à moins de quarante centimètres, l’observateur atteignant son état de pleine confiance en moins de trois secondes.
+Vers la détection de défauts et de cyberattaques
+Le dernier résultat est le plus significatif au regard de la finalité du projet : en l’absence de toute attaque, le résidu normalisé reste borné à 2,12, nettement sous le seuil d’alarme statistique, sans aucune fausse alerte sur l’ensemble de la séquence. Ce résultat fixe leplancher de bruità partir duquel le seuil de détection d’une cyberattaque pourra être dimensionné : toute anomalie faisant franchir ce seuil au résidu pourra être attribuée à une mesure corrompue plutôt qu’au bruit naturel de l’estimation. La qualité de l’estimation nominale conditionne directement la sensibilité de détection, ce qui justifie l’effort porté sur la stabilisation du cap.
+
+Figure 9 : contexte applicatif — circulation en convoi (platooning) sur les véhicules d’essai du laboratoire
+Ce cadre s’inscrit dans le contexte du suivi coopératif de véhicules, où la fiabilité des données de navigation échangées entre véhicules est une condition de sûreté : la détection d’une donnée falsifiée à la source, au niveau du capteur embarqué, y prend une importance critique.
+Bilan des travaux
+L’opération a permis de franchir le verrou de l’embarquabilité, en couvrant l’ensemble du parcours : de l’étude de la carte dédiée et du contournement de ses défaillances jusqu’à la validation dynamique sur véhicule. L’observateur du projet fonctionne désormais en temps réel sur cible matérielle réelle, intégré à un véhicule et à son écosystème logiciel.
+Objectif de l’opération
+État
+Éléments de bilan
+Exigences et architecture matérielle / logicielle
+Atteint
+Architecture double cœur définie et mise en œuvre
+Firmware temps réel et pilotes de capteurs
+Atteint
+Pilotes inertiel, GNSS et magnétomètre développés et validés
+Observateur embarqué temps réel
+Atteint
+Exécution à 100 Hz ; vitesse, cap et position validés
+Chaîne complète de communication
+Atteint
+Capteur → estimation → WiFi/UDP → ROS 2 opérationnelle
+Plan de tests et validation expérimentale
+Atteint
+Bancs contrôlés, chaîne réelle et essais dynamiques extérieurs
+Détection de défauts et de cyberattaques
+Partiel
+Principe établi et plancher de bruit caractérisé ; validation sous attaque à mener
+Tableau 5 : bilan de l’opération au regard des objectifs
+Les performances mesurées — estimation de vitesse au centimètre par seconde, cap au demi-degré, robustesse validée aux perturbations magnétiques et au biais gyroscopique, absence de fausse alarme du résidu — démontrent la maturité de la chaîne d’estimation. La brique embarquée ainsi constituée forme le socle expérimental sur lequel les mécanismes de détection de cyberattaques et de confiance distribuée du projet VEHALSECU pourront être éprouvés en conditions réelles, puis portés sur la carte de production.
+Ressources humaines
+Cf. documents économiques
+Partenariat scientifique et recherche confiée
+Ce projet s’inscrit pour partie dans une collaboration avec le Centre de Recherche en Automatique de Nancy (CRAN) et bénéficie d’une thèse CIFRE de NGUYEN Quang Huy. Le laboratoire apporte son expertise dans les domaines de l’électronique et le développement d’observateurs et contrôleurs. Il met à disposition aussi sa plateforme de test pour la validation des modèles.
+
+
+
+
+
+
+
+
+Les annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externeLes annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externeAnnexes livrables (Dossier pré-économique)
+Les annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externe
+
+Les annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externe
+
+Tableau synthétique de l’Opération
+Classification de l'Opération R&D
+Domaines de Recherche /Mots-clés
+Présentation synthétique
+Indicateurs de recherche
+Observations
+Présence de Thèse
+Si collab avec le ministère de la Défense (DGA) ou de l’Intérieur, préciser la classification :
+SD : Secret Défense
+CD : Confidentiel Défense
+DR : Diffusion Restreinte
+NA : Non Applicable
+Identifier précisément les domaines scientifiques (principal et sousdomaines) : utiliser la nomenclature figurant en annexe et compléter avec des motsclés libres afin de guider le ministère dans le choix d’un expert scientifique
+Si Mots-Clés : Indiquer précisément « mots-clés : … » 
+Résumer l’opération de R&D (en 4 à 5 phrases maximum), en exposant les objectifs des travauxet leurs résultatset contributions scientifiques, techniques ou technologiques.
+Lister les indicateurs : publications scientifiques et communications en congrès international, collaborations académiques, universitaires avec des organismes publics (CNRS, INSERM, INRA, CEA…), thèse, contrat CIFRE, projet coopératif subventionné par la France ou l’Union Européenne  FUI, ANR…), dépôt de brevet, etc.
+
+Oui / Non
+NA
+Domaine : A1a, A2b, A3d
+
+Mots-clés : capteur embarqué intelligent ; observateur d'état temps réel (filtre de Kalman étendu) ; fusion inertiel / GNSS / magnétomètre ; détection de défauts et de cyberattaques par surveillance du résidu ; systèmes temps réel embarqués (RTOS, microcontrôleur double cœur) ; intégration ROS 2 ; véhicules autonomes et connectés.
+L'opération porte sur le passage à l'embarqué temps réel des observateurs d'état du projet VEHALSECU, jusqu'ici validés en simulation. Un capteur embarqué intelligent a été conçu, développé et validé : firmware temps réel multitâche sur microcontrôleur double cœur, pilotes des capteurs inertiel, magnétomètre et GNSS, et observateur de type filtre de Kalman étendu à six états exécuté à 100 Hz avec estimation en ligne du biais gyroscopique.
+
+Une chaîne de communication complète a été réalisée, du capteur au calculateur ROS 2 du véhicule d'expérimentation via une passerelle sans fil, la position étant publiée au format normalisé de positionnement par satellite.
+
+Le système a été validé en environnement contrôlé puis en conditions réelles sur véhicule : RMSE de vitesse de 0,011 m/s (R² = 0,99904), RMSE de cap de 0,43°, RMSE de position de 0,39 m, cap stabilisé sous 0,2° d'écart-type après calibration du magnétomètre.
+
+Le résidu normalisé de l'observateur a été caractérisé en fonctionnement sain (maximum de 2,12, aucune fausse alarme) : ce plancher de bruit conditionne le dimensionnement du seuil de détection des cyberattaques, dont la validation sous attaque constitue la suite immédiate.
+Ces travaux bénéficient de la thèse CIFRE VEHALSECU lancée le 01/06/2023 avec M. NGUYEN Quang Huy (ANRT 2022/1732), en collaboration avec le CRAN (UMR 7039 CNRS / Université de Lorraine).
+
+Publications : (Diouf et al., SAGIP 2023) ; (Nguyen et al., 2024) « Cyberattack Detection by Using a Discrete-Time Model-Based Unknown Input Observer » ; (Sadki et al., 2025).
+
+Encadrement d'un stage de fin d'études Master 2 (Université de Strasbourg, parcours SEME) co-encadré CRAN / SEGULA Technologies.
+
+Oui
+
+
+
+
+
+
+
+
+
+
+

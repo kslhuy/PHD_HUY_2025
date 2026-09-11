@@ -1,0 +1,32 @@
+% Texte des sections 6 à 8 et cellules de l’annexe repris du DOCX original.
+\section{Ressources humaines}
+
+Cf. documents économiques 
+
+\section{Partenariat scientifique et recherche confiée}
+
+Ce projet s’inscrit pour partie dans une collaboration avec le Centre de Recherche en Automatique de Nancy (CRAN) et bénéficie d’une thèse CIFRE de NGUYEN Quang Huy. Le laboratoire apporte son expertise dans les domaines de l’électronique et le développement d’observateurs et contrôleurs. Il met à disposition aussi sa plateforme de test pour la validation des modèles.
+
+
+\clearpage
+\begin{landscape}
+\section{Annexes livrables (Dossier pré-économique)}
+
+\subsection{Tableau synthétique de l’Opération }
+
+
+Les annexes suivantes à remplir lors de la transmission pour relecture de la FS et ne doivent pas être diffusées en externe.
+
+\begingroup\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{4.0cm}|>{\raggedright\arraybackslash}p{7.7cm}|>{\raggedright\arraybackslash}p{6.2cm}|>{\raggedright\arraybackslash}p{1.9cm}|>{\raggedright\arraybackslash}p{1.8cm}|}
+\hline
+\rowcolor{TableHead} \textbf{Classification de l'Opération R\&D} & \textbf{Domaines de Recherche /Mots-clés} & \textbf{Présentation synthétique} & \textbf{Indicateurs de recherche} & \textbf{Observations} & \textbf{Présence de Thèse} \\ \hline
+\endfirsthead
+\rowcolor{TableHead} \textbf{Classification de l'Opération R\&D} & \textbf{Domaines de Recherche /Mots-clés} & \textbf{Présentation synthétique} & \textbf{Indicateurs de recherche} & \textbf{Observations} & \textbf{Présence de Thèse} \\ \hline
+\endhead
+Si collab avec le ministère de la Défense (DGA) ou de l’Intérieur, préciser la classification :\par SD : Secret Défense\par CD : Confidentiel Défense\par DR : Diffusion Restreinte\par NA~: Non Applicable & Identifier précisément les domaines scientifiques (principal et sous-domaines)~: utiliser la nomenclature figurant en annexe et compléter avec des mots-clés libres afin de guider le ministère dans le choix d’un expert scientifique\par Si Mots-Clés~: Indiquer précisément «~mots-clés~: …~»  & Résumer l’opération de R\&D (en 4 à 5 phrases maximum), en exposant les objectifs des travaux et leurs résultats et contributions scientifiques, techniques ou technologiques. & Lister les indicateurs : publications scientifiques et communications en congrès international, collaborations académiques, universitaires avec des organismes publics (CNRS, INSERM, INRA, CEA…), thèse, contrat CIFRE, projet coopératif subventionné par la France ou l’Union Européenne  FUI, ANR…), dépôt de brevet, etc. &  & Oui / Non \\ \hline
+NA & Domaine : A1a, A2b, A3d\par \par Mots-clés : capteur embarqué intelligent ; observateur d'état temps réel (filtre de Kalman étendu) ; fusion inertiel / GNSS / magnétomètre ; détection de défauts et de cyberattaques par surveillance du résidu ; systèmes temps réel embarqués (RTOS, microcontrôleur double cœur) ; intégration ROS 2 ; véhicules autonomes et connectés. & L'opération porte sur le passage à l'embarqué temps réel des observateurs d'état du projet VEHALSECU, jusqu'ici validés en simulation. Un capteur embarqué intelligent a été conçu, développé et validé : firmware temps réel multitâche sur microcontrôleur double cœur, pilotes des capteurs inertiel, magnétomètre et GNSS, et observateur de type filtre de Kalman étendu à six états exécuté à 100 Hz avec estimation en ligne du biais gyroscopique.\par \par Une chaîne de communication complète a été réalisée, du capteur au calculateur ROS 2 du véhicule d'expérimentation via une passerelle sans fil, la position étant publiée au format normalisé de positionnement par satellite.\par \par Le système a été validé en environnement contrôlé puis en conditions réelles sur véhicule : RMSE de vitesse de 0,011 m/s (R\textsuperscript{2} = 0,99904), RMSE de cap de 0,43°, RMSE de position de 0,39 m, cap stabilisé sous 0,2° d'écart-type après calibration du magnétomètre.\par \par Le résidu normalisé de l'observateur a été caractérisé en fonctionnement sain (maximum de 2,12, aucune fausse alarme) : ce plancher de bruit conditionne le dimensionnement du seuil de détection des cyberattaques, dont la validation sous attaque constitue la suite immédiate. & Ces travaux bénéficient de la thèse CIFRE VEHALSECU lancée le 01/06/2023 avec M. NGUYEN Quang Huy (ANRT 2022/1732), en collaboration avec le CRAN (UMR 7039 CNRS / Université de Lorraine).\par \par Publications : (Diouf et al., SAGIP 2023) ; (Nguyen et al., 2024) « Cyberattack Detection by Using a Discrete-Time Model-Based Unknown Input Observer » ; (Sadki et al., 2025).\par \par Encadrement d'un stage de fin d'études Master 2 (Université de Strasbourg, parcours SEME) co-encadré CRAN / SEGULA Technologies. &  & Oui \\ \hline
+\end{longtable}
+\endgroup
+\end{landscape}

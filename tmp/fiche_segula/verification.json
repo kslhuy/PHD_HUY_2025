@@ -1,0 +1,13 @@
+{
+  "pages": 23,
+  "source_unchanged": true,
+  "final_sha256": "25c3d945526855bae3575081e6d1bfec25c3381592bf7442090d54115019c403",
+  "images": 15,
+  "tables": 11,
+  "changed_pages_last_pass": [
+    22,
+    23
+  ],
+  "render": "Microsoft Word PDF export with local printer; source DOCX structural reconstruction required",
+  "qa": "All 23 pages visually inspected; final text corrections on pages 22 and 23"
+}

@@ -1,0 +1,556 @@
+
+=== PAGE PDF 1 ===
+30
+Quantitative Trust 
+Cybersecurity 
+Quantitative Trust 
+Authentication
+Comms
+Control , Estimation
+Information
+ Problem: Wrong data → unsafe behavior
+ Solution: Evaluate trust before using data.
+
+=== PAGE PDF 2 ===
+31
+Consensus  
+In control : Platooning on a road network agreement on velocity and heading 
+In estimation : Reach the same value on all the estimation state
+
+
+=== PAGE PDF 3 ===
+•Local State
+State of an individual vehicle (e.g., position, velocity, heading).
+•Global / Fleet / Distributed State
+Combined state of all vehicles in the platoon.
+•Absolute Position
+Position expressed in a world-fixed frame (GPS / map coordinates).
+•Relative Position
+Distance or offset between vehicles (vehicle-to-vehicle frame).
+32
+State Definitions in Vehicle Platooning
+
+=== PAGE PDF 4 ===
+33
+We consider a vehicle with Ackermann steering geometry, whose kinematics 
+can be approximated by the bicycle model as follows:
+Dynamic Model of Single Vehicle
+
+
+=== PAGE PDF 5 ===
+34
+each of the vehicles in the platoon has the following state
+ -
+space equation:
+Each vehicle has a full measurement state obtained in real time, including 
+the  position, and velocity, orientation angle from a GPS, IMU sensor 
+mounted on the vehicle. 
+We consider a platoon comprised of 
+ N 
+vehicles , 
+Dynamic Model of Single Vehicle
+
+=== PAGE PDF 6 ===
+: are nonnegative consensus weights related to the communication network
+35
+: is residual self
+ -
+weight
+Local Observer
+Distributed Observer
+or
+Where : 
+
+=== PAGE PDF 7 ===
+Virtual
+Local
+Global
+LocalLocal
+GlobalGlobal
+Communications*
+Consensus System
+Physical Layer
+Platoon
+Virtual  Layer
+ACC controller
+CACC controller
+36
+
+=== PAGE PDF 8 ===
+37
+How we build the Trust ?
+❑Its speed doesn’t conflict with what others report
+❑Its distance makes physical sense
+❑Its acceleration follows real-world behavior
+❑Its distributed estimate matches the host’s estimate
+❑Its messages are fresh and authenticated
+
+=== PAGE PDF 9 ===
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust for 
+all vehicles
+Global 
+estimate data
+Local 
+estimate data
+Vehicle j
+Target vehicle
+Communication
+Trust 
+aggeration
+1 2
+3
+4
+38
+0
+
+=== PAGE PDF 10 ===
+39
+0. Data Validity Indicator
+Only packets with 𝛿𝑖,𝑙 𝑡 = 1 are used in the trust evaluation
+• Prevents spoofing (fake vehicle pretending to be another one).
+• Prevents replay attacks (old packets being resent by an attacker).
+
+=== PAGE PDF 11 ===
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust for 
+all vehicles
+Global 
+estimate data
+Local 
+estimate data Vehicle j
+Target vehicle
+Communication
+Trust 
+aggeration
+1 2
+3
+4
+40
+0
+
+=== PAGE PDF 12 ===
+41
+1. Local Trust (LT)
+Checks physical consistency:
+• Velocity mismatch
+• Distance mismatch
+• Acceleration mismatch
+• Heading mismatch
+
+
+=== PAGE PDF 13 ===
+42
+1. Local Trust (LT)
+Example :
+Distance mismatch
+Velocity mismatch
+
+
+=== PAGE PDF 14 ===
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust 
+for all vehicles
+Global 
+estimate data
+Local 
+estimate data Vehicle j
+Target vehicle
+Communication
+Trust 
+aggeration
+1 2
+3
+4
+43
+0
+
+=== PAGE PDF 15 ===
+44
+2. Global/Distributed Trust (DT)
+Three score is use that coming from : 
+    host estimate, local measurement, self-consistency.
+Evaluates whether the neighbor’s distributed estimate is 
+globally believable
+
+=== PAGE PDF 16 ===
+The host 
+ compare  
+ received 
+data directly to its own fleet 
+estimate
+Consistency with Host's Global Estimate
+45
+2. Global/Distributed Trust 
+(DT)
+
+
+=== PAGE PDF 17 ===
+Ensure that fleet estimates 
+ received from neighbors vehicles 
+ align 
+with trusted local relative measurement.
+Consistency with Local Sensor Measurements
+46
+2. Global/Distributed Trust 
+(DT)
+: Relative distance , velocity 
+
+
+=== PAGE PDF 18 ===
+Self
+ -
+Consistency with Local Sensor Measurements
+47
+2. Global/Distributed Trust 
+(DT)
+Ensure that host fleet estimates align with trusted local sensor data.
+
+
+=== PAGE PDF 19 ===
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust 
+for all vehicles
+Global 
+estimate data
+Local 
+estimate data Vehicle j
+Target vehicle
+Communication
+Trust 
+aggregation
+1 2
+3
+4
+48
+
+=== PAGE PDF 20 ===
+49
+3. Vehicle Trust (VT)
+Trust at time t :
+Target trust is the instantaneous score at time t
+
+=== PAGE PDF 21 ===
+50
+3. Vehicle Trust (VT)
+Trust smoothing over time
+• We classify trust into 5 levels:
+ Unreliable – Poor – Acceptable – Good – Excellent
+• Recent data affects trust more strongly.
+• Old data slowly fades away.
+• This prevents trust from changing too fast due to noise or brief packet losses.
+Step smoothed trust:
+2. Trust distribution :
+1. Trust history : 
+3. Expected smooth trust
+Trust at time t :
+
+=== PAGE PDF 22 ===
+3. Vehicle Trust (VT)
+51
+
+=== PAGE PDF 23 ===
+Local trust Global trust
+Combine to 
+A single trust
+An array of trust 
+for all vehicles
+Trust 
+aggregation
+Global 
+estimate data
+Local 
+estimate data
+Vehicle i
+Target vehicle j
+Local trust Global trust
+A single general 
+trust
+An array of trust 
+for all vehicles
+Global 
+estimate data
+Local 
+estimate data Vehicle j
+Target vehicle
+Communication
+Trust 
+aggregation
+1 2
+3
+4
+52
+
+=== PAGE PDF 24 ===
+53
+4. Generalized Trust Vector
+• Fallback rule when data missing
+Purpose: Each vehicle 𝒊 obtains a trust opinion about ALL vehicles.
+• Self-trust
+• Direct-neighbor trust
+• One-hop trust propagation
+
+=== PAGE PDF 25 ===
+The weight matrix that priority the local estimation term is defined as 
+54
+Using Trust for Weight Design in the Observer
+ 
+Ensures resilient estimation  
+  
+Isolates malicious vehicles
+
+=== PAGE PDF 26 ===
+Case Type Target Parameters
+1 Bias Position bias = -5 m
+2 Faulty Position int. = 10, p = 0.3
+3 Bias Velocity bias = -2 m/s
+4 Faulty Velocity int. = 2.5, p = 0.3
+5 Faulty Acceleration int. = 1.0, p = 0.3
+6 Drop All p_drop = 0.5
+Attack Cases Table
+4 vehicle in platoon , communication  V2V
+Vehicle 1 is attacker send false data to the platoon
+Attack interval start at 10 end at 15s
+55
+Numerical Simulation
+
+=== PAGE PDF 27 ===
+56
+
+
+=== PAGE PDF 28 ===
+
+
+=== PAGE PDF 29 ===
+58
+Roll back
+The Case When Rollback Is Useful:
+• Attacker V0 sends bad data ( send Fake position ).
+• Honest neighbor V2 uses that bad data in its own estimator ( trust detected late , V1 also).
+• Later host vehicle V1 receives V2 fleet estimate of V0 .
+• From V1 perspective, V2 is honest, but V2  estimate is already contaminated upstream.
+• Even later V1 see V2 is malicious , V1 already contaminated , so the pure prediction will go wrong
+
+=== PAGE PDF 30 ===
+59
+Roll back
+The Case When Rollback Is Useful:
+• Attacker V0 sends bad data ( send Fake position ).
+• Honest neighbor V2 uses that bad data in its own estimator ( trust detected late).
+• Later host vehicle V1 receives V2 fleet estimate of V0 .
+• From V1 perspective, V2 is honest, but V2  estimate is already contaminated upstream.
+Rollback is used when an attack is detected late. 
+We can have a good base initial state for prediction
+
+=== PAGE PDF 31 ===
+60
+Roll back
+ Repair step after the trust detector has already found bad contributors
+At every time step 𝑘
+, before the observer update is finalized, we save the information needed to 
+replay the update later.
+
+
+=== PAGE PDF 32 ===
+61
+Roll back
+ Repair step after the trust detector has already found bad contributors
+Final replacement:
+At every time step 𝑘
+, before the observer update is finalized, we save the information needed to 
+replay the update later.
+
+
+=== PAGE PDF 33 ===
+62
+
+
+=== PAGE PDF 34 ===
+63
+Robust KalmanNet State Estimation
+Neural 
+Network
+Model based 
+physics 
+Mixer
+Stability 
+Adaptability 
+Sensors
+
+=== PAGE PDF 35 ===
+64
+When 
+ attack in the sensor layer 
+ , its will be affected the 
+performance of the state estimator . 
+Break down all the chain of estimation before
+Problem Setup: Signals and Measurement
+Measurement vector
+RKNet keep the performance while rejecting corrupted GPS and velocity measurements.
+
+=== PAGE PDF 36 ===
+65
+Controller Kinematic 
+predictor prior state
+Learned Kalman 
+updateMeasurement corrected state
+• Prediction is physics-based.
+• Update learns measurement reliability mask and Kalman gain.
+• Main robustness target: GPS position and velocity corruption.
+RKNet Concept Design
+
+=== PAGE PDF 37 ===
+66
+Learned Kalman 
+update
+• Prediction is physics-based.
+• Update learns measurement reliability mask and Kalman gain.
+• Main robustness target: GPS position and velocity corruption.
+RKNet Concept Design
+Learn Kalman Gain , that will 
+reduce the contribution of attack 
+Learn Mask that show the 
+measurement is trust or not 
+
+=== PAGE PDF 38 ===
+67
+Prediction Math: Bicycle Model
+
+
+=== PAGE PDF 39 ===
+68
+1. Innovation
+ 3. Measurement difference
+4. Measurement availability
+2. Prediction difference
+Learn Robust Update Math
+
+
+=== PAGE PDF 40 ===
+69
+1. Innovation
+ 3. Measurement difference
+4. Measurement availability
+2. Prediction difference
+Learned Robust Update Math
+Updater features
+ Measurement mask
+
+=== PAGE PDF 41 ===
+70
+1. Innovation
+ 3. Measurement difference
+4. Measurement availability
+2. Prediction difference
+Learned Robust Update Math
+Updater features
+ Measurement mask
+Learned Kalman gain
+
+
+=== PAGE PDF 42 ===
+71
+1. Innovation
+ 3. Measurement difference
+4. Measurement availability
+2. Prediction difference
+Learned Robust Update Math
+Updater features Measurement mask
+Learned Kalman gain
+Final update
+where
+
+
+=== PAGE PDF 43 ===
+72
+GPS position attacks Velocity attacks
+Attack labels supervise the mask:
+Attack Setup: Focus on GPS and Velocity
+
+
+=== PAGE PDF 44 ===
+73
+•
+ Phase A : Train updater only. Train updater with good previous state input
+•
+ Phase B : End
+ -
+to
+-
+end fine tuning. Model uses its own previous output train the full 
+recurrent estimation loop
+•
+ Validation split: 20% tail.
+Training schedule
+Loss
+
+
+=== PAGE PDF 45 ===
+74
+Testing, Diagnostics, and Result
+
+=== PAGE PDF 46 ===
+75
+Mask and Gain RKNet go down  
+So less depend on the measurement , 
+more robust

@@ -56,13 +56,12 @@
   \end{beamercolorbox}%
 }
 
-% The reference deck is supplied without page numbering. The blue footer and
-% white logo reproduce its recurring visual anchor without adding slide chrome.
+% Keep the recurring blue footer and white logo, with compact slide numbering.
 \setbeamertemplate{footline}{%
   \leavevmode%
   \begin{beamercolorbox}[wd=\paperwidth,ht=0.29cm,dp=0.11cm,leftskip=0.46cm,rightskip=0.46cm]{footer}%
     \includegraphics[height=0.20cm]{segula_white.png}\hfill%
-    {\fontsize{6.3}{7.4}\selectfont TRUST-AWARE CONNECTED VEHICLE PROJECT}%
+    {\fontsize{6.3}{7.4}\selectfont \insertframenumber\,/\,\inserttotalframenumber}%
   \end{beamercolorbox}%
 }
 \setbeameroption{hide notes}
@@ -306,30 +305,38 @@
 \end{frame}
 
 % -----------------------------------------------------------------------------
-\begin{frame}{Validation progressed from simulation to embedded hardware}
+\begin{frame}{One loop, three validation environments}
+  \eyebrow{Virtual, physical and embedded validation}
   \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.51\textwidth}
-      \includegraphics[width=\linewidth,height=0.47\textheight,keepaspectratio]{2car_board_prototype.jpeg}\par
-      \vspace{0.05cm}
-      {\color{Muted}\fontsize{7.4}{8.9}\selectfont Multi-platform physical test setup}
+    \begin{column}{0.31\textwidth}
+      \includegraphics[width=\linewidth,height=0.19\textheight,keepaspectratio]{qlabs_map.png}\par
+      \vspace{0.07cm}
+      \stepnumber{01}\hspace{0.10cm}{\fontsize{10.7}{12.7}\selectfont\bfseries Virtual campaign}\par
+      {\color{Muted}\fontsize{7.5}{9}\selectfont Numerical and QLabs runs repeat the same states and attacks with controlled ground truth.}
     \end{column}
-    \begin{column}{0.44\textwidth}
-      \eyebrow{Three validation levels}
-      \stepnumber{01}\hspace{0.16cm}{\fontsize{11.3}{13.4}\selectfont\bfseries Numerical campaign}\par
-      {\color{Muted}\fontsize{8.3}{10}\selectfont Five vehicles, controlled ground truth and repeated channel attacks.}\par
-      \vspace{0.17cm}
-      \stepnumber{02}\hspace{0.16cm}{\fontsize{11.3}{13.4}\selectfont\bfseries Digital and physical loop}\par
-      {\color{Muted}\fontsize{8.3}{10}\selectfont QLabs plus QCar/LIMO packet exchange, timing and closed-loop trajectories.}\par
-      \vspace{0.17cm}
-      \stepnumber{03}\hspace{0.16cm}{\fontsize{11.3}{13.4}\selectfont\bfseries Embedded transfer}\par
-      {\color{Muted}\fontsize{8.3}{10}\selectfont Four-layer PCB, RTOS scheduling, sensing, radio communication and logging.}\par
+    \begin{column}{0.31\textwidth}
+      \includegraphics[width=\linewidth,height=0.19\textheight,keepaspectratio]{scale_model_track.jpg}\par
+      \vspace{0.07cm}
+      \stepnumber{02}\hspace{0.10cm}{\fontsize{10.7}{12.7}\selectfont\bfseries Physical loop}\par
+      {\color{Muted}\fontsize{7.5}{9}\selectfont QCar/LIMO trials add real packet timing, sensor noise, scheduling and actuator response.}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \includegraphics[width=\linewidth,height=0.19\textheight,keepaspectratio]{1car_board_smaller_img.jpeg}\par
+      \vspace{0.07cm}
+      \stepnumber{03}\hspace{0.10cm}{\fontsize{10.7}{12.7}\selectfont\bfseries Embedded transfer}\par
+      {\color{Muted}\fontsize{7.5}{9}\selectfont The research PCB reproduces the loop with RTOS timing, sensing, communication and logging.}
     \end{column}
   \end{columns}
+  \vspace{0.14cm}
+  {\color{BrandBlue}\rule{0.08cm}{0.55cm}}\hspace{0.12cm}%
+  \begin{minipage}[b]{0.90\linewidth}
+    {\fontsize{8.2}{9.8}\selectfont\bfseries The algorithm and attack scenarios stay comparable while platform realism increases.}
+  \end{minipage}
   \sourcefoot{Thesis Chapter 6 methodology and final manuscript validation layers}
   \note{[Sources]\par
-    \texttt{\detokenize{ch6/ch6_main.tex}}, Experimental methodology: from virtual validation to real trials.\par
-    \texttt{\detokenize{ch5/TRust_final/manuscript_v7_submit.tex}}, aggregate attack-window performance.\par
-    Image: user-provided project asset \texttt{\detokenize{assets/2car_board_prototype.jpeg}}.}
+    \texttt{\detokenize{ch6/ch6_main.tex}}, Experimental methodology: from virtual validation to real trials and the QLabs experimental workflow.\par
+    \texttt{\detokenize{ch5/TRust_final/manuscript_v7_submit.tex}}, aggregate attack-window performance and QCar/LIMO platform validation.\par
+    Images: user-provided project assets \texttt{\detokenize{assets/qlabs_map.png}}, \texttt{\detokenize{assets/scale_model_track.jpg}} and \texttt{\detokenize{assets/1car_board_smaller_img.jpeg}}.}
 \end{frame}
 
 % -----------------------------------------------------------------------------
@@ -417,31 +424,6 @@
 \end{frame}
 
 % -----------------------------------------------------------------------------
-\begin{frame}{The same operating loop is reproduced virtually and physically}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.62\textwidth}
-      \includegraphics[width=\linewidth,height=0.44\textheight,keepaspectratio]{scale_model_track.jpg}\par
-      \vspace{0.05cm}
-      {\color{BrandBlue}\fontsize{8.4}{10.1}\selectfont\bfseries Physical QCar/LIMO track}\par
-      {\color{Muted}\fontsize{7.6}{9.1}\selectfont Real packet timing, sensor noise, scheduling and actuator response.}
-    \end{column}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[width=0.92\linewidth]{1car_board_smaller_img.jpeg}\par
-      \vspace{0.05cm}
-      {\color{BrandBlue}\fontsize{8.4}{10.1}\selectfont\bfseries Research PCB on the vehicle}\par
-      {\color{Muted}\fontsize{7.6}{9.1}\selectfont
-        \textbf{Physical loop:} embedded timing, sensing and communication.\par
-        \textbf{Virtual twin:} the same states and attacks are repeated in QLabs.}
-    \end{column}
-  \end{columns}
-  \sourcefoot{Thesis Chapter 6 and final manuscript QCar/LIMO implementation}
-  \note{[Sources]\par
-    Images: user-provided project assets \texttt{\detokenize{assets/scale_model_track.jpg}}, \texttt{\detokenize{assets/1car_board_smaller.jpeg}} and \texttt{\detokenize{assets/qlabs_map.png}}.\par
-    \texttt{\detokenize{ch6/ch6_main.tex}}, QLabs environment and experimental workflow.\par
-    \texttt{\detokenize{ch5/TRust_final/manuscript_v7_submit.tex}}, QCar/LIMO platform validation.}
-\end{frame}
-
-% -----------------------------------------------------------------------------
 \begin{frame}{Prototype evolution: breadboard to four-layer PCB}
   \eyebrow{Embedded transfer}
   \begin{columns}[T,onlytextwidth]
@@ -473,68 +455,52 @@
 \end{frame}
 
 % -----------------------------------------------------------------------------
-\begin{frame}{The current PCB is an embedded trust demonstrator}
+\begin{frame}{Research PCB vs commercial OBU}
+  \eyebrow{Direct comparison}
   \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.57\textwidth}
-      \includegraphics[width=\linewidth,height=0.46\textheight,keepaspectratio]{pcb_photo.jpg}
+    \begin{column}{0.46\textwidth}
+      \centering
+      \includegraphics[width=0.78\linewidth,height=0.18\textheight,keepaspectratio]{pcb_photo.jpg}\par
+      \vspace{0.05cm}
+      {\color{BrandBlue}\fontsize{11.2}{13.2}\selectfont\bfseries Embedded trust demonstrator}\par
+      \vspace{0.08cm}
+      {\raggedright\fontsize{7.6}{9.1}\selectfont
+        \textbf{Core role:} state estimation, source trust, rollback and exported health flags.\par
+        \vspace{0.07cm}
+        \textbf{Interfaces:} IMU, GNSS/1PPS, research Wi-Fi, UART/USB, storage and synchronized logging.\par
+        \vspace{0.07cm}
+        \textbf{Readiness:} proves the embedded trust functions on a research vehicle platform.}
     \end{column}
-    \begin{column}{0.38\textwidth}
-      \eyebrow{What it already supports}
-      {\color{BrandBlue}\fontsize{10.5}{12.5}\selectfont\bfseries Sensing and timing}\par
-      {\fontsize{8}{9.6}\selectfont IMU, GNSS, 1PPS timing and selected vehicle kinematics.}\par
-      \vspace{0.12cm}
-      {\color{BrandBlue}\fontsize{10.5}{12.5}\selectfont\bfseries Interfaces}\par
-      {\fontsize{8}{9.6}\selectfont Research Wi-Fi, UART/USB, storage and synchronized logging.}\par
-      \vspace{0.12cm}
-      {\color{BrandBlue}\fontsize{10.5}{12.5}\selectfont\bfseries Runtime role}\par
-      {\fontsize{8}{9.6}\selectfont State estimation, source trust, rollback and exported health flags.}
+    \begin{column}{0.49\textwidth}
+      \centering
+      \begin{minipage}[t]{0.47\linewidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.18\textheight,keepaspectratio]{cohda_mk6_obu.jpg}
+      \end{minipage}\hfill
+      \begin{minipage}[t]{0.47\linewidth}
+        \centering
+        \includegraphics[width=\linewidth,height=0.18\textheight,keepaspectratio]{commsignia_obu.jpg}
+      \end{minipage}\par
+      \vspace{0.05cm}
+      {\color{BrandBlue}\fontsize{11.2}{13.2}\selectfont\bfseries Commercial OBU envelope}\par
+      \vspace{0.08cm}
+      {\raggedright\fontsize{7.6}{9.1}\selectfont
+        \textbf{Core role:} deployment-ready V2X communication, positioning and vehicle integration.\par
+        \vspace{0.07cm}
+        \textbf{Interfaces:} DSRC/C-V2X, cellular/WLAN options, GNSS, CAN/GPIO and onboard sensor inputs.\par
+        \vspace{0.07cm}
+        \textbf{Readiness:} hardware-backed security, automotive design, certifications and lifecycle support.}
     \end{column}
   \end{columns}
-  \vspace{0.08cm}
-  {\color{Warn}\fontsize{8}{9.6}\selectfont\bfseries Product gaps:}\hspace{0.05cm}%
-  {\fontsize{7.8}{9.3}\selectfont protected power, CAN/CAN-FD, production V2X radio, secure key storage, enclosure and qualification.}
-  \sourcefoot{Thesis Chapter 6, board requirements, interfaces and qualification roadmap}
-  \note{[Sources]\par
-    Image: user-provided project asset \texttt{\detokenize{assets/pcb_photo.jpg}}.\par
-    \texttt{\detokenize{ch6/ch6_main.tex}}, board motivation, functional requirements, component selection, firmware structure and integration roadmap.}
-\end{frame}
-
-% -----------------------------------------------------------------------------
-\begin{frame}{Commercial OBUs define the target product envelope}
-  \eyebrow{Existing V2V onboard units}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.47\textwidth}
-      \centering
-      \includegraphics[width=0.76\linewidth,height=0.18\textheight,keepaspectratio]{cohda_mk6_obu.jpg}\par
-      \vspace{0.05cm}
-      {\color{BrandBlue}\fontsize{11.5}{13.5}\selectfont\bfseries Cohda Wireless MK6 OBU}\par
-      \vspace{0.10cm}
-      {\raggedright\fontsize{7.6}{9.1}\selectfont
-      \begin{itemize}
-        \item DSRC and C-V2X, plus 5G cellular, Wi-Fi and Bluetooth
-        \item OmniAir, FCC, CE, E1 R10/R118 and other listed certifications
-      \end{itemize}}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \centering
-      \includegraphics[width=0.88\linewidth,height=0.18\textheight,keepaspectratio]{commsignia_obu.jpg}\par
-      \vspace{0.05cm}
-      {\color{BrandBlue}\fontsize{11.5}{13.5}\selectfont\bfseries Commsignia OB4}\par
-      \vspace{0.10cm}
-      {\raggedright\fontsize{7.6}{9.1}\selectfont
-      \begin{itemize}
-        \item Dual-mode DSRC/C-V2X, GNSS, WLAN/LTE, CAN and GPIO
-        \item Onboard sensor inputs, integrated HSM, secure boot and automotive-grade design
-      \end{itemize}}
-    \end{column}
-  \end{columns}
-  \vspace{0.03cm}
+  \vspace{0.06cm}
   {\color{BrandMagenta}\rule{0.08cm}{0.55cm}}\hspace{0.12cm}%
   \begin{minipage}[b]{0.90\linewidth}
-    {\fontsize{7.9}{9.5}\selectfont\bfseries Product lesson:} {\fontsize{7.9}{9.5}\selectfont multi-radio V2X, vehicle I/O, positioning, hardware-backed security, protected power, enclosure and lifecycle tools surround the research trust layer.}
+    {\fontsize{7.6}{9.1}\selectfont\bfseries Next step:} {\fontsize{7.6}{9.1}\selectfont keep the trust layer; add vehicle I/O, production V2X, secure hardware and qualification.}
   \end{minipage}
-  \sourcefoot{Official Cohda Wireless MK6 and Commsignia OBU product pages}
+  \sourcefoot{Thesis Chapter 6; official Cohda Wireless MK6 and Commsignia OBU product pages}
   \note{[Sources]\par
+    Image: user-provided project asset \texttt{\detokenize{assets/pcb_photo.jpg}}.\par
+    \texttt{\detokenize{ch6/ch6_main.tex}}, board motivation, functional requirements, component selection, firmware structure and integration roadmap.\par
     Cohda Wireless MK6 product page and image: https://cohdawireless.com/solutions/mk6/ and https://cohdawireless.com/wp-content/uploads/2025/02/MK6-OBU-Hero-front-1-scaled.jpg\par
     Commsignia OBU product page and product image: https://commsignia.com/products/obu\par
     Product-envelope statement is an inference from the capabilities listed by both vendors; it is not a direct performance comparison.}
